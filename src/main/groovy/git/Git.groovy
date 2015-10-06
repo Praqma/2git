@@ -1,6 +1,6 @@
 package git
 
-import migration.Stream
+import migration.GitOptions
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import net.praqma.util.execute.CommandLine
@@ -21,7 +21,7 @@ class Git {
         log.debug("Entering call().")
         String cmd = "git " + args.join(" ");
         log.info("Running '{}' in {}", cmd, path)
-        CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line }
+        CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line}
         log.debug("Exiting call().")
     }
 
@@ -29,20 +29,18 @@ class Git {
      * Configures git in the set path using the passed in cc-to-git Stream
      * @param stream The Stream to use for configuration
      */
-    static void configureRepository() {
+    static void configureRepository(GitOptions gitOptions) {
         log.debug("Entering configureRepository().")
-        def user = "cc-to-git";
-        call("config", "user.name", user)
-        log.info("Set git user.name to {}.", user)
-        def mail = "support@praqma.net"
-        call("config", "user.email", mail)
-        log.info("Set git user.email to {}.", mail)
-        /*def gitIgnore = new File(path, '.gitignore');
+        call("config", "user.name", gitOptions.user)
+        log.info("Set git user.name to {}.", gitOptions.user)
+        call("config", "user.email", gitOptions.email)
+        log.info("Set git user.email to {}.", gitOptions.email)
+        def gitIgnore = new File(path, '.gitignore');
         if (gitIgnore.exists()) FileUtils.forceDelete(gitIgnore)
-        stream.gitIgnore.each { rule ->
+        gitOptions.ignore.each { rule ->
             FileUtils.writeStringToFile(gitIgnore, rule + '\n', true)
             log.info("Added {} to .gitignore.", rule)
-        }*/
+        }
         log.debug("Exiting configureRepository().")
     }
 }

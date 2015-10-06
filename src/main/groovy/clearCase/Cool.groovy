@@ -81,9 +81,9 @@ class Cool {
      */
     static BaselineList getBaselines(CoolComponent coolComponent, CoolStream coolStream, BaselineFilter baselineFilter) {
         log.debug("Entering getBaselines().")
-        log.info("Getting baselines for {} in {}", coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
+        log.info("Retrieving Cool baselines for {} in {}", coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
         def baselines = new BaselineList(coolStream, coolComponent, null).addFilter(baselineFilter).apply()
-        log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+        log.info("Retrieved {} Cool baselines for {} in {}", baselines.size(), coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
         log.debug("Exiting getBaselines().")
         return baselines
     }
@@ -95,9 +95,11 @@ class Cool {
      * @return The Cool Component.
      */
     static CoolComponent getComponent(String componentName, CoolPVob coolPVob) {
-        println "getting component"
+        log.debug("Entering getComponent().")
+        log.info("Retrieving Cool component")
         def coolComponent = CoolComponent.get(componentName, coolPVob)
-        println "got component " + coolComponent.fqname
+        log.info("Retrieved Cool component {}", coolComponent.fqname)
+        log.debug("Exiting getComponent().")
         return coolComponent
     }
 
@@ -107,9 +109,11 @@ class Cool {
      * @return The Cool PVob.
      */
     static CoolPVob getPVob(String pvobName) {
-        println "getting vob"
+        log.debug("Entering getPVob().")
+        log.info("Retrieving Cool vob")
         def coolPVob = CoolPVob.get(pvobName)
-        println "got vob " + coolPVob.fullyQualifiedName
+        log.info("Retrieved Cool vob {}", coolPVob.fullyQualifiedName)
+        log.debug("Exiting getPVob().")
         return coolPVob
     }
 
@@ -120,9 +124,11 @@ class Cool {
      * @return The Cool Stream.
      */
     static CoolStream getStream(String streamName, CoolPVob vob) {
-        println "getting stream " + streamName
+        log.debug("Entering getStream().")
+        log.info("Retrieving Cool stream {}", streamName)
         def coolStream = CoolStream.get(streamName, vob)
-        println "got stream " + coolStream.fqname
+        log.info("Retrieved Cool stream {}", coolStream.fqname)
+        log.debug("Exiting getStream().")
         return coolStream
     }
 

@@ -1,11 +1,22 @@
 migrate('E:\\cc-to-git') {
     vob('\\2Cool_PVOB') {
         component('Model') {
-            stream('server_dev') {
+            migrationOptions {
+                git {
+                    /* TODO?
+                    path    'E:\\cc-to-git'
+                    call "some custom git command?"
+                    */
+                    ignore '.jnk'
+                    user 'praqma'
+                    email 'support@praqma.net'
+                }
+            }
+            stream('server_dev2') {
                 migrationSteps {
                     filter {
                         criteria {
-                            baselineName 'version_.*'
+                            baselineName 'v\\d{3}.*'
                         }
                         extractions {
                             baselineExtractor([name: 'shortname'])

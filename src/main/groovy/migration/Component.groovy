@@ -13,6 +13,7 @@ import utils.StringExtensions
 class Component {
     String name     // The name of the Component
     List<Stream> streams = []   // The Streams for which this Component should be migrated
+    MigrationOptions migrationOptions   // Contains some options used in the migration
 
     /**
      * Constructor for Component
@@ -42,5 +43,16 @@ class Component {
         streams.add(stream)
         log.info('Added Stream {} to Component {}.', stream.name, this.name)
         log.debug('Exiting stream().')
+    }
+    
+    def void migrationOptions(@DelegatesTo(MigrationOptions) Closure closure){
+        log.debug('Entering migrationOptions().')
+        def migrationOptions = new MigrationOptions()
+        def migrationOptionsClosure = closure.rehydrate(migrationOptions, this, this)
+        migrationOptionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        migrationOptionsClosure()
+        this.migrationOptions = migrationOptions
+        log.info('Configured migration options for Component {}.', this.name)
+        log.debug('Exiting migrationOptions().')
     }
 }

@@ -36,33 +36,38 @@ class Migrator {
         try {
             //-----VOB-----\\
             log.info("Migrating from {} Vob(s).", migrationContext.vobs.size())
-            migrationContext.vobs.each { vob ->
+            for(Vob vob : migrationContext.vobs) {
                 CoolVob sourcePVob = Cool.getPVob(vob.name)
                 log.info("Migrating from Vob {}.", vob.name)
 
                 //-----COMPONENT-----\\
                 log.info("Migrating {} Component(s).", vob.components.size())
-                vob.components.each { component ->
+                for(Component component : vob.components) {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
 
                     Git.path = path + "/" + component.name
                     FileUtils.forceMkdir(new File(Git.path))
                     Git.call('init')
-                    Git.configureRepository()
+                    Git.configureRepository(component.migrationOptions.gitOptions)
 
                     //-----STREAM-----\\
                     log.info("Migrating {} Stream(s)", component.streams.size())
-                    component.streams.each { stream ->
+                    for(Stream stream : component.streams) {
                         CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
                         log.info("Migrating Stream {}.", stream.name)
 
                         BaselineList baselines = null
                         LinkedHashMap<String, Baseline> baselineMap = [:]
-                        stream.filters.each { filter ->
+                        for(Filter filter : stream.filters) {
                             //-----CRITERIA-----\\
                             BaselineFilter baselineFilter = new AggregatedBaselineFilter(filter.criteria)
                             baselines = baselines ? baselines.applyFilter(baselineFilter) : Cool.getBaselines(sourceComponent, sourceStream, baselineFilter)
+                            log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+                            if(!baselines){
+                                log.warn("No further baseline matches in step {}.", stream.filters.indexOf(filter) + 1)
+                                break
+                            }
                             baselines.each { sourceBaseline ->
                                 if(!baselineMap.get(sourceBaseline.fqname))
                                     baselineMap.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
@@ -77,7 +82,7 @@ class Migrator {
 
                         if (!baselineMap) {
                             log.warn("No baselines to migrate in {}.", stream.name)
-                            return // continue
+                            continue
                         }
 
                         Git.call("checkout -b " + stream.name)
@@ -88,10 +93,12 @@ class Migrator {
                         // Create a temporary View inside the Git repository.
                         // Because ClearCase can't make Views in existing folders, Cool deletes the target path.
                         // We temporarily move the .git dir to avoid it being deleted by Cool.
-                        FileUtils.moveDirectory(new File(Git.path, ".git"), new File(path, ".git"));
+                        FileUtils.moveDirectory(new File(Git.path, ".git"), new File(path, ".git"))
+                        FileUtils.moveFile(new File(Git.path, ".gitignore"), new File(path, ".gitignore"))
                         def migrationView = Cool.createView(migrationStream, Git.path, component.name + "_cc-to-git")
                         viewsToRemove.add(migrationView)
-                        FileUtils.moveDirectory(new File(path, ".git"), new File(Git.path, ".git"));
+                        FileUtils.moveDirectory(new File(path, ".git"), new File(Git.path, ".git"))
+                        FileUtils.moveFile(new File(path, ".gitignore"), new File(Git.path, ".gitignore"))
 
                         baselineMap.values().each { baseline ->
                             Cool.rebase(baseline.source, migrationView)
