@@ -8,7 +8,7 @@ import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 class ExtractionsContext {
     List<Extraction> extractions = []
 
-    def void baselineExtractor(Map<String, String> mappingValues) {
+    def void baselineProperty(Map<String, String> mappingValues) {
         extractions.add(new Extraction() {
             @Override
             HashMap<String, Object> extract(CoolBaseline baseline) {

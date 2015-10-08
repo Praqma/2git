@@ -3,10 +3,7 @@ migrate('E:\\cc-to-git') {
         component('Model') {
             migrationOptions {
                 git {
-                    /* TODO?
-                    path    'E:\\cc-to-git'
-                    call "some custom git command?"
-                    */
+                    // path    'E:\\cc-to-git' //TODO?
                     ignore '.jnk'
                     user 'praqma'
                     email 'support@praqma.net'
@@ -19,7 +16,7 @@ migrate('E:\\cc-to-git') {
                             baselineName 'v\\d{3}.*'
                         }
                         extractions {
-                            baselineExtractor([name: 'shortname'])
+                            baselineProperty([name: 'shortname'])
                         }
                         actions {
                             git 'add -A'
@@ -31,7 +28,7 @@ migrate('E:\\cc-to-git') {
                             promotionLevels 'INITIAL'
                         }
                         extractions {
-                            baselineExtractor([level: 'promotionLevel'])
+                            baselineProperty([level: 'promotionLevel'])
                         }
                         actions {
                             git 'tag \"$level-$name\"'
