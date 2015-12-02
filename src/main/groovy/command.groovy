@@ -13,6 +13,7 @@ migrate('E:\\cc-to-git') {
                 migrationSteps {
                     filter {
                         criteria {
+                            since (new Date() - 100) // last 100 days
                             baselineName 'v\\d{3}.*'
                         }
                         extractions {

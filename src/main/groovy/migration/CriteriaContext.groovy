@@ -33,4 +33,20 @@ class CriteriaContext {
             }
         })
     }
+
+    def void since (String format, String date) {
+        since(Date.parseToStringDate(format, date))
+    }
+
+    def void since(Date date) {
+        criteria.add(new Criteria() {
+            @Override
+            boolean appliesTo(Baseline baseline) {
+                println "Matching '" + baseline.shortname + "(" + baseline.date + ")' against date '" + date+ "'."
+                def result = baseline.date >= date
+                println "Result: " + (result ? "PASS" : "FAIL")
+                return result
+            }
+        })
+    }
 }
