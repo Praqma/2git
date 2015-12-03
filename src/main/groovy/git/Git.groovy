@@ -3,6 +3,7 @@ package git
 import migration.GitOptions
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
+import net.praqma.util.execute.AbnormalProcessTerminationException
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
 
@@ -16,13 +17,25 @@ class Git {
     /**
      * Calls git with given arguments in the set path.
      * @param args The arguments to call git with.
+     * @return the exit code of the command
      */
-    static void call(String... args) {
+    static int call(String... args) {
         log.debug("Entering call().")
+        try {
+            callOrDie(args)
+        } catch(AbnormalProcessTerminationException ex) {
+            log.warn("Command exited with status code {}", ex.exitValue)
+            return ex.exitValue
+        }
+        log.debug("Exiting call().")
+        return 0
+    }
+
+    static void callOrDie(String... args) {
         String cmd = "git " + args.join(" ");
         log.info("Running '{}' in {}", cmd, path)
+        log.info("Executing: {}", cmd)
         CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line}
-        log.debug("Exiting call().")
     }
 
     /**
@@ -31,9 +44,9 @@ class Git {
      */
     static void configureRepository(GitOptions gitOptions) {
         log.debug("Entering configureRepository().")
-        call("config", "user.name", gitOptions.user)
+        callOrDie("config", "user.name", gitOptions.user)
         log.info("Set git user.name to {}.", gitOptions.user)
-        call("config", "user.email", gitOptions.email)
+        callOrDie("config", "user.email", gitOptions.email)
         log.info("Set git user.email to {}.", gitOptions.email)
         def gitIgnore = new File(path, '.gitignore');
         if (gitIgnore.exists()) FileUtils.forceDelete(gitIgnore)

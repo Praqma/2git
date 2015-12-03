@@ -156,5 +156,4 @@ class Cool {
         def updateView = new UpdateView(coolView).setLoadRules(loadRules).update()
         log.debug("Exiting updateView().")
     }
-
 }
