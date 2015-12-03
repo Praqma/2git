@@ -13,10 +13,10 @@ class CriteriaContext {
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(Baseline baseline) {
-                println "Matching '" + baseline.shortname + "' against regex '" + regex + "'."
+                println "Testing '" + baseline.shortname + "' against regex '" + regex + "'."
                 def matcher = baseline.shortname =~ regex
                 def result = matcher.matches()
-                println "Result: " + (result ? "PASS" : "FAIL")
+                println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
             }
         })
@@ -26,9 +26,9 @@ class CriteriaContext {
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(Baseline baseline) {
-                println "Matching '" + baseline.shortname + "(" + baseline.promotionLevel + ")' against promotionLevels '" + promotionLevels + "'."
+                println "Testing '" + baseline.shortname + "(" + baseline.promotionLevel + ")' against promotionLevels '" + promotionLevels + "'."
                 def result = promotionLevels.contains(baseline.promotionLevel.toString())
-                println "Result: " + (result ? "PASS" : "FAIL")
+                println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
             }
         })
@@ -42,9 +42,9 @@ class CriteriaContext {
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(Baseline baseline) {
-                println "Matching '" + baseline.shortname + "(" + baseline.date + ")' against date '" + date+ "'."
+                println "Testing '" + baseline.shortname + "(" + baseline.date + ")' against date '" + date+ "'."
                 def result = baseline.date >= date
-                println "Result: " + (result ? "PASS" : "FAIL")
+                println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
             }
         })
