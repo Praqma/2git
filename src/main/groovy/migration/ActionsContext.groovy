@@ -11,7 +11,7 @@ class ActionsContext {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(cmd).make(extractionMap).toString()
-                Git.call(expandedCommand)
+                Git.callOrDie(expandedCommand)
             }
         })
     }

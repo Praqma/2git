@@ -46,9 +46,13 @@ class Migrator {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
 
-                    Git.path = path + "/" + component.name
-                    FileUtils.forceMkdir(new File(Git.path))
-                    Git.call('init')
+                    File repository = new File(path + "/" + component.name)
+                    Git.path = repository.path
+                    if(!repository.exists()) {
+                        log.info("Path {} does not exist, performing first time setup.", path)
+                        FileUtils.forceMkdir(new File(Git.path))
+                        Git.callOrDie('init')
+                    }
                     Git.configureRepository(component.migrationOptions.gitOptions)
 
                     //-----STREAM-----\\
@@ -85,7 +89,10 @@ class Migrator {
                             continue
                         }
 
-                        Git.call("checkout -b " + stream.name)
+                        if(!Git.call("rev-parse --verify " + stream.name))
+                            Git.callOrDie("checkout " + stream.name)
+                        else
+                            Git.callOrDie("checkout -b " + stream.name)
 
                         def firstBaseline = baselineMap.values()[0]
                         def migrationStream = Cool.createStream(sourceStream, firstBaseline.source, component.name + "_cc-to-git")
