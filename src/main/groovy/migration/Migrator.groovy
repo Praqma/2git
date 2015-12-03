@@ -107,7 +107,12 @@ class Migrator {
                         FileUtils.moveDirectory(new File(path, ".git"), new File(Git.path, ".git"))
                         FileUtils.moveFile(new File(path, ".gitignore"), new File(Git.path, ".gitignore"))
 
+                        def currentBaseline = 0
+                        def baselineCount = baselineMap.values().size()
                         baselineMap.values().each { baseline ->
+                            currentBaseline++
+                            log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
+
                             Cool.rebase(baseline.source, migrationView)
                             Cool.updateView(migrationView)
 
