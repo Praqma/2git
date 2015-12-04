@@ -7,6 +7,10 @@ import net.praqma.util.execute.CommandLine
 class ActionsContext {
     List<Action> actions = []
 
+    /**
+     * Executes a Git command in the target repository
+     * @param command the Git command to execute
+     */
     def void git(String command) {
         actions.add(new Action() {
             @Override

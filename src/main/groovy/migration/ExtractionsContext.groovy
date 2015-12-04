@@ -8,6 +8,10 @@ import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 class ExtractionsContext {
     List<Extraction> extractions = []
 
+    /**
+     * Extracts a CoolBaseline property
+     * @param mappingValues A map of values to extract and keys to map them to.
+     */
     def void baselineProperty(Map<String, String> mappingValues) {
         extractions.add(new Extraction() {
             @Override
