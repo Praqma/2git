@@ -3,7 +3,7 @@ A Groovy DSL to facilitate migration from ClearCase to Git. The project currentl
 ## Concept
 The ClearCase to Git DSL allows users to define steps to migrate their ClearCase components to Git repositories. 
 
-After choosing which Stream to retrieve the Component Baselines from, Baseline subsets can easily be selected and acted upon, slecting which Baselines to migrate as commits and which of those to tag, etc...
+After choosing which Stream to retrieve the Component Baselines from, Baseline subsets can easily be selected and acted upon, selecting which Baselines to migrate as commits and which of those to tag, etc...
 
 ### Mapping table
 
