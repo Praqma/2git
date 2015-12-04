@@ -3,7 +3,6 @@ migrate('E:\\cc-to-git') {
         component('Model') {
             migrationOptions {
                 git {
-                    // path    'E:\\cc-to-git' //TODO?
                     ignore '.jnk'
                     user 'praqma'
                     email 'support@praqma.net'
@@ -13,7 +12,7 @@ migrate('E:\\cc-to-git') {
                 migrationSteps {
                     filter {
                         criteria {
-                            since (new Date() - 100) // last 100 days
+                            afterDate 'dd-MM-yyyy', '31-05-1991'
                             baselineName 'v\\d{3}.*'
                         }
                         extractions {
@@ -26,7 +25,8 @@ migrate('E:\\cc-to-git') {
                     }
                     filter {
                         criteria {
-                            promotionLevels 'INITIAL'
+                            afterBaseline 'v100@\\2Cool_PVOB'
+                            promotionLevels 'RELEASED'
                         }
                         extractions {
                             baselineProperty([level: 'promotionLevel'])
