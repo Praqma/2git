@@ -2,7 +2,6 @@ package dslContext
 
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
-import migration.GitOptions
 import migration.MigrationOptions
 
 @Slf4j
@@ -22,10 +21,12 @@ class MigrationOptionsContext {
      * Sets Git options for this migration
      * @param closure the Git options configurations
      */
-    def void git(@DelegatesTo(value = GitOptions, strategy = Closure.DELEGATE_ONLY) Closure closure){
+    def void git(@DelegatesTo(GitOptionsContext) Closure closure){
         log.debug('Entering git().')
         def gitOptionsContext = new GitOptionsContext()
-        closure.rehydrate(gitOptionsContext, this, this).run()
+        def gitOptionsClosure = closure.rehydrate(gitOptionsContext, this, this)
+        gitOptionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        gitOptionsClosure.run()
         migrationOptions.gitOptions = gitOptionsContext.gitOptions
         log.info('Configured git options.')
         log.debug('Exiting git().')

@@ -24,12 +24,14 @@ class VobContext {
     /**
      * Adds a Component to the Vob
      * @param name the Component name
-     * @param closure the ComponentContext configuraiton
+     * @param closure the ComponentContext configuration
      */
-    def void component(String name, @DelegatesTo(value = ComponentContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void component(String name, @DelegatesTo(ComponentContext) Closure closure) {
         log.debug('Entering component().')
         def componentContext = new ComponentContext(name)
-        closure.rehydrate(componentContext, this, this).run()
+        def componentClosure = closure.rehydrate(componentContext, this, this)
+        componentClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        componentClosure.run()
         vob.components.add(componentContext.component)
         log.info('Added Component {} to Vob {}.', componentContext.component.name, vob.name)
         log.debug('Exiting component().')

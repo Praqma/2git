@@ -13,10 +13,12 @@ class MigrationContext {
      * @param name The name of the Vob
      * @param closure The configuration of the Vob
      */
-    def void vob(String name, @DelegatesTo(value = Vob, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void vob(String name, @DelegatesTo(VobContext) Closure closure) {
         log.debug('Entering vob().')
         def vobContext = new VobContext(name)
-        closure.rehydrate(vobContext, this, this).run()
+        def vobClosure = closure.rehydrate(vobContext, this, this)
+        vobClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        vobClosure.run()
         vobs.add(vobContext.vob)
         log.info('Added Vob {}.', vobContext.vob.name)
         log.debug('Exiting vob().')

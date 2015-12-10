@@ -36,11 +36,13 @@ class StreamContext {
      * Configures the migration steps
      * @param closure the migration step configuration
      */
-    def void migrationSteps(@DelegatesTo(value = MigrationStepsContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void migrationSteps(@DelegatesTo(MigrationStepsContext) Closure closure) {
         log.debug('Entering migrationSteps().')
         def stepsContext = new MigrationStepsContext()
-        closure.rehydrate(stepsContext, this, this).run()
-        stream.filters = stepsContext.filters
+        def stepsClosure = closure.rehydrate(stepsContext, this, this)
+        stepsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        stepsClosure.run()
+        stream.filters.addAll(stepsContext.filters)
         log.info('Added {} Steps to Stream {}.', stepsContext.filters.size(), stream.name)
         log.debug('Exiting migrationSteps().')
     }

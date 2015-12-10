@@ -23,11 +23,13 @@ class FilterContext {
      * Sets the Filter Criteria
      * @param closure the Criteria configuration
      */
-    def void criteria(@DelegatesTo(value = CriteriaContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void criteria(@DelegatesTo(CriteriaContext) Closure closure) {
         log.debug('Entering criteria().')
         def criteriaContext = new CriteriaContext()
-        closure.rehydrate(criteriaContext, this, this).run()
-        filter.criteria = criteriaContext.criteria
+        def criteriaClosure = closure.rehydrate(criteriaContext, this, this)
+        criteriaClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        criteriaClosure.run()
+        filter.criteria.addAll(criteriaContext.criteria)
         log.info('Added {} Criteria to Filter.', criteriaContext.criteria.size())
         log.debug('Exiting criteria().')
     }
@@ -36,11 +38,13 @@ class FilterContext {
      * Sets the Filter Extractions
      * @param closure the Extractions configuration
      */
-    def void extractions(@DelegatesTo(value = ExtractionsContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void extractions(@DelegatesTo(ExtractionsContext) Closure closure) {
         log.debug('Entering extractions().')
         def extractionsContext = new ExtractionsContext()
-        closure.rehydrate(extractionsContext, this, this).run()
-        filter.extractions = extractionsContext.extractions
+        def extractionsClosure = closure.rehydrate(extractionsContext, this, this)
+        extractionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        extractionsClosure.run()
+        filter.extractions.addAll(extractionsContext.extractions)
         log.info('Added {} Extractions to Filter.', extractionsContext.extractions.size())
         log.debug('Exiting extractions().')
     }
@@ -49,11 +53,13 @@ class FilterContext {
      * Sets the Filter Actions
      * @param closure the Actions configuration
      */
-    def void actions(@DelegatesTo(value = ActionsContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void actions(@DelegatesTo(ActionsContext) Closure closure) {
         log.debug('Entering actions().')
         def actionsContext = new ActionsContext()
-        closure.rehydrate(actionsContext, this, this).run()
-        filter.actions = actionsContext.actions
+        def actionsClosure = closure.rehydrate(actionsContext, this, this)
+        actionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        actionsClosure.run()
+        filter.actions.addAll(actionsContext.actions)
         log.info('Added {} Actions to Filter.', actionsContext.actions.size())
         log.debug('Exiting actions().')
     }

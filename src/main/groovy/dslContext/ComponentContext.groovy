@@ -28,11 +28,13 @@ class ComponentContext {
      * @param name The name of the Stream
      * @param closure The configuration of the Stream
      */
-    def void stream(String name, @DelegatesTo(value = StreamContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void stream(String name, @DelegatesTo(StreamContext) Closure closure) {
         log.debug('Entering stream().')
-        if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.")
+        if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.") //TODO Isn't it?
         def streamContext = new StreamContext(name)
-        closure.rehydrate(streamContext, this, this).run()
+        def streamClosure = closure.rehydrate(streamContext, this, this)
+        streamClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        streamClosure.run()
         component.streams.add(streamContext.stream)
         log.info('Added Stream {} to Component {}.', streamContext.stream.name, component.name)
         log.debug('Exiting stream().')
@@ -53,10 +55,12 @@ class ComponentContext {
      * Sets migration options for the Component
      * @param closure the migration options to set
      */
-    def void migrationOptions(@DelegatesTo(value = MigrationOptions, strategy = Closure.DELEGATE_ONLY) Closure closure){
+    def void migrationOptions(@DelegatesTo(MigrationOptionsContext) Closure closure){
         log.debug('Entering migrationOptions().')
         def migrationOptionsContext = new MigrationOptionsContext()
-        closure.rehydrate(migrationOptionsContext, this, this).run()
+        def migrationOptionsClosure = closure.rehydrate(migrationOptionsContext, this, this)
+        migrationOptionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        migrationOptionsClosure.run()
         component.migrationOptions = migrationOptionsContext.migrationOptions
         log.info('Configured migration options for Component {}.', component.name)
         log.debug('Exiting migrationOptions().')

@@ -12,10 +12,12 @@ class MigrationStepsContext {
      * Configures a Filter for this migration
      * @param closure the Filter configuration
      */
-    def void filter(@DelegatesTo(value = FilterContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void filter(@DelegatesTo(FilterContext) Closure closure) {
         log.debug('Entering filter().')
         def filterContext = new FilterContext()
-        closure.rehydrate(filterContext, this, this).run()
+        def filterClosure = closure.rehydrate(filterContext, this, this)
+        filterClosure.resolveStrategy = Closure.DELEGATE_ONLY
+        filterClosure.run()
         filters.add(filterContext.filter)
         log.debug('Exiting filter().')
     }
