@@ -1,6 +1,7 @@
-migrate('E:\\cc-to-git') {
+migrate{
     vob('\\2Cool_PVOB') {
         component('Model') {
+            repository 'E:\\cc-to-git'
             migrationOptions {
                 git {
                     ignore '.jnk'
@@ -9,6 +10,7 @@ migrate('E:\\cc-to-git') {
                 }
             }
             stream('server_dev2') {
+                branch 'server_dev'
                 migrationSteps {
                     filter {
                         criteria {
@@ -35,7 +37,6 @@ migrate('E:\\cc-to-git') {
                             git 'tag \"$level-$name\"'
                         }
                     }
-
                 }
             }
         }

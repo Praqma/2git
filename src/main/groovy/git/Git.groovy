@@ -15,8 +15,8 @@ class Git {
     static String path = "./output" // The path the Git commands will be run in
 
     /**
-     * Calls git with given arguments in the set path.
-     * @param args The arguments to call git with.
+     * Calls Git with given arguments in the set path.
+     * @param args The arguments to call Git with.
      * @return the exit code of the command
      */
     static int call(String... args) {
@@ -31,6 +31,11 @@ class Git {
         return 0
     }
 
+    /**
+     * Calls Git with given arguments in the set path.
+     * Throws exceptions on error/failure
+     * @param args the arguments to call Git with
+     */
     static void callOrDie(String... args) {
         String cmd = "git " + args.join(" ");
         log.info("Running '{}' in {}", cmd, path)
@@ -55,5 +60,16 @@ class Git {
             log.info("Added {} to .gitignore.", rule)
         }
         log.debug("Exiting configureRepository().")
+    }
+
+    /**
+     * Checkout a branch, if it doesn't exist, create it and check it out.
+     * @param branch the branch to check out
+     */
+    static void forceCheckout(String branch) {
+        if(!Git.call("rev-parse --verify " + branch))
+            Git.callOrDie("checkout " + branch)
+        else
+            Git.callOrDie("checkout -b " + branch)
     }
 }

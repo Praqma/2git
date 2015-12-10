@@ -1,7 +1,8 @@
-package migration
+package dslContext
 
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
+import migration.filter.criterias.Criteria
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
 @Slf4j
@@ -22,7 +23,7 @@ class CriteriaContext {
      * @param date the date
      */
     def void afterDate(String format, String date) {
-        afterDate(Date.parseToStringDate(format, date))
+        afterDate(Date.parse(format, date))
     }
 
     /**

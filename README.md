@@ -16,15 +16,20 @@ After choosing which Stream to retrieve the Component Baselines from, Baseline s
 ## Example
 The following example just shows off what the migration of a demo component looks like.
 #### DSL script
-```java
-// Set the output path for the Git repositories.
-migrate('/home/natalie/sandbox') {
+```groovy
+migrate {
 	// Pick a Vob to migrate from
     vob('\\v_foo') {
     	// Pick a Component to migrate
         component('c_model') {
+            // Optionally set the target repository path
+            repository '/home/natalie/sandbox/model'
+
         	// Pick a Stream from which the Baselines will be migrated
             stream('s_model_int') {
+                // Optionally set the target branch name 
+                branch 'master'
+
                 migrationSteps {
                 	// A migration step is represented by a filter
                     filter {

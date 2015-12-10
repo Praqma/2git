@@ -1,4 +1,4 @@
-package clearCase
+package clearcase
 
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
@@ -12,10 +12,10 @@ import net.praqma.clearcase.ucm.utils.BaselineList
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 import net.praqma.clearcase.ucm.view.UpdateView
 
-@Slf4j
 /**
- * A helpful wrapper for Cool that adds logging.
+ * A Cool wrapper that adds logging.
  */
+@Slf4j
 class Cool {
 
     /**
@@ -140,7 +140,7 @@ class Cool {
     static void rebase(CoolBaseline coolBaseline, CoolSnapshotView coolView) {
         log.debug("Entering rebase().")
         log.info("Rebasing {} onto {}.", coolBaseline.fullyQualifiedName, coolView.fullyQualifiedName)
-        def coolRebase = new CoolRebase(coolView).addBaseline(coolBaseline).rebase(true)
+        new CoolRebase(coolView).addBaseline(coolBaseline).rebase(true)
         log.info("Rebased {} onto {}.", coolBaseline.fullyQualifiedName, coolView.fullyQualifiedName)
         log.debug("Exiting rebase().")
     }
@@ -153,7 +153,7 @@ class Cool {
         log.debug("Entering updateView().")
         log.info("Updating {}", coolView.fullyQualifiedName)
         def loadRules = new CoolSnapshotView.LoadRules2(CoolSnapshotView.Components.MODIFIABLE);
-        def updateView = new UpdateView(coolView).setLoadRules(loadRules).update()
+        new UpdateView(coolView).setLoadRules(loadRules).update()
         log.debug("Exiting updateView().")
     }
 }

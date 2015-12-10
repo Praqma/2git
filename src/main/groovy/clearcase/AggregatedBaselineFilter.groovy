@@ -1,6 +1,6 @@
-package clearCase
+package clearcase
 
-import migration.Criteria
+import migration.filter.criterias.Criteria
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.utils.BaselineList
 
@@ -9,12 +9,19 @@ import net.praqma.clearcase.ucm.utils.BaselineList
  */
 class AggregatedBaselineFilter extends BaselineFilter {
 
-    List<Criteria> criteria
+    List<Criteria> criteria // criteria to filter BaselineLists with
 
-    def AggregatedBaselineFilter(List<Criteria> criteria) {
+    /**
+     * AggregatedBaselineFilter constructor
+     * @param criteria criteria to filter BaselineLists with
+     */
+    public AggregatedBaselineFilter(List<Criteria> criteria) {
         this.criteria = criteria
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     int filter(BaselineList baselines) {
         int removed = 0
@@ -32,6 +39,9 @@ class AggregatedBaselineFilter extends BaselineFilter {
         return removed
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     String getName() {
         return "AggregatedBaselineFilter"
