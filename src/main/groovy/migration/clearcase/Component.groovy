@@ -32,7 +32,7 @@ class Component {
     File setUpRepository() {
         File repository = new File(target)
         Git.path = repository.path
-        if(!repository.exists()) {
+        if (!repository.exists()) {
             log.info("Path {} does not exist, performing first time setup.", repository.path)
             FileUtils.forceMkdir(new File(repository.path))
             Git.callOrDie('init')

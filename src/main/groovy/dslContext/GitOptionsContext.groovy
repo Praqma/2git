@@ -11,7 +11,7 @@ class GitOptionsContext {
     /**
      * GitOptionsContext constructor
      */
-    public GitOptionsContext(){
+    public GitOptionsContext() {
         log.debug('Entering GitOptionsContext().')
         gitOptions = new GitOptions()
         log.debug('Exiting GitOptionsContext().')
@@ -21,7 +21,7 @@ class GitOptionsContext {
      * Adds given String arguments to the Git ignore file
      * @param args the String arguments to add
      */
-    def void ignore(String... args){
+    def void ignore(String... args) {
         log.debug('Entering ignore().')
         gitOptions.ignore.addAll(args)
         log.info('Expanded Git ignore to: {}', gitOptions.ignore)
@@ -32,7 +32,7 @@ class GitOptionsContext {
      * Sets the Git user
      * @param user the user name
      */
-    def void user(String user){
+    def void user(String user) {
         log.debug('Entering user().')
         gitOptions.user = user
         log.info('Set user to: {}', user)
@@ -43,7 +43,7 @@ class GitOptionsContext {
      * Sets the Git user email
      * @param email the user email
      */
-    def void email(String email){
+    def void email(String email) {
         log.debug('Entering email().')
         gitOptions.email = email
         log.info('Set email to: {}', email)

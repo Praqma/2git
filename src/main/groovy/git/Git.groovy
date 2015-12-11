@@ -1,8 +1,8 @@
 package git
 
-import migration.GitOptions
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
+import migration.GitOptions
 import net.praqma.util.execute.AbnormalProcessTerminationException
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
@@ -23,7 +23,7 @@ class Git {
         log.debug("Entering call().")
         try {
             callOrDie(args)
-        } catch(AbnormalProcessTerminationException ex) {
+        } catch (AbnormalProcessTerminationException ex) {
             log.warn("Command exited with status code {}", ex.exitValue)
             return ex.exitValue
         }
@@ -40,7 +40,7 @@ class Git {
         String cmd = "git " + args.join(" ");
         log.info("Running '{}' in {}", cmd, path)
         log.info("Executing: {}", cmd)
-        CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line}
+        CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line }
     }
 
     /**
@@ -67,7 +67,7 @@ class Git {
      * @param branch the branch to check out
      */
     static void forceCheckout(String branch) {
-        if(!Git.call("rev-parse --verify " + branch))
+        if (!Git.call("rev-parse --verify " + branch))
             Git.callOrDie("checkout " + branch)
         else
             Git.callOrDie("checkout -b " + branch)

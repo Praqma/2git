@@ -1,11 +1,11 @@
 package migration
 
-@Grab('org.slf4j:slf4j-simple:1.7.7')
-import groovy.util.logging.Slf4j
 @GrabResolver(name = 'praqma', root = 'http://code.praqma.net/repo/maven/', m2Compatible = 'true')
 @Grab('net.praqma:cool:0.6.45')
 import clearcase.Cool
 import git.Git
+@Grab('org.slf4j:slf4j-simple:1.7.7')
+import groovy.util.logging.Slf4j
 import migration.clearcase.Baseline
 import migration.clearcase.Component
 import migration.clearcase.Stream
@@ -28,6 +28,8 @@ class Migrator {
      */
     def static void migrate(List<Vob> vobs) {
         log.debug("Entering migrate().")
+        def startDate = new Date()
+        log.info("Migration started at " + startDate.toTimestamp())
 
         // Collections to keep track of temporary Streams and Views.
         // These will be removed after a(n un)successful migration.
@@ -37,41 +39,38 @@ class Migrator {
         try {
             //-----VOB-----\\
             log.info("Migrating from {} Vob(s).", vobs.size())
-            for(Vob vob : vobs) {
+            for (Vob vob : vobs) {
                 CoolVob sourcePVob = Cool.getPVob(vob.name)
                 log.info("Migrating from Vob {}.", vob.name)
 
                 //-----COMPONENT-----\\
                 log.info("Migrating {} Component(s).", vob.components.size())
-                for(Component component : vob.components) {
+                for (Component component : vob.components) {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
 
                     File repository = component.setUpRepository()
-
                     //-----STREAM-----\\
                     log.info("Migrating {} Stream(s)", component.streams.size())
-                    for(Stream stream : component.streams) {
+                    for (Stream stream : component.streams) {
                         CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
                         log.info("Migrating Stream {}.", stream.name)
 
                         BaselineList baselines = null
                         LinkedHashMap<String, Baseline> baselineMap = [:]
-                        for(Filter filter : stream.filters) {
+                        for (Filter filter : stream.filters) {
                             //-----APPLY CRITERIA-----\\
                             baselines = filter.getBaselines(baselines, sourceComponent, sourceStream)
-                            if(!baselines){
+                            if (!baselines) {
                                 log.warn("No further baseline matches in step {}.", stream.filters.indexOf(filter) + 1)
                                 break
                             }
 
-                            baselines.each { sourceBaseline ->
-                                if(!baselineMap[sourceBaseline.fqname])
-                                    baselineMap.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
-                            }
-
                             //-----REGISTER EXTRACTIONS AND ACTIONS-----\\
                             baselines.each { sourceBaseline ->
+                                if (!baselineMap[sourceBaseline.fqname])
+                                    baselineMap.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
+
                                 baselineMap[sourceBaseline.fqname].extractions.addAll(filter.extractions)
                                 baselineMap[sourceBaseline.fqname].actions.addAll(filter.actions)
                             }
@@ -84,9 +83,10 @@ class Migrator {
 
                         Git.forceCheckout(stream.target)
 
-                        def firstBaseline = baselineMap.values()[0]
-                        def migrationStream = Cool.createStream(sourceStream, firstBaseline.source, component.name + "_cc-to-git")
+                        Baseline startingBaseline = baselineMap.values()[0]
+                        def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc-to-git")
                         streamsToRemove.add(migrationStream)
+
                         // Create a temporary View inside the Git repository.
                         // Because ClearCase can't make Views in existing folders, Cool deletes the branch path.
                         // We temporarily move the .git dir to avoid it being deleted by Cool.
@@ -121,12 +121,22 @@ class Migrator {
                                 action.act(extractionMap)
                             }
                         }
-                        Cool.cleanUp(viewsToRemove, streamsToRemove)
+
+                        //Migration complete, let's clean up
+                        Cool.deleteViews(viewsToRemove)
+                        Cool.deleteStreams(streamsToRemove)
                     }
                 }
             }
         } finally {
-            Cool.cleanUp(viewsToRemove, streamsToRemove)
+            Cool.deleteViews(viewsToRemove)
+            Cool.deleteStreams(streamsToRemove)
+            def endDate = new Date()
+            log.info("Migration ended at " + endDate.toTimestamp())
+            use(groovy.time.TimeCategory) {
+                def duration = endDate - startDate
+                log.info("Migration took " + duration.toString())
+            }
             log.debug("Exiting migrate().")
         }
     }

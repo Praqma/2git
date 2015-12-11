@@ -41,7 +41,22 @@ class ActionsContext {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
-                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line}
+                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line }
+            }
+        })
+    }
+
+    /**
+     * Executes a custom command groovy using
+     * @param cl the closure to run, returns void, runs in the extraction's HashMap context
+     */
+    def void custom(Closure cl){
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                cl.resolveStrategy = Closure.DELEGATE_ONLY
+                cl.delegate = extractionMap
+                cl.run()
             }
         })
     }

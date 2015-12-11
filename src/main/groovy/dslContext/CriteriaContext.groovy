@@ -13,7 +13,7 @@ class CriteriaContext {
      * Filters out baselines that were created before a baseline
      * @param name the name of the baseline
      */
-    def void afterBaseline(String name){
+    def void afterBaseline(String name) {
         afterDate(CoolBaseline.get(name).date)
     }
 
@@ -34,7 +34,7 @@ class CriteriaContext {
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(CoolBaseline baseline) {
-                println "Testing '" + baseline.shortname + " (" + baseline.date + ")' against date '" + date+ "'."
+                println "Testing '" + baseline.shortname + " (" + baseline.date + ")' against date '" + date + "'."
                 def result = baseline.date > date
                 println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
@@ -53,6 +53,24 @@ class CriteriaContext {
                 println "Testing '" + baseline.shortname + "' against regex '" + regex + "'."
                 def matcher = baseline.shortname =~ regex
                 def result = matcher.matches()
+                println "Result: " + (result ? "SUCCESS" : "FAILURE")
+                return result
+            }
+        })
+    }
+
+    /**
+     * Filters out baselines using a custom Groovy closure
+     * @param cl Closure to run, returns boolean, runs in the Baseline's context
+     */
+    def void custom(Closure<Boolean> cl){
+        criteria.add(new Criteria() {
+            @Override
+            boolean appliesTo(CoolBaseline baseline) {
+                println "Testing " + baseline.shortname + " using custom criteria."
+                cl.resolveStrategy = Closure.DELEGATE_ONLY
+                cl.delegate = baseline
+                def result = cl.call()
                 println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
             }

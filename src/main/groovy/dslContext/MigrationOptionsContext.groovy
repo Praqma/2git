@@ -11,7 +11,7 @@ class MigrationOptionsContext {
     /**
      * MigrationOptionsContext constructor
      */
-    public MigrationOptionsContext(){
+    public MigrationOptionsContext() {
         log.debug('Entering MigrationOptionsContext().')
         migrationOptions = new MigrationOptions()
         log.debug('Exiting MigrationOptionsContext().')
@@ -21,7 +21,7 @@ class MigrationOptionsContext {
      * Sets Git options for this migration
      * @param closure the Git options configurations
      */
-    def void git(@DelegatesTo(GitOptionsContext) Closure closure){
+    def void git(@DelegatesTo(GitOptionsContext) Closure closure) {
         log.debug('Entering git().')
         def gitOptionsContext = new GitOptionsContext()
         def gitOptionsClosure = closure.rehydrate(gitOptionsContext, this, this)

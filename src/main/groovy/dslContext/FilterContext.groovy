@@ -13,7 +13,7 @@ class FilterContext {
      * FilterContext constructor
      * @return a new FilterContext
      */
-    def FilterContext(){
+    def FilterContext() {
         log.debug('Entering FilterContext().')
         filter = new Filter()
         log.debug('Exiting FilterContext().')

@@ -3,7 +3,6 @@ package dslContext
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import migration.clearcase.Component
-import migration.MigrationOptions
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import utils.StringExtensions
 
@@ -44,7 +43,7 @@ class ComponentContext {
      * Sets the branch repository for the component
      * @param path the repository path
      */
-    def void repository (String repository){
+    def void repository(String repository) {
         log.debug('Entering repository().')
         component.target = repository
         log.info('Set Component {} repository path to {}', component.name, component.target)
@@ -55,7 +54,7 @@ class ComponentContext {
      * Sets migration options for the Component
      * @param closure the migration options to set
      */
-    def void migrationOptions(@DelegatesTo(MigrationOptionsContext) Closure closure){
+    def void migrationOptions(@DelegatesTo(MigrationOptionsContext) Closure closure) {
         log.debug('Entering migrationOptions().')
         def migrationOptionsContext = new MigrationOptionsContext()
         def migrationOptionsClosure = closure.rehydrate(migrationOptionsContext, this, this)

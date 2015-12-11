@@ -7,10 +7,10 @@ import groovy.util.logging.Slf4j
 import migration.filter.actions.Action
 import migration.filter.criterias.Criteria
 import migration.filter.extractions.Extraction
-import net.praqma.clearcase.ucm.utils.BaselineFilter
-import net.praqma.clearcase.ucm.utils.BaselineList
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
+import net.praqma.clearcase.ucm.utils.BaselineFilter
+import net.praqma.clearcase.ucm.utils.BaselineList
 
 @Slf4j
 class Filter {

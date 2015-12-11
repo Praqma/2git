@@ -1,4 +1,4 @@
-migrate{
+migrate {
     vob('\\2Cool_PVOB') {
         component('Model') {
             repository 'E:\\cc-to-git'

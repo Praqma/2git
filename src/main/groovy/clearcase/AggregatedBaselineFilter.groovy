@@ -20,7 +20,7 @@ class AggregatedBaselineFilter extends BaselineFilter {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     int filter(BaselineList baselines) {
@@ -40,7 +40,7 @@ class AggregatedBaselineFilter extends BaselineFilter {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     String getName() {

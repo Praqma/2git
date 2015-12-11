@@ -101,6 +101,17 @@ criteria {
     baselineName /v\d{1}\.\d{1}\.\d{1}/ //ex.: v1.2.0
 }
 ```
+##### Custom
+`custom (Closure<Boolean> closure)`
+```groovy
+criteria {
+    custom {
+        println "Testing baseline name length limit."
+		return shortname.length <= 10
+    }
+}
+```
+*Note: Executed in the context of the Baseline. You can access [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) properties.*
 ##### Promotion level
 `promotionLevels (String... promotionLevels)`
 ```groovy
@@ -119,6 +130,20 @@ extractions {
 }
 ```
 *Note: See the [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) and its superclasses for viable properties to map.*
+#### Custom
+`custom (Closure<HashMap<String, Object>> closure)`
+```groovy
+extractions {
+    /* Return a HashMap you build yourself. */
+    custom {
+        def map = new HashMap<String, Object>()
+		map.put('baselineName', shortname)
+		map.put('lostFoundContents', new File('lost+found').text)
+		return map
+    }
+}
+```
+*Note: Executed in the context of the Baseline. You can access [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) properties.*
 ## Actions
 #### CLI commands
 `cmd(String command)`
@@ -133,6 +158,19 @@ actions {
     cmd 'echo Finished a baseline. >> output.log', 'D:\\migration\\logging'
 }
 ```
+#### Custom
+`custom(Closure closure)`
+```groovy
+actions {
+    custom {
+	    println "Executing custom logging action."
+	    def timestamp = new Date().toTimestamp()
+	    new File("timestamps.log").append("Migrated $extractedBaselineName at $timestamp.\n")
+	}
+}
+```
+*Note: Runs in the context of your extractions. You can reference extracted key/value pairs as properties.*
+
 #### Git commands
 `git (String command)`
 ```groovy

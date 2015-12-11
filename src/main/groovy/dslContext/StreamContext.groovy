@@ -25,7 +25,7 @@ class StreamContext {
      * Sets the branch branch of the stream
      * @param target the branch name
      */
-    def void branch(String branch){
+    def void branch(String branch) {
         log.debug('Entering branch().')
         stream.target = branch
         log.info('Set stream {} branch to {}', stream.name, stream.target)

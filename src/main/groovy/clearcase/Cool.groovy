@@ -19,12 +19,11 @@ import net.praqma.clearcase.ucm.view.UpdateView
 class Cool {
 
     /**
-     * Removes given Views and Streams.
+     * Removes given Views
      * @param coolViews The Cool Views to remove.
-     * @param coolStreams The Cool Streams to remove.
      */
-    static void cleanUp(List<CoolSnapshotView> coolViews, List<CoolStream> coolStreams) {
-        log.debug("Entering cleanup().")
+    static void deleteViews(List<CoolSnapshotView> coolViews) {
+        log.debug("Entering deleteViews().")
         def viewIterator = coolViews.iterator()
         while (viewIterator.hasNext()) {
             CoolSnapshotView coolView = viewIterator.next()
@@ -32,6 +31,15 @@ class Cool {
             coolView.remove()
             viewIterator.remove()
         }
+        log.debug("Exiting deleteViews()")
+    }
+
+    /**
+     * Removes given Streams.
+     * @param coolStreams The Cool Streams to remove.
+     */
+    static void deleteStreams(List<CoolStream> coolStreams){
+        log.debug("Entering deleteStreams().")
         def streamIterator = coolStreams.iterator()
         while (streamIterator.hasNext()) {
             CoolStream coolStream = streamIterator.next()
@@ -39,7 +47,7 @@ class Cool {
             coolStream.remove()
             streamIterator.remove()
         }
-        log.debug("Exiting cleanup()")
+        log.debug("Exiting deleteStreams()")
     }
 
     /**
