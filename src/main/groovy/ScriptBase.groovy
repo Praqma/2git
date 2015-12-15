@@ -1,21 +1,25 @@
+import dslContext.Context
+import dslContext.DslContext
 import dslContext.MigrationContext
 import groovy.util.logging.Slf4j
 import migration.Migrator
+
+import static dslContext.ContextHelper.executeInContext
 
 /**
  * Script base for the DSL.
  * The script the user provides is run from this context.
  */
 @Slf4j
-abstract class ScriptBase extends Script {
+abstract class ScriptBase extends Script implements Context {
     /**
      * Closure containing DSL methods used for the migration
      * @param closure The DSL code
      */
-    def void migrate(@DelegatesTo(value = MigrationContext, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    def void migrate(@DslContext(MigrationContext) Closure closure) {
         log.debug('Entering migrate().')
         def migrationContext = new MigrationContext()
-        closure.rehydrate(migrationContext, this, this).run()
+        executeInContext(closure, migrationContext)
         Migrator.migrate(migrationContext.vobs);
         log.info(migrationComplete())
         log.debug('Exiting migrate().')

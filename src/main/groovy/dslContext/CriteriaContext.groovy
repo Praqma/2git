@@ -6,7 +6,7 @@ import migration.filter.criterias.Criteria
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
 @Slf4j
-class CriteriaContext {
+class CriteriaContext implements Context {
     List<Criteria> criteria = []
 
     /**
@@ -61,16 +61,16 @@ class CriteriaContext {
 
     /**
      * Filters out baselines using a custom Groovy closure
-     * @param cl Closure to run, returns boolean, runs in the Baseline's context
+     * @param closure Closure to run, returns boolean, passes in the Baseline
      */
-    def void custom(Closure<Boolean> cl){
+    def void custom(Closure<Boolean> closure){
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(CoolBaseline baseline) {
                 println "Testing " + baseline.shortname + " using custom criteria."
-                cl.resolveStrategy = Closure.DELEGATE_ONLY
-                cl.delegate = baseline
-                def result = cl.call()
+                closure.delegate = this
+                closure.resolveStrategy = Closure.DELEGATE_FIRST
+                def result = closure.call(baseline)
                 println "Result: " + (result ? "SUCCESS" : "FAILURE")
                 return result
             }

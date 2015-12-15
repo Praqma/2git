@@ -4,8 +4,10 @@ package dslContext
 import groovy.util.logging.Slf4j
 import migration.clearcase.Vob
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
-class MigrationContext {
+class MigrationContext implements Context {
     List<Vob> vobs = []
 
     /**
@@ -13,12 +15,10 @@ class MigrationContext {
      * @param name The name of the Vob
      * @param closure The configuration of the Vob
      */
-    def void vob(String name, @DelegatesTo(VobContext) Closure closure) {
+    def void vob(String name, @DslContext(VobContext) Closure closure) {
         log.debug('Entering vob().')
         def vobContext = new VobContext(name)
-        def vobClosure = closure.rehydrate(vobContext, this, this)
-        vobClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        vobClosure.run()
+        executeInContext(closure, vobContext)
         vobs.add(vobContext.vob)
         log.info('Added Vob {}.', vobContext.vob.name)
         log.debug('Exiting vob().')

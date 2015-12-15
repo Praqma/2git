@@ -6,8 +6,10 @@ import migration.clearcase.Component
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import utils.StringExtensions
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
-class ComponentContext {
+class ComponentContext implements Context {
     Component component
 
     /**
@@ -27,13 +29,11 @@ class ComponentContext {
      * @param name The name of the Stream
      * @param closure The configuration of the Stream
      */
-    def void stream(String name, @DelegatesTo(StreamContext) Closure closure) {
+    def void stream(String name, @DslContext(StreamContext) Closure closure) {
         log.debug('Entering stream().')
         if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.") //TODO Isn't it?
         def streamContext = new StreamContext(name)
-        def streamClosure = closure.rehydrate(streamContext, this, this)
-        streamClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        streamClosure.run()
+        executeInContext(closure, streamContext)
         component.streams.add(streamContext.stream)
         log.info('Added Stream {} to Component {}.', streamContext.stream.name, component.name)
         log.debug('Exiting stream().')
@@ -54,12 +54,10 @@ class ComponentContext {
      * Sets migration options for the Component
      * @param closure the migration options to set
      */
-    def void migrationOptions(@DelegatesTo(MigrationOptionsContext) Closure closure) {
+    def void migrationOptions(@DslContext(MigrationOptionsContext) Closure closure) {
         log.debug('Entering migrationOptions().')
         def migrationOptionsContext = new MigrationOptionsContext()
-        def migrationOptionsClosure = closure.rehydrate(migrationOptionsContext, this, this)
-        migrationOptionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        migrationOptionsClosure.run()
+        executeInContext(closure, migrationOptionsContext)
         component.migrationOptions = migrationOptionsContext.migrationOptions
         log.info('Configured migration options for Component {}.', component.name)
         log.debug('Exiting migrationOptions().')

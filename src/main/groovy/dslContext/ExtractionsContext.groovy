@@ -7,7 +7,7 @@ import net.praqma.clearcase.ucm.entities.Baseline
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
 @Slf4j
-class ExtractionsContext {
+class ExtractionsContext implements Context {
     List<Extraction> extractions = []
 
     /**
@@ -15,6 +15,7 @@ class ExtractionsContext {
      * @param mappingValues A map of values to extract and keys to map them to.
      */
     def void baselineProperty(Map<String, String> mappingValues) {
+        log.debug("Entering baselineProperty().")
         extractions.add(new Extraction() {
             @Override
             HashMap<String, Object> extract(CoolBaseline baseline) {
@@ -25,19 +26,20 @@ class ExtractionsContext {
                 return map
             }
         })
+        log.debug("Exiting baselineProperty().")
     }
 
     /**
      * Runs a custom closure to extract values.
-     * @param cl Closure to run, returns HashMap<String, Object>, runs in the Baseline's context
+     * @param closure Closure to run, returns HashMap<String, Object>, passes in the Baseline
      */
-    def void custom(Closure<HashMap<String, Object>> cl) {
+    def void custom(Closure<HashMap<String, Object>> closure) {
         extractions.add(new Extraction() {
             @Override
             HashMap<String, Object> extract(Baseline baseline) {
-                cl.resolveStrategy = Closure.DELEGATE_ONLY
-                cl.delegate = baseline
-                return cl.call()
+                closure.delegate = this
+                closure.resolveStrategy = Closure.DELEGATE_FIRST
+                return closure.call(baseline)
             }
         })
     }

@@ -5,8 +5,10 @@ import groovy.util.logging.Slf4j
 import migration.clearcase.Vob
 import utils.StringExtensions
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
-class VobContext {
+class VobContext implements Context {
     Vob vob
 
     /**
@@ -26,12 +28,10 @@ class VobContext {
      * @param name the Component name
      * @param closure the ComponentContext configuration
      */
-    def void component(String name, @DelegatesTo(ComponentContext) Closure closure) {
+    def void component(String name, @DslContext(ComponentContext) Closure closure) {
         log.debug('Entering component().')
         def componentContext = new ComponentContext(name)
-        def componentClosure = closure.rehydrate(componentContext, this, this)
-        componentClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        componentClosure.run()
+        executeInContext(closure, componentContext)
         vob.components.add(componentContext.component)
         log.info('Added Component {} to Vob {}.', componentContext.component.name, vob.name)
         log.debug('Exiting component().')

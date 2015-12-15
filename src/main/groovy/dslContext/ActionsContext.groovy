@@ -5,7 +5,7 @@ import groovy.text.SimpleTemplateEngine
 import migration.filter.actions.Action
 import net.praqma.util.execute.CommandLine
 
-class ActionsContext {
+class ActionsContext implements Context{
     List<Action> actions = []
 
     /**
@@ -48,15 +48,15 @@ class ActionsContext {
 
     /**
      * Executes a custom command groovy using
-     * @param cl the closure to run, returns void, runs in the extraction's HashMap context
+     * @param closure the closure to run, returns void, passes in the extraction map
      */
-    def void custom(Closure cl){
+    def void custom(Closure closure){
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                cl.resolveStrategy = Closure.DELEGATE_ONLY
-                cl.delegate = extractionMap
-                cl.run()
+                closure.delegate = this
+                closure.resolveStrategy = Closure.DELEGATE_FIRST
+                closure.call(extractionMap)
             }
         })
     }

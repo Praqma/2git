@@ -5,7 +5,7 @@ import groovy.util.logging.Slf4j
 import migration.GitOptions
 
 @Slf4j
-class GitOptionsContext {
+class GitOptionsContext implements Context {
     GitOptions gitOptions
 
     /**

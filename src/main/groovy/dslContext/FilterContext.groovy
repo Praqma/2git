@@ -4,9 +4,11 @@ package dslContext
 import groovy.util.logging.Slf4j
 import migration.filter.Filter
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
 
-class FilterContext {
+class FilterContext implements Context {
     Filter filter
 
     /**
@@ -23,12 +25,10 @@ class FilterContext {
      * Sets the Filter Criteria
      * @param closure the Criteria configuration
      */
-    def void criteria(@DelegatesTo(CriteriaContext) Closure closure) {
+    def void criteria(@DslContext(CriteriaContext) Closure closure) {
         log.debug('Entering criteria().')
         def criteriaContext = new CriteriaContext()
-        def criteriaClosure = closure.rehydrate(criteriaContext, this, this)
-        criteriaClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        criteriaClosure.run()
+        executeInContext(closure, criteriaContext)
         filter.criteria.addAll(criteriaContext.criteria)
         log.info('Added {} Criteria to Filter.', criteriaContext.criteria.size())
         log.debug('Exiting criteria().')
@@ -41,9 +41,7 @@ class FilterContext {
     def void extractions(@DelegatesTo(ExtractionsContext) Closure closure) {
         log.debug('Entering extractions().')
         def extractionsContext = new ExtractionsContext()
-        def extractionsClosure = closure.rehydrate(extractionsContext, this, this)
-        extractionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        extractionsClosure.run()
+        executeInContext(closure, extractionsContext)
         filter.extractions.addAll(extractionsContext.extractions)
         log.info('Added {} Extractions to Filter.', extractionsContext.extractions.size())
         log.debug('Exiting extractions().')
@@ -56,9 +54,7 @@ class FilterContext {
     def void actions(@DelegatesTo(ActionsContext) Closure closure) {
         log.debug('Entering actions().')
         def actionsContext = new ActionsContext()
-        def actionsClosure = closure.rehydrate(actionsContext, this, this)
-        actionsClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        actionsClosure.run()
+        executeInContext(closure, actionsContext)
         filter.actions.addAll(actionsContext.actions)
         log.info('Added {} Actions to Filter.', actionsContext.actions.size())
         log.debug('Exiting actions().')

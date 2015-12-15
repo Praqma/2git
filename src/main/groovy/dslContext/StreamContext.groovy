@@ -5,8 +5,10 @@ import groovy.util.logging.Slf4j
 import migration.clearcase.Stream
 import utils.StringExtensions
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
-class StreamContext {
+class StreamContext implements Context {
     Stream stream
 
     /**
@@ -36,12 +38,10 @@ class StreamContext {
      * Configures the migration steps
      * @param closure the migration step configuration
      */
-    def void migrationSteps(@DelegatesTo(MigrationStepsContext) Closure closure) {
+    def void migrationSteps(@DslContext(MigrationStepsContext) Closure closure) {
         log.debug('Entering migrationSteps().')
         def stepsContext = new MigrationStepsContext()
-        def stepsClosure = closure.rehydrate(stepsContext, this, this)
-        stepsClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        stepsClosure.run()
+        executeInContext(closure, stepsContext)
         stream.filters.addAll(stepsContext.filters)
         log.info('Added {} Steps to Stream {}.', stepsContext.filters.size(), stream.name)
         log.debug('Exiting migrationSteps().')

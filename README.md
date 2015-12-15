@@ -105,13 +105,13 @@ criteria {
 `custom (Closure<Boolean> closure)`
 ```groovy
 criteria {
-    custom {
+    custom { baseline ->
         println "Testing baseline name length limit."
-		return shortname.length <= 10
+		return baseline.shortname.length <= 10
     }
 }
 ```
-*Note: Executed in the context of the Baseline. You can access [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) properties.*
+*Note: The parameter passed in is a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
 ##### Promotion level
 `promotionLevels (String... promotionLevels)`
 ```groovy
@@ -129,21 +129,21 @@ extractions {
     baselineProperty [name: 'shortname']
 }
 ```
-*Note: See the [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) and its superclasses for viable properties to map.*
+*Note: Runs in the context of a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
 #### Custom
 `custom (Closure<HashMap<String, Object>> closure)`
 ```groovy
 extractions {
     /* Return a HashMap you build yourself. */
-    custom {
+    custom { baseline ->
         def map = new HashMap<String, Object>()
-		map.put('baselineName', shortname)
+		map.put('baselineName', baseline.shortname)
 		map.put('lostFoundContents', new File('lost+found').text)
 		return map
     }
 }
 ```
-*Note: Executed in the context of the Baseline. You can access [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java) properties.*
+*Note: The parameter passed in is a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
 ## Actions
 #### CLI commands
 `cmd(String command)`
@@ -162,14 +162,14 @@ actions {
 `custom(Closure closure)`
 ```groovy
 actions {
-    custom {
+    custom { map ->
 	    println "Executing custom logging action."
 	    def timestamp = new Date().toTimestamp()
-	    new File("timestamps.log").append("Migrated $extractedBaselineName at $timestamp.\n")
+	    new File("timestamps.log").append("$map.myExtractedValue seen at $timestamp.\n")
 	}
 }
 ```
-*Note: Runs in the context of your extractions. You can reference extracted key/value pairs as properties.*
+*Note: The parameter passed in is the extraction HashMap<String, Object> created in the Extraction phase.*
 
 #### Git commands
 `git (String command)`

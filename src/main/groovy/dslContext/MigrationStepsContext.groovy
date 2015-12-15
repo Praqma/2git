@@ -4,20 +4,20 @@ package dslContext
 import groovy.util.logging.Slf4j
 import migration.filter.Filter
 
+import static dslContext.ContextHelper.executeInContext
+
 @Slf4j
-class MigrationStepsContext {
+class MigrationStepsContext implements Context {
     List<Filter> filters = []
 
     /**
      * Configures a Filter for this migration
      * @param closure the Filter configuration
      */
-    def void filter(@DelegatesTo(FilterContext) Closure closure) {
+    def void filter(@DslContext(FilterContext) Closure closure) {
         log.debug('Entering filter().')
         def filterContext = new FilterContext()
-        def filterClosure = closure.rehydrate(filterContext, this, this)
-        filterClosure.resolveStrategy = Closure.DELEGATE_ONLY
-        filterClosure.run()
+        executeInContext(closure, filterContext)
         filters.add(filterContext.filter)
         log.debug('Exiting filter().')
     }
