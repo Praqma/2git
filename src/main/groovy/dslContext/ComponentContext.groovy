@@ -3,7 +3,6 @@ package dslContext
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import migration.clearcase.Component
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import utils.StringExtensions
 
 import static dslContext.ContextHelper.executeInContext
@@ -31,7 +30,6 @@ class ComponentContext implements Context {
      */
     def void stream(String name, @DslContext(StreamContext) Closure closure) {
         log.debug('Entering stream().')
-        if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.")
         def streamContext = new StreamContext(name)
         executeInContext(closure, streamContext)
         component.streams.add(streamContext.stream)

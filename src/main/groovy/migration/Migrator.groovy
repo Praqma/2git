@@ -1,5 +1,6 @@
 package migration
 
+import clearcase.AggregatedBaselineFilter
 @GrabResolver(name = 'praqma', root = 'http://code.praqma.net/repo/maven/', m2Compatible = 'true')
 @Grab('net.praqma:cool:0.6.45')
 import clearcase.Cool
@@ -14,6 +15,7 @@ import migration.filter.Filter
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
+import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.utils.BaselineList
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolView
 import org.apache.commons.io.FileUtils
@@ -31,8 +33,8 @@ class Migrator {
         def startDate = new Date()
         log.info("Migration started at " + startDate.toTimestamp())
 
-        // Collections to keep track of temporary Streams and Views.
-        // These will be removed after a(n un)successful migration.
+        // collections to keep track of temporary Streams and Views.
+        // these will be removed after a(n un)successful migration.
         List<CoolStream> streamsToRemove = []
         List<CoolView> viewsToRemove = []
 
@@ -49,12 +51,14 @@ class Migrator {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
 
+
+                    //-----set up Git repository-----\\
                     def gitOptions = component.migrationOptions.gitOptions
                     File gitDir = new File(gitOptions.dir)
                     File workTree = new File(gitOptions.workTree)
                     Git.path = workTree
-                    if(!workTree.exists()) FileUtils.forceMkdir(workTree)
-                    if(!gitDir.exists()){
+                    if (!workTree.exists()) FileUtils.forceMkdir(workTree)
+                    if (!gitDir.exists()) {
                         log.info("Git dir {} does not exist, performing first time setup.", gitDir)
                         FileUtils.forceMkdir(gitDir)
                         Git.callOrDie("init --separate-git-dir $gitOptions.dir")
@@ -67,54 +71,42 @@ class Migrator {
                         CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
                         log.info("Migrating Stream {}.", stream.name)
 
-                        BaselineList baselines = null
-                        LinkedHashMap<String, Baseline> baselineMap = [:]
+                        //-----register extractions and actions with Baselines-----\\
+                        LinkedHashMap<String, Baseline> migrationPlan = [:]
                         for (Filter filter : stream.filters) {
-                            //-----APPLY CRITERIA-----\\
-                            baselines = filter.getBaselines(baselines, sourceComponent, sourceStream)
-                            if (!baselines) {
-                                log.warn("No further baseline matches in step {}.", stream.filters.indexOf(filter) + 1)
-                                break
-                            }
-
-                            //-----REGISTER EXTRACTIONS AND ACTIONS-----\\
-                            baselines.each { sourceBaseline ->
-                                if (!baselineMap[sourceBaseline.fqname])
-                                    baselineMap.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
-
-                                baselineMap[sourceBaseline.fqname].extractions.addAll(filter.extractions)
-                                baselineMap[sourceBaseline.fqname].actions.addAll(filter.actions)
-                            }
+                            buildMigrationPlan(migrationPlan, filter, sourceComponent, sourceStream)
                         }
 
-                        if (!baselineMap) {
+                        if (!migrationPlan) {
                             log.warn("No baselines to migrate in {}.", stream.name)
                             continue
                         }
 
+                        //-----Set up Git work tree-----\\
                         Git.forceCheckout(stream.target)
-
-                        Baseline startingBaseline = baselineMap.values()[0]
+                        Baseline startingBaseline = migrationPlan.values()[0]
                         def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc-to-git")
                         streamsToRemove.add(migrationStream)
-
-                        // Create a temporary View inside the Git work tree.
                         def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc-to-git")
                         viewsToRemove.add(migrationView)
 
+
+                        //-----execute extractions and actions per Baseline-----\\
+                        def baselines = migrationPlan.values()
+                        def baselineCount = baselines.size()
                         def currentBaseline = 0
-                        def baselineCount = baselineMap.values().size()
-                        baselineMap.values().each { baseline ->
+                        for (Baseline baseline : baselines){
                             currentBaseline++
                             log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
 
+                            //-----rebase the stream and update the view-----\\
                             Cool.rebase(baseline.source, migrationView)
                             Cool.updateView(migrationView)
+                            // the .git and .gitignore file get removed during the update, add them again
                             new File(workTree, '.git').write("gitdir: $gitOptions.dir")
                             Git.writeGitIgnore(gitOptions)
 
-                            //-----EXTRACTIONS-----\\
-                            log.info("Extracting...")
+                            log.info("Executing extractions.")
                             def extractionMap = [:]
                             baseline.extractions.each { extraction ->
                                 extraction.extract(baseline.source).entrySet().each { kv ->
@@ -123,13 +115,14 @@ class Migrator {
                             }
                             log.info("Extracted: {}.", extractionMap)
 
-                            //-----ACTIONS-----\\
+                            log.info("Executing actions.")
                             baseline.actions.each { action ->
                                 action.act(extractionMap)
                             }
+                            log.info("Done executing actions.")
                         }
 
-                        //Migration complete, let's clean up
+                        // migration complete, let's clean up
                         Cool.deleteViews(viewsToRemove)
                         Cool.deleteStreams(streamsToRemove)
                     }
@@ -145,6 +138,67 @@ class Migrator {
                 log.info("Migration took " + duration.toString())
             }
             log.debug("Exiting migrate().")
+        }
+    }
+
+    /**
+     * Builds a map of filtered Baselines with registered extractions and actions
+     * @param migrationPlan the Baseline map to build up
+     * @param filter the filter to use to get Baselines from ClearCase
+     * @param sourceComponent the Baseline source component
+     * @param sourceStream the Baseline source stream
+     */
+    static void buildMigrationPlan(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, CoolComponent sourceComponent, CoolStream sourceStream) {
+        BaselineFilter baselineFilter = new AggregatedBaselineFilter(filter.criteria)
+        def baselines = Cool.getBaselines(sourceComponent, sourceStream, baselineFilter)
+        log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+        if (!baselines) {
+            log.warn("No more matching baselines.")
+            return
+        }
+
+        addMigrationSteps(migrationPlan, filter, baselines)
+        for(Filter childFilter : filter.filters){
+            buildMigrationPlan(migrationPlan, childFilter, baselines)
+        }
+    }
+
+    /**
+     * Builds a map of filtered Baselines with registered extractions and actions
+     * @param migrationPlan the Baseline map to build up
+     * @param filter the filter to apply
+     * @param baselines the Baselines to apply the filter on
+     */
+    static void buildMigrationPlan(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, BaselineList baselines) {
+        BaselineFilter baselineFilter = new AggregatedBaselineFilter(filter.criteria)
+        baselines = baselines.applyFilter(baselineFilter)
+        log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+        if (!baselines) {
+            log.warn("No more matching baselines.")
+            return
+        }
+
+        addMigrationSteps(migrationPlan, filter, baselines)
+        for(Filter childFilter : filter.filters){
+            buildMigrationPlan(migrationPlan, childFilter, baselines)
+        }
+    }
+
+    /**
+     * Adds a filter's extractions and actions to Baselines and adds them to the migration plan
+     * @param migrationPlan the Baseline map to build up
+     * @param filter the filter whose steps to add to the baselines
+     * @param baselines the Baselines to add to the migration plan
+     */
+    static void addMigrationSteps(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, BaselineList baselines) {
+        baselines.each { sourceBaseline ->
+            // register baseline if necessary
+            if (!migrationPlan[sourceBaseline.fqname])
+                migrationPlan.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
+
+            // add actions and extractions
+            migrationPlan[sourceBaseline.fqname].extractions.addAll(filter.extractions)
+            migrationPlan[sourceBaseline.fqname].actions.addAll(filter.actions)
         }
     }
 }

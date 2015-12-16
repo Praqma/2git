@@ -67,13 +67,14 @@ class Git {
     }
 
     /**
-     * Checkout a branch, if it doesn't exist, create it and check it out.
+     * Checkout a branch, if it doesn't exist, check out an orphan.
      * @param branch the branch to check out
      */
     static void forceCheckout(String branch) {
         if (!call("rev-parse --verify " + branch))
             callOrDie("checkout " + branch)
-        else
-            callOrDie("checkout -b " + branch)
+        else{
+            callOrDie("checkout --orphan " + branch)
+        }
     }
 }

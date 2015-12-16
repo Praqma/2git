@@ -22,6 +22,19 @@ class FilterContext implements Context {
     }
 
     /**
+     * Sets the Filter Actions
+     * @param closure the Actions configuration
+     */
+    def void actions(@DelegatesTo(ActionsContext) Closure closure) {
+        log.debug('Entering actions().')
+        def actionsContext = new ActionsContext()
+        executeInContext(closure, actionsContext)
+        filter.actions.addAll(actionsContext.actions)
+        log.info('Added {} Actions to Filter.', actionsContext.actions.size())
+        log.debug('Exiting actions().')
+    }
+
+    /**
      * Sets the Filter Criteria
      * @param closure the Criteria configuration
      */
@@ -38,7 +51,7 @@ class FilterContext implements Context {
      * Sets the Filter Extractions
      * @param closure the Extractions configuration
      */
-    def void extractions(@DelegatesTo(ExtractionsContext) Closure closure) {
+    def void extractions(@DslContext(ExtractionsContext) Closure closure) {
         log.debug('Entering extractions().')
         def extractionsContext = new ExtractionsContext()
         executeInContext(closure, extractionsContext)
@@ -48,15 +61,15 @@ class FilterContext implements Context {
     }
 
     /**
-     * Sets the Filter Actions
-     * @param closure the Actions configuration
+     * Adds a child filter to the filter
+     * @param closure the Filter configuration
      */
-    def void actions(@DelegatesTo(ActionsContext) Closure closure) {
-        log.debug('Entering actions().')
-        def actionsContext = new ActionsContext()
-        executeInContext(closure, actionsContext)
-        filter.actions.addAll(actionsContext.actions)
-        log.info('Added {} Actions to Filter.', actionsContext.actions.size())
-        log.debug('Exiting actions().')
+    def void filter(@DslContext(FilterContext) Closure closure){
+        log.debug('Entering filter().')
+        def filterContext = new FilterContext()
+        executeInContext(closure, filterContext)
+        filter.filters.add(filterContext.filter)
+        log.info('Added Filter to Filter.')
+        log.debug('Exiting filter().')
     }
 }

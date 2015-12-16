@@ -49,17 +49,17 @@ migrate {
                             git 'add -A'
                             git 'commit -m\"myName\"'
                         }
-                    }
-                    // further filter previously selected baselines
-                    filter {
-                        criteria {
-                            promotionLevels 'RELEASED'
-                        }
-                        extractions {
-                            baselineExtractor([level: 'promotionLevel'])
-                        }
-                        actions {
-                            git 'tag \"$level-$name\"'
+                        // further filter selected baselines
+                        filter {
+                            criteria {
+                                promotionLevels 'RELEASED'
+                            }
+                            extractions {
+                                baselineExtractor([level: 'promotionLevel'])
+                            }
+                            actions {
+                                git 'tag \"$level-$name\"'
+                            }
                         }
                     }
                 }
@@ -223,19 +223,19 @@ migrate{
 							git 'add .'
 							git 'commit -m"$name"'
 							git 'notes add -m"$fqname" HEAD' 
-                        }
+                        }                    
+    					filter {
+    						criteria {
+    							promotionLevels 'RELEASED'
+    						}
+    						extractions {
+    							baselineProperty([level: 'promotionLevel'])
+						    }
+						    actions {
+						    	git 'tag \"$level-$name\"'  // tag released baselines
+					    	}
+					    }
                     }
-					filter {
-						criteria {
-							promotionLevels 'RELEASED'
-						}
-						extractions {
-							baselineProperty([level: 'promotionLevel'])
-						}
-						actions {
-							git 'tag \"$level-$name\"'  // tag released baselines
-						}
-					}
                 }
             }
         }
