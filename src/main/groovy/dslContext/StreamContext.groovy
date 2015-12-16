@@ -30,7 +30,7 @@ class StreamContext implements Context {
     def void branch(String branch) {
         log.debug('Entering branch().')
         stream.target = branch
-        log.info('Set stream {} branch to {}', stream.name, stream.target)
+        log.info('Set branch to {} for stream', stream.target, stream.name)
         log.debug('Exiting branch().')
     }
 
@@ -43,7 +43,7 @@ class StreamContext implements Context {
         def stepsContext = new MigrationStepsContext()
         executeInContext(closure, stepsContext)
         stream.filters.addAll(stepsContext.filters)
-        log.info('Added {} Steps to Stream {}.', stepsContext.filters.size(), stream.name)
+        log.info('Added {} filters to stream {}.', stepsContext.filters.size(), stream.name)
         log.debug('Exiting migrationSteps().')
     }
 }

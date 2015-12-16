@@ -19,7 +19,7 @@ import net.praqma.clearcase.ucm.view.UpdateView
 class Cool {
 
     /**
-     * Removes given Views
+     * Removes given Views. Doesn't delete the View directory.
      * @param coolViews The Cool Views to remove.
      */
     static void deleteViews(List<CoolSnapshotView> coolViews) {
