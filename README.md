@@ -1,49 +1,50 @@
 # ClearCase to Git
 A Groovy DSL to facilitate migration from ClearCase to Git. The project currently focuses on the migration of ClearCase UCM components to Git repositories. 
-## Concept
-The ClearCase to Git DSL allows users to define steps to migrate their ClearCase components to Git repositories. 
 
-After choosing which Stream to retrieve the Component Baselines from, Baseline subsets can easily be selected and acted upon, selecting which Baselines to migrate as commits and which of those to tag, etc...
+## Concept and workflow
+The cc-to-git DSL allows you to easily select sets of baselines from a component stream and assign actions for them. 
+These actions can be anything but will most likely consist of Git commits, tags, etc.
 
-### Mapping table
-
+A temporary child stream is created for the migration, its view acts as the git work tree in the migration.
+Every selected baseline is rebased onto the child stream, the view is updated and the actions are executed.
+#### Mapping table
 | CCUCM         |   | Git        	|
 |:-------------:|:-:|:-------------:|
 | Component 	|-> | Repository 	|
 | Stream    	|-> | Branch     	|
 | Baseline  	|-> | Commit      	|
 
-## Example
-The following example just shows off what the migration of a demo component looks like.
+## A quick example
+The following example shows off what the migration of a demo component looks like.
 #### DSL script
 ```groovy
 migrate {
-    vob('\\v_foo') {
-    	component('c_model') {
-            migrationOptions {                              // optional migration settings
+    vob('\\v_foo') {    // a VOB to migrate from
+    	component('c_model') {  // a component we will be migrating
+            migrationOptions {      // some migration options we can set
                 git {
-                    dir 'e:\\cc-to-git\\model\\.git'        // target git repository
-                    workTree 'e:\\cc-to-git\\model\\view'   // target git work tree
-                    ignore '*.log', 'junk.txt'              // add files to the .gitignore file
-                    user 'praqma'                           // set the Git user name
-                    email 'support@praqma.net'              // set the Git user mail
+                    dir 'e:\\cc-to-git\\model\\.git'        // the git repository path
+                    workTree 'e:\\cc-to-git\\model\\view'   // the git work tree path
+                    ignore '*.log', 'junk.txt'              // files to add to .gitignore
+                    user 'praqma'                           // the Git user name
+                    email 'support@praqma.net'              // the Git user mail
                 }
             }
-            stream('s_model_int') {
-                branch 'master'     // target Git branch name
-
+            stream('s_model_int') { // the stream we will be migrating
+                branch 'master'         // optionally set the target branch name, defaults to stream name
                 migrationSteps {
-                	// baselines are selected and acted upon in steps using filters
+                	// baselines are selected and acted upon in steps through filters
                     filter {
-                    	// select Baselines using criteria
+                    	// criteria for selecting baselines
                         criteria {
-                            baselineName 'v\\d{1}\\.\\d{1}\\.\\d{1}' //ex.: v1.2.0
+                            afterDate (new Date() - 100) // from the past 100 days  
+                            baselineName 'v\\d{1}\\.\\d{1}\\.\\d{1}' // matching this regex ex.: v1.2.0
                         }
-                        // extract values to a map for use in actions
+                        // map values for use in actions
                         extractions {
-                            baselineExtractor([myName: 'shortname'])
+                            baselineExtractor([myName: 'shortname']) // evaluates&maps the baseline shortname
                         }
-                        // execute actions for these baselines
+                        // register actions to run for these baselines
                         actions {
                             git 'add -A'
                             git 'commit -m\"myName\"'
@@ -68,15 +69,19 @@ migrate {
 }
 ```
 #### Resulting repository
-* `7ffbaa4` v1.1.0 (HEAD -> s_model_int, tag: RELEASED-v1.1.0) 
+* `7ffbaa4` v1.1.0 (HEAD -> master, tag: RELEASED-v1.1.0) 
 * `bb84137` v1.0.1
 * `13d4ac4` v1.0.0 (tag: RELEASED-v1.0.0)
 
 ## Running the DSL
-Tweak the `command.groovy`, then run `ClearCaseToGit.groovy`.
+Write your DSL code in the `command.groovy` file and run `ClearCaseToGit.groovy`.
 
-## Features
-### Filter criteria
+OR
+
+Run `ClearCaseToGit.groovy` after setting the DSL as the `CCTOGIT_COMMAND` environment variable.
+
+## Filter features
+### Criteria
 ##### Baseline creation date
 `afterBaseline (String baselineName)`
 ```groovy
@@ -121,7 +126,7 @@ criteria {
     promotionLevels 'TESTED', 'RELEASED'
 }
 ```
-## Extractions
+### Extractions
 #### Baseline properties
 `baselineProperty (Map<String, String> mappingValues)`
 ```groovy
@@ -146,7 +151,7 @@ extractions {
 }
 ```
 *Note: The parameter passed in is a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
-## Actions
+### Actions
 #### CLI commands
 `cmd(String command)`
 ```groovy
@@ -178,5 +183,71 @@ actions {
 ```groovy
 actions {
     git 'commit -m\"$name\"''
+}
+```
+
+## More examples
+Cookie cutter migration script.
+```groovy
+def vobName = '\\2Cool_PVOB'
+def componentName = 'Client' 
+def streamName = 'Client_int'  
+def gitDir = "E:\\cc-to-git\\$componentName\\.git"
+def gitWorkTree = "E:\\cc-to-git\\$componentName\\view"
+def startDate = '31-05-2012'
+
+migrate{
+    vob(vobName) {
+        component(componentName) {
+            migrationOptions {
+                git {
+					dir	gitDir
+					workTree gitWorkTree
+                    ignore 'build.log', 'test.log'
+                    user 'praqma'
+                    email 'support@praqma.net'
+                }
+            }
+            stream(streamName) {
+				branch 'master'
+                migrationSteps {
+                    filter {
+                        criteria {
+							afterDate 'dd-MM-yyy', startDate
+							promotionLevels 'TESTED', 'RELEASED'
+                        }
+                        extractions {
+                            baselineProperty([name: 'shortname', fqname: 'fqname'])
+                        }
+                        actions {
+							git 'add .'
+							git 'commit -m"$name"'
+							git 'notes add -m"$fqname" HEAD' 
+                        }
+                    }
+					filter {
+						criteria {
+							promotionLevels 'RELEASED'
+						}
+						extractions {
+							baselineProperty([level: 'promotionLevel'])
+						}
+						actions {
+							git 'tag \"$level-$name\"'  // tag released baselines
+						}
+					}
+                }
+            }
+        }
+    }
+}
+```
+In the above example we add the fully qualified baseline name as a note to the commit.
+You can use this to have the migration continue from where it last left off.
+```groovy
+criteria {
+    def lastBaselineName = "git --git-dir $gitWorkTree notes show HEAD".execute().text
+	afterBaseline lastBaselineName
+    promotionLevels 'TESTED', 'RELEASED'
 }
 ```
