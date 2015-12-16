@@ -18,36 +18,38 @@ The following example just shows off what the migration of a demo component look
 #### DSL script
 ```groovy
 migrate {
-	// Pick a Vob to migrate from
     vob('\\v_foo') {
-    	// Pick a Component to migrate
-        component('c_model') {
-            // Optionally set the target repository path
-            repository '/home/natalie/sandbox/model'
-
-        	// Pick a Stream from which the Baselines will be migrated
+    	component('c_model') {
+            migrationOptions {                              // optional migration settings
+                git {
+                    dir 'e:\\cc-to-git\\model\\.git'        // target git repository
+                    workTree 'e:\\cc-to-git\\model\\view'   // target git work tree
+                    ignore '*.log', 'junk.txt'              // add files to the .gitignore file
+                    user 'praqma'                           // set the Git user name
+                    email 'support@praqma.net'              // set the Git user mail
+                }
+            }
             stream('s_model_int') {
-                // Optionally set the target branch name 
-                branch 'master'
+                branch 'master'     // target Git branch name
 
                 migrationSteps {
-                	// A migration step is represented by a filter
+                	// baselines are selected and acted upon in steps using filters
                     filter {
-                    	// Filter Baselines using given criteria
+                    	// select Baselines using criteria
                         criteria {
-                            baselineName /v\d{1}\.\d{1}\.\d{1}/ //ex.: v1.2.0
+                            baselineName 'v\\d{1}\\.\\d{1}\\.\\d{1}' //ex.: v1.2.0
                         }
-                        // Extract values to a map, which can be used in the actions
+                        // extract values to a map for use in actions
                         extractions {
-                            baselineExtractor([name: 'shortname'])
+                            baselineExtractor([myName: 'shortname'])
                         }
-                        // Execute given actions for these baselines
+                        // execute actions for these baselines
                         actions {
                             git 'add -A'
-                            git 'commit -m\"$name\"'
+                            git 'commit -m\"myName\"'
                         }
                     }
-                    // FURTHER filter Baselines using given criteria
+                    // further filter previously selected baselines
                     filter {
                         criteria {
                             promotionLevels 'RELEASED'

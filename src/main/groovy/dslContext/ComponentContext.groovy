@@ -31,23 +31,12 @@ class ComponentContext implements Context {
      */
     def void stream(String name, @DslContext(StreamContext) Closure closure) {
         log.debug('Entering stream().')
-        if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.") //TODO Isn't it?
+        if (component.streams) throw new NotImplementedException("Multiple streams for one component aren't supported yet.")
         def streamContext = new StreamContext(name)
         executeInContext(closure, streamContext)
         component.streams.add(streamContext.stream)
         log.info('Added Stream {} to Component {}.', streamContext.stream.name, component.name)
         log.debug('Exiting stream().')
-    }
-
-    /**
-     * Sets the branch repository for the component
-     * @param path the repository path
-     */
-    def void repository(String repository) {
-        log.debug('Entering repository().')
-        component.target = repository
-        log.info('Set Component {} repository path to {}', component.name, component.target)
-        log.debug('Exiting repository().')
     }
 
     /**

@@ -12,7 +12,7 @@ import org.apache.commons.io.FileUtils
  */
 @Slf4j
 class Git {
-    static String path = "./output" // The path the Git commands will be run in
+    static File path = new File("./output") // The path the Git commands will be run in TODO Remove this
 
     /**
      * Calls Git with given arguments in the set path.
@@ -40,7 +40,7 @@ class Git {
         String cmd = "git " + args.join(" ");
         log.info("Running '{}' in {}", cmd, path)
         log.info("Executing: {}", cmd)
-        CommandLine.newInstance().run(cmd, new File(path)).stdoutBuffer.eachLine { line -> println line }
+        CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line -> println line }
     }
 
     /**
@@ -53,13 +53,17 @@ class Git {
         log.info("Set git user.name to {}.", gitOptions.user)
         callOrDie("config", "user.email", gitOptions.email)
         log.info("Set git user.email to {}.", gitOptions.email)
-        def gitIgnore = new File(path, '.gitignore');
+        writeGitIgnore(gitOptions)
+        log.debug("Exiting configureRepository().")
+    }
+
+    static void writeGitIgnore(GitOptions gitOptions) {
+        def gitIgnore = new File(gitOptions.workTree, '.gitignore');
         if (gitIgnore.exists()) FileUtils.forceDelete(gitIgnore)
         gitOptions.ignore.each { rule ->
             FileUtils.writeStringToFile(gitIgnore, rule + '\n', true)
             log.info("Added {} to .gitignore.", rule)
         }
-        log.debug("Exiting configureRepository().")
     }
 
     /**
@@ -67,9 +71,9 @@ class Git {
      * @param branch the branch to check out
      */
     static void forceCheckout(String branch) {
-        if (!Git.call("rev-parse --verify " + branch))
-            Git.callOrDie("checkout " + branch)
+        if (!call("rev-parse --verify " + branch))
+            callOrDie("checkout " + branch)
         else
-            Git.callOrDie("checkout -b " + branch)
+            callOrDie("checkout -b " + branch)
     }
 }

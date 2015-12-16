@@ -49,4 +49,24 @@ class GitOptionsContext implements Context {
         log.info('Set email to: {}', email)
         log.debug('Exiting email().')
     }
+
+    /**
+     * Sets the Git dir path
+     */
+    def void dir(String path) {
+        log.debug('Entering dir().')
+        gitOptions.dir = path
+        log.info('Set dir to: {}', path)
+        log.debug('Exiting dir().')
+    }
+
+    /**
+     * Sets the Git work tree path
+     */
+    def void workTree(String path) {
+        log.debug('Entering workTree().')
+        gitOptions.workTree = path
+        log.info('Set workTree to: {}', path)
+        log.debug('Exiting workTree().')
+    }
 }

@@ -1,9 +1,10 @@
 migrate {
     vob('\\2Cool_PVOB') {
         component('Model') {
-            repository 'E:\\cc-to-git'
             migrationOptions {
                 git {
+                    dir 'E:\\cc-to-git\\.git'
+                    workTree 'E:\\cc-to-git\\view'
                     ignore '.jnk'
                     user 'praqma'
                     email 'support@praqma.net'

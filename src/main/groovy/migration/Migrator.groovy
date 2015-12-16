@@ -49,7 +49,18 @@ class Migrator {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
 
-                    File repository = component.setUpRepository()
+                    def gitOptions = component.migrationOptions.gitOptions
+                    File gitDir = new File(gitOptions.dir)
+                    File workTree = new File(gitOptions.workTree)
+                    Git.path = workTree
+                    if(!workTree.exists()) FileUtils.forceMkdir(workTree)
+                    if(!gitDir.exists()){
+                        log.info("Git dir {} does not exist, performing first time setup.", gitDir)
+                        FileUtils.forceMkdir(gitDir)
+                        Git.callOrDie("init --separate-git-dir $gitOptions.dir")
+                    }
+                    Git.configureRepository(gitOptions)
+
                     //-----STREAM-----\\
                     log.info("Migrating {} Stream(s)", component.streams.size())
                     for (Stream stream : component.streams) {
@@ -87,15 +98,9 @@ class Migrator {
                         def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc-to-git")
                         streamsToRemove.add(migrationStream)
 
-                        // Create a temporary View inside the Git repository.
-                        // Because ClearCase can't make Views in existing folders, Cool deletes the branch path.
-                        // We temporarily move the .git dir to avoid it being deleted by Cool.
-                        FileUtils.moveDirectory(new File(repository.path, ".git"), new File(repository.parentFile.path, ".git"))
-                        FileUtils.moveFile(new File(repository.path, ".gitignore"), new File(repository.parentFile.path, ".gitignore"))
-                        def migrationView = Cool.createView(migrationStream, repository.path, component.name + "_cc-to-git")
+                        // Create a temporary View inside the Git work tree.
+                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc-to-git")
                         viewsToRemove.add(migrationView)
-                        FileUtils.moveDirectory(new File(repository.parentFile.path, ".git"), new File(repository.path, ".git"))
-                        FileUtils.moveFile(new File(repository.parentFile.path, ".gitignore"), new File(repository.path, ".gitignore"))
 
                         def currentBaseline = 0
                         def baselineCount = baselineMap.values().size()
@@ -105,6 +110,8 @@ class Migrator {
 
                             Cool.rebase(baseline.source, migrationView)
                             Cool.updateView(migrationView)
+                            new File(workTree, '.git').write("gitdir: $gitOptions.dir")
+                            Git.writeGitIgnore(gitOptions)
 
                             //-----EXTRACTIONS-----\\
                             log.info("Extracting...")

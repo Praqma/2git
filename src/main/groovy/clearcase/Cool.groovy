@@ -71,10 +71,10 @@ class Cool {
      * @param path The path to create the Cool View at.
      * @return The new Cool View.
      */
-    static CoolSnapshotView createView(CoolStream coolStream, String path, String tag) {
+    static CoolSnapshotView createView(CoolStream coolStream, File path, String tag) {
         log.debug("Entering createView().")
         log.info("Creating view for {}.", coolStream.fullyQualifiedName)
-        def coolView = CoolSnapshotView.create(coolStream, new File(path), tag)
+        def coolView = CoolSnapshotView.create(coolStream, path, tag)
         log.info("Created view for {}.", coolStream.fullyQualifiedName)
         log.debug("Exiting createView().")
         return coolView
