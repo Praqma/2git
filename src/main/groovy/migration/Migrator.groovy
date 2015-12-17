@@ -78,7 +78,7 @@ class Migrator {
                         }
 
                         if (!migrationPlan) {
-                            log.warn("No baselines to migrate in {}.", stream.name)
+                            log.warn("No baselines matching criteria in stream {}.", stream.name)
                             continue
                         }
 
@@ -106,7 +106,7 @@ class Migrator {
                             new File(workTree, '.git').write("gitdir: $gitOptions.dir")
                             Git.writeGitIgnore(gitOptions)
 
-                            log.info("Executing extractions.")
+                            log.info("Executing {} extractions.", baseline.extractions.size())
                             def extractionMap = [:]
                             baseline.extractions.each { extraction ->
                                 extraction.extract(baseline.source).entrySet().each { kv ->
@@ -115,7 +115,7 @@ class Migrator {
                             }
                             log.info("Extracted: {}.", extractionMap)
 
-                            log.info("Executing actions.")
+                            log.info("Executing {} actions.", baseline.actions.size())
                             baseline.actions.each { action ->
                                 action.act(extractionMap)
                             }
@@ -151,7 +151,7 @@ class Migrator {
     static void buildMigrationPlan(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, CoolComponent sourceComponent, CoolStream sourceStream) {
         BaselineFilter baselineFilter = new AggregatedBaselineFilter(filter.criteria)
         def baselines = Cool.getBaselines(sourceComponent, sourceStream, baselineFilter)
-        log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+        log.info("Found {} baseline(s) matching given requirements: {}", baselines.size(), baselines)
         if (!baselines) {
             log.warn("No more matching baselines.")
             return
@@ -172,7 +172,7 @@ class Migrator {
     static void buildMigrationPlan(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, BaselineList baselines) {
         BaselineFilter baselineFilter = new AggregatedBaselineFilter(filter.criteria)
         baselines = baselines.applyFilter(baselineFilter)
-        log.info("Found {} baselines matching given requirements: {}", baselines.size(), baselines)
+        log.info("Found {} baseline(s) matching given requirements: {}", baselines.size(), baselines)
         if (!baselines) {
             log.warn("No more matching baselines.")
             return
@@ -191,10 +191,12 @@ class Migrator {
      * @param baselines the Baselines to add to the migration plan
      */
     static void addMigrationSteps(LinkedHashMap<String, Baseline> migrationPlan, Filter filter, BaselineList baselines) {
+        log.info("Registering {} extraction(s) and {} action(s) to {} baseline(s).", filter.extractions.size(), filter.actions.size(), baselines.size())
         baselines.each { sourceBaseline ->
             // register baseline if necessary
-            if (!migrationPlan[sourceBaseline.fqname])
+            if (!migrationPlan[sourceBaseline.fqname]){
                 migrationPlan.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
+            }
 
             // add actions and extractions
             migrationPlan[sourceBaseline.fqname].extractions.addAll(filter.extractions)

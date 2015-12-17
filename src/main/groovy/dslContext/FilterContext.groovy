@@ -17,7 +17,7 @@ class FilterContext implements Context {
     def FilterContext() {
         log.debug('Entering FilterContext().')
         filter = new Filter()
-        log.info("Creating a filter for migration.")
+        log.trace("Creating a filter for migration.")
         log.debug('Exiting FilterContext().')
     }
 
@@ -30,7 +30,7 @@ class FilterContext implements Context {
         def actionsContext = new ActionsContext()
         executeInContext(closure, actionsContext)
         filter.actions.addAll(actionsContext.actions)
-        log.info('Added {} actions to the filter.', actionsContext.actions.size())
+        log.trace('Added {} actions to the filter.', actionsContext.actions.size())
         log.debug('Exiting actions().')
     }
 
@@ -43,7 +43,7 @@ class FilterContext implements Context {
         def criteriaContext = new CriteriaContext()
         executeInContext(closure, criteriaContext)
         filter.criteria.addAll(criteriaContext.criteria)
-        log.info('Added {} criteria to the filter.', criteriaContext.criteria.size())
+        log.trace('Added {} criteria to the filter.', criteriaContext.criteria.size())
         log.debug('Exiting criteria().')
     }
 
@@ -56,7 +56,7 @@ class FilterContext implements Context {
         def extractionsContext = new ExtractionsContext()
         executeInContext(closure, extractionsContext)
         filter.extractions.addAll(extractionsContext.extractions)
-        log.info('Added {} extractions to the filter.', extractionsContext.extractions.size())
+        log.trace('Added {} extractions to the filter.', extractionsContext.extractions.size())
         log.debug('Exiting extractions().')
     }
 
@@ -69,7 +69,7 @@ class FilterContext implements Context {
         def filterContext = new FilterContext()
         executeInContext(closure, filterContext)
         filter.filters.add(filterContext.filter)
-        log.info('Added a child filter to the filter.')
+        log.trace('Added a child filter to the filter.')
         log.debug('Exiting filter().')
     }
 }

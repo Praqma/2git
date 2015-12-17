@@ -19,7 +19,7 @@ class StreamContext implements Context {
         log.debug('Entering StreamContext().')
         def parseResult = StringExtensions.parseClearCaseName(name)
         this.stream = new Stream(parseResult.tag)
-        log.info("Stream {} registered for migration.", stream.name)
+        log.trace("Stream {} registered for migration.", stream.name)
         log.debug('Exiting StreamContext().')
     }
 
@@ -30,7 +30,7 @@ class StreamContext implements Context {
     def void branch(String branch) {
         log.debug('Entering branch().')
         stream.target = branch
-        log.info('Set branch to {} for stream', stream.target, stream.name)
+        log.trace('Set branch to {} for stream', stream.target, stream.name)
         log.debug('Exiting branch().')
     }
 
@@ -43,7 +43,7 @@ class StreamContext implements Context {
         def stepsContext = new MigrationStepsContext()
         executeInContext(closure, stepsContext)
         stream.filters.addAll(stepsContext.filters)
-        log.info('Added {} filters to stream {}.', stepsContext.filters.size(), stream.name)
+        log.trace('Added {} filters to stream {}.', stepsContext.filters.size(), stream.name)
         log.debug('Exiting migrationSteps().')
     }
 }

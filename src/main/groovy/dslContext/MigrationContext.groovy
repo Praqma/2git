@@ -20,7 +20,7 @@ class MigrationContext implements Context {
         def vobContext = new VobContext(name)
         executeInContext(closure, vobContext)
         vobs.add(vobContext.vob)
-        log.info('Added Vob {}.', vobContext.vob.name)
+        log.trace('Added Vob {}.', vobContext.vob.name)
         log.debug('Exiting vob().')
     }
 }

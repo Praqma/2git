@@ -38,8 +38,7 @@ class Git {
      */
     static void callOrDie(String... args) {
         String cmd = "git " + args.join(" ");
-        log.info("Running '{}' in {}", cmd, path)
-        log.info("Executing: {}", cmd)
+        log.info("Executing '{}' in {}", cmd, path)
         CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line -> println line }
     }
 
@@ -50,9 +49,9 @@ class Git {
     static void configureRepository(GitOptions gitOptions) {
         log.debug("Entering configureRepository().")
         callOrDie("config", "user.name", gitOptions.user)
-        log.info("Set git user.name to {}.", gitOptions.user)
+        log.trace("Set git user.name to {}.", gitOptions.user)
         callOrDie("config", "user.email", gitOptions.email)
-        log.info("Set git user.email to {}.", gitOptions.email)
+        log.trace("Set git user.email to {}.", gitOptions.email)
         writeGitIgnore(gitOptions)
         log.debug("Exiting configureRepository().")
     }
@@ -62,7 +61,7 @@ class Git {
         if (gitIgnore.exists()) FileUtils.forceDelete(gitIgnore)
         gitOptions.ignore.each { rule ->
             FileUtils.writeStringToFile(gitIgnore, rule + '\n', true)
-            log.info("Added {} to .gitignore.", rule)
+            log.trace("Added {} to .gitignore.", rule)
         }
     }
 

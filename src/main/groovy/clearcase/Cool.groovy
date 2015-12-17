@@ -27,8 +27,10 @@ class Cool {
         def viewIterator = coolViews.iterator()
         while (viewIterator.hasNext()) {
             CoolSnapshotView coolView = viewIterator.next()
-            log.info("Removing view {}.", coolView.fullyQualifiedName)
+            String viewName = coolView.fullyQualifiedName
+            log.info("Removing view {}.", viewName)
             coolView.remove()
+            log.info("Removed view {}.", viewName)
             viewIterator.remove()
         }
         log.debug("Exiting deleteViews()")
@@ -43,8 +45,10 @@ class Cool {
         def streamIterator = coolStreams.iterator()
         while (streamIterator.hasNext()) {
             CoolStream coolStream = streamIterator.next()
-            log.info("Removing stream {}.", coolStream.fullyQualifiedName)
+            def streamName = coolStream.fullyQualifiedName
+            log.info("Removing stream {}.", streamName)
             coolStream.remove()
+            log.info("Removed stream {}.", streamName)
             streamIterator.remove()
         }
         log.debug("Exiting deleteStreams()")
@@ -91,7 +95,7 @@ class Cool {
         log.debug("Entering getBaselines().")
         log.info("Retrieving Cool baselines for {} in {}", coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
         def baselines = new BaselineList(coolStream, coolComponent, null).addFilter(baselineFilter).apply()
-        log.info("Retrieved {} Cool baselines for {} in {}", baselines.size(), coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
+        log.info("Retrieved {} Cool baseline(s) for {} in {}", baselines.size(), coolComponent.fullyQualifiedName, coolStream.fullyQualifiedName)
         log.debug("Exiting getBaselines().")
         return baselines
     }
@@ -162,6 +166,7 @@ class Cool {
         log.info("Updating {}", coolView.fullyQualifiedName)
         def loadRules = new CoolSnapshotView.LoadRules2(CoolSnapshotView.Components.MODIFIABLE);
         new UpdateView(coolView).setLoadRules(loadRules).update()
+        log.info("Updated {}", coolView.fullyQualifiedName)
         log.debug("Exiting updateView().")
     }
 }

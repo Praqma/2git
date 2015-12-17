@@ -18,8 +18,10 @@ abstract class ScriptBase extends Script implements Context {
      */
     def void migrate(@DslContext(MigrationContext) Closure closure) {
         log.debug('Entering migrate().')
+        log.info('Building migration tree.')
         def migrationContext = new MigrationContext()
         executeInContext(closure, migrationContext)
+        log.info('Finished building migration tree.')
         Migrator.migrate(migrationContext.vobs);
         log.info(migrationComplete())
         log.debug('Exiting migrate().')

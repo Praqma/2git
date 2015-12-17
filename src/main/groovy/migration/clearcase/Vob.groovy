@@ -16,6 +16,8 @@ class Vob {
      * @param name the Vob name
      */
     public Vob(String name) {
+        log.debug('Entering Vob()')
         this.name = name
+        log.debug('Exiting Vob()')
     }
 }

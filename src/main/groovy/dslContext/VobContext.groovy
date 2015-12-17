@@ -19,7 +19,7 @@ class VobContext implements Context {
         log.debug('Entering VobContext().')
         def parseResult = StringExtensions.parseClearCaseName(name)
         vob = new Vob(parseResult.vob)
-        log.info('Vob {} registered for migration.', vob.name)
+        log.trace('Vob {} registered for migration.', vob.name)
         log.debug('Exiting VobContext().')
     }
 
@@ -33,7 +33,7 @@ class VobContext implements Context {
         def componentContext = new ComponentContext(name)
         executeInContext(closure, componentContext)
         vob.components.add(componentContext.component)
-        log.info('Added Component {} to Vob {}.', componentContext.component.name, vob.name)
+        log.trace('Added Component {} to Vob {}.', componentContext.component.name, vob.name)
         log.debug('Exiting component().')
     }
 }

@@ -14,6 +14,7 @@ class GitOptionsContext implements Context {
     public GitOptionsContext() {
         log.debug('Entering GitOptionsContext().')
         gitOptions = new GitOptions()
+        log.trace('Configuring Git options.')
         log.debug('Exiting GitOptionsContext().')
     }
 
@@ -24,7 +25,7 @@ class GitOptionsContext implements Context {
     def void ignore(String... args) {
         log.debug('Entering ignore().')
         gitOptions.ignore.addAll(args)
-        log.info('Expanded Git ignore to: {}', gitOptions.ignore)
+        log.trace('Expanded Git ignore to: {}', gitOptions.ignore)
         log.debug('Exiting ignore().')
     }
 
@@ -35,7 +36,7 @@ class GitOptionsContext implements Context {
     def void user(String user) {
         log.debug('Entering user().')
         gitOptions.user = user
-        log.info('Set user to: {}', user)
+        log.trace('Set user to: {}', user)
         log.debug('Exiting user().')
     }
 
@@ -46,7 +47,7 @@ class GitOptionsContext implements Context {
     def void email(String email) {
         log.debug('Entering email().')
         gitOptions.email = email
-        log.info('Set email to: {}', email)
+        log.trace('Set email to: {}', email)
         log.debug('Exiting email().')
     }
 
@@ -56,7 +57,7 @@ class GitOptionsContext implements Context {
     def void dir(String path) {
         log.debug('Entering dir().')
         gitOptions.dir = path
-        log.info('Set dir to: {}', path)
+        log.trace('Set dir to: {}', path)
         log.debug('Exiting dir().')
     }
 
@@ -66,7 +67,7 @@ class GitOptionsContext implements Context {
     def void workTree(String path) {
         log.debug('Entering workTree().')
         gitOptions.workTree = path
-        log.info('Set workTree to: {}', path)
+        log.trace('Set workTree to: {}', path)
         log.debug('Exiting workTree().')
     }
 }

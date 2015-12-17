@@ -28,7 +28,7 @@ class MigrationOptionsContext implements Context {
         def gitOptionsContext = new GitOptionsContext()
         executeInContext(closure, gitOptionsContext)
         migrationOptions.gitOptions = gitOptionsContext.gitOptions
-        log.info('Configured git options.')
+        log.trace('Configured git options.')
         log.debug('Exiting git().')
     }
 }

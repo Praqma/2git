@@ -1,11 +1,11 @@
 # ClearCase to Git
-A Groovy DSL to facilitate migration from ClearCase to Git. The project currently focuses on the migration of ClearCase UCM components to Git repositories. 
+A Groovy DSL to facilitate migration from ClearCase to Git. The project currently focuses on the migration of UCM components to Git repositories. 
 
 ## Concept and workflow
-The cc-to-git DSL allows you to easily select sets of baselines from a component stream and assign actions for them. 
+The cc-to-git DSL allows you to easily select sets of baselines and assign actions for them. 
 These actions can be anything but will most likely consist of Git commits, tags, etc.
 
-A temporary child stream is created for the migration, its view acts as the git work tree in the migration.
+A temporary child stream is created for the migration, its view acts as the Git work tree in the migration.
 Every selected baseline is rebased onto the child stream, the view is updated and the actions are executed.
 #### Mapping table
 | CCUCM         |   | Git        	|
@@ -18,53 +18,52 @@ Every selected baseline is rebased onto the child stream, the view is updated an
 The following example shows off what the migration of a demo component looks like.
 #### DSL script
 ```groovy
-migrate {
-    vob('\\v_foo') {    // a VOB to migrate from
-    	component('c_model') {  // a component we will be migrating
-            migrationOptions {      // some migration options we can set
+migrate{
+    vob('\\2Cool_PVOB') {	// the vob to migrate from
+        component('_Client') {	// the component to migrate
+            migrationOptions {	// some migration options
                 git {
-                    dir 'e:\\cc-to-git\\model\\.git'        // the git repository path
-                    workTree 'e:\\cc-to-git\\model\\view'   // the git work tree path
-                    ignore '*.log', 'junk.txt'              // files to add to .gitignore
-                    user 'praqma'                           // the Git user name
-                    email 'support@praqma.net'              // the Git user mail
+					dir	'e:/cc-to-git/client/repo'		// git repo path
+					workTree 'e:/cc-to-git/client/view'	// git work tree path
+                    ignore '*.log', 'tmp'					// git ignore rules
+                    user 'praqma'							// git user name
+                    email 'support@praqma.net'				// git user mail
                 }
             }
-            stream('s_model_int') { // the stream we will be migrating
-                branch 'master'         // optionally set the target branch name, defaults to stream name
+            stream('Client_migr') {	// the stream to select baselines from
+				branch 'master'	// set target branch name
                 migrationSteps {
-                	// baselines are selected and acted upon in steps through filters
-                    filter {
-                    	// criteria for selecting baselines
-                        criteria {
-                            afterDate (new Date() - 100) // from the past 100 days  
-                            baselineName 'v\\d{1}\\.\\d{1}\\.\\d{1}' // matching this regex ex.: v1.2.0
-                        }
-                        // map values for use in actions
-                        extractions {
-                            baselineExtractor([myName: 'shortname']) // evaluates&maps the baseline shortname
-                        }
-                        // register actions to run for these baselines
-                        actions {
-                            git 'add -A'
-                            git 'commit -m\"myName\"'
-                        }
-                        // further filter selected baselines
-                        filter {
-                            criteria {
-                                promotionLevels 'RELEASED'
-                            }
-                            extractions {
-                                baselineExtractor([level: 'promotionLevel'])
-                            }
+					// baselines are selected and acted upon in steps through filters
+					filter {
+						// criteria for selecting baselines
+						criteria {
+							afterDate 'dd-MM-yyy', '01-01-2015'	// since 2015
+						}
+						// register value mappings for use in actions
+						extractions {
+							baselineProperty([blName: 'shortname']) 
+						}
+						// register actions to selected baselines
+						actions {
+							git 'add -A'
+							git 'commit -m$blName'
+							cmd 'echo $blName >> e:/cc-to-git/client/migration.log'
+						}
+						filter {
+							criteria {
+								promotionLevels 'TESTED', 'RELEASED'
+							}
+							extractions {
+                                baselineProperty([blLevel: 'promotionLevel'])
+							}
                             actions {
-                                git 'tag \"$level-$name\"'
+                                git 'tag $blLevel-$blName'
                             }
-                        }
-                    }
+						}
+					}
                 }
             }
-        }
+		}
     }
 }
 ```
@@ -78,7 +77,7 @@ Write your DSL code in the `command.groovy` file and run `ClearCaseToGit.groovy`
 
 OR
 
-Run `ClearCaseToGit.groovy` after setting the DSL as the `CCTOGIT_COMMAND` environment variable.
+Run `ClearCaseToGit.groovy` after setting your DSL code as the `CCTOGIT_COMMAND` environment variable.
 
 ## Filter features
 ### Criteria
@@ -105,7 +104,7 @@ criteria {
 `baselineName (String regex)`
 ```groovy
 criteria {
-    baselineName /v\d{1}\.\d{1}\.\d{1}/ //ex.: v1.2.0
+    baselineName(/v(\d+\.?){3}/) //ex.: v1.0.12
 }
 ```
 ##### Custom
@@ -113,8 +112,8 @@ criteria {
 ```groovy
 criteria {
     custom { baseline ->
-        println "Testing baseline name length limit."
-		return baseline.shortname.length <= 10
+        println "Testing baseline name length."
+		return baseline.shortname.length() <= 10
     }
 }
 ```
@@ -131,9 +130,8 @@ criteria {
 `baselineProperty (Map<String, String> mappingValues)`
 ```groovy
 extractions {
-    /* Map the 'shortname' property to the 'name' variable for use in the Actions.
-    *  Use $name to reference the baseline's shortname. */
-    baselineProperty [name: 'shortname']
+    /* Map the 'shortname' property to the 'name' variable for use in the actions. */
+    baselineProperty [name: 'shortname', level: 'promotionLevel']
 }
 ```
 *Note: Runs in the context of a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
@@ -141,12 +139,11 @@ extractions {
 `custom (Closure<HashMap<String, Object>> closure)`
 ```groovy
 extractions {
-    /* Return a HashMap you build yourself. */
+    // build a custom HashMap
     custom { baseline ->
-        def map = new HashMap<String, Object>()
-		map.put('baselineName', baseline.shortname)
-		map.put('lostFoundContents', new File('lost+found').text)
-		return map
+        // read some data from a file in the view
+        String projectVersion = new File("$workTree/foo/model/version.txt").text
+        return [version: projectVersion, name: baseline.shortname]
     }
 }
 ```
@@ -162,7 +159,7 @@ actions {
 `cmd(String command, String path)`
 ```groovy
 actions {
-    cmd 'echo Finished a baseline. >> output.log', 'D:\\migration\\logging'
+    cmd 'echo Today is a good day. >> output.log', 'd:/migration/logging'
 }
 ```
 #### Custom
@@ -170,19 +167,19 @@ actions {
 ```groovy
 actions {
     custom { map ->
-	    println "Executing custom logging action."
+        // custom trace messages
 	    def timestamp = new Date().toTimestamp()
-	    new File("timestamps.log").append("$map.myExtractedValue seen at $timestamp.\n")
+	    println "Started migrating $map.baselineName at $timestamp"
 	}
 }
 ```
-*Note: The parameter passed in is the extraction HashMap<String, Object> created in the Extraction phase.*
+*Note: The parameter passed in is the extraction HashMap<String, Object> created by the extractions.*
 
 #### Git commands
 `git (String command)`
 ```groovy
 actions {
-    git 'commit -m\"$name\"''
+    git 'commit -m$name'
 }
 ```
 
@@ -190,11 +187,11 @@ actions {
 Cookie cutter migration script.
 ```groovy
 def vobName = '\\2Cool_PVOB'
-def componentName = 'Client' 
-def streamName = 'Client_int'  
-def gitDir = "E:\\cc-to-git\\$componentName\\.git"
-def gitWorkTree = "E:\\cc-to-git\\$componentName\\view"
-def startDate = '31-05-2012'
+def componentName = '_Client' 
+def streamName = 'Client_migr'  
+def startDate = '31-05-2015'
+def gitDir = "e:/cc-to-git/$componentName/.git"
+def gitWorkTree = "e:/cc-to-git/$componentName/view"
 
 migrate{
     vob(vobName) {
@@ -214,7 +211,7 @@ migrate{
                     filter {
                         criteria {
 							afterDate 'dd-MM-yyy', startDate
-							promotionLevels 'TESTED', 'RELEASED'
+							promotionLevels 'INITIAL'
                         }
                         extractions {
                             baselineProperty([name: 'shortname', fqname: 'fqname'])
@@ -226,13 +223,13 @@ migrate{
                         }                    
     					filter {
     						criteria {
-    							promotionLevels 'RELEASED'
+    							promotionLevels 'INITIAL'
     						}
     						extractions {
     							baselineProperty([level: 'promotionLevel'])
 						    }
 						    actions {
-						    	git 'tag \"$level-$name\"'  // tag released baselines
+						    	git 'tag $level-$name'
 					    	}
 					    }
                     }

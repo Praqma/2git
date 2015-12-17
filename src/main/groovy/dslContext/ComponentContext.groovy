@@ -19,7 +19,7 @@ class ComponentContext implements Context {
         log.debug('Entering ComponentContext().')
         def parseResult = StringExtensions.parseClearCaseName(name)
         component = new Component(parseResult.tag)
-        log.info("Component {} registered for migration.", component.name)
+        log.trace("Component {} registered for migration.", component.name)
         log.debug('Exiting ComponentContext().')
     }
 
@@ -33,7 +33,7 @@ class ComponentContext implements Context {
         def streamContext = new StreamContext(name)
         executeInContext(closure, streamContext)
         component.streams.add(streamContext.stream)
-        log.info('Added Stream {} to Component {}.', streamContext.stream.name, component.name)
+        log.trace('Added Stream {} to Component {}.', streamContext.stream.name, component.name)
         log.debug('Exiting stream().')
     }
 
@@ -46,7 +46,7 @@ class ComponentContext implements Context {
         def migrationOptionsContext = new MigrationOptionsContext()
         executeInContext(closure, migrationOptionsContext)
         component.migrationOptions = migrationOptionsContext.migrationOptions
-        log.info('Configured migration options for Component {}.', component.name)
+        log.trace('Configured migration options for Component {}.', component.name)
         log.debug('Exiting migrationOptions().')
     }
 }
