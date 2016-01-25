@@ -30,7 +30,7 @@ migrate{
                     email 'support@praqma.net'				// git user mail
                 }
                 clearCase {
-                    components 'all'
+                    components 'all'                        // components to migrate ('all'/'modifiable')
                 }
             }
             stream('Client_migr') {	// the stream to select baselines from
@@ -81,6 +81,16 @@ Write your DSL code in the `command.groovy` file and run `ClearCaseToGit.groovy`
 OR
 
 Run `ClearCaseToGit.groovy` after setting your DSL code as the `CCTOGIT_COMMAND` environment variable.
+
+### Arguments
+
+Both positional or named arguments can be passed into the script.
+
+`groovy ClearCaseToGit.groovy myArgument foo="bar and baz"`
+```groovy
+println args[0] // myArgument
+println foo     // bar and baz
+```
 
 ## Filter features
 ### Criteria
