@@ -2,6 +2,7 @@ package clearcase
 
 @Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
+import migration.ClearCaseOptions
 import net.praqma.clearcase.PVob as CoolPVob
 import net.praqma.clearcase.Rebase as CoolRebase
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
@@ -161,10 +162,10 @@ class Cool {
      * Updates the given View.
      * @param coolView The Cool View to update.
      */
-    static void updateView(CoolSnapshotView coolView) {
+    static void updateView(CoolSnapshotView coolView, ClearCaseOptions clearCaseOptions) {
         log.debug("Entering updateView().")
         log.info("Updating {}", coolView.fullyQualifiedName)
-        def loadRules = new CoolSnapshotView.LoadRules2(CoolSnapshotView.Components.MODIFIABLE);
+        def loadRules = new CoolSnapshotView.LoadRules2(clearCaseOptions.components);
         new UpdateView(coolView).setLoadRules(loadRules).update()
         log.info("Updated {}", coolView.fullyQualifiedName)
         log.debug("Exiting updateView().")

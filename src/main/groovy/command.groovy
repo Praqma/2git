@@ -17,6 +17,9 @@ migrate{
                     user 'praqma'
                     email 'support@praqma.net'
                 }
+                clearCase {
+                    components 'all'
+                }
             }
             stream(streamName) {
                 branch 'master'

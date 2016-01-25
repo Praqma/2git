@@ -7,3 +7,4 @@ gradle-app.setting
 # IDEA
 .idea/
 *.iml
+/.nb-gradle/

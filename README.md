@@ -29,6 +29,9 @@ migrate{
                     user 'praqma'							// git user name
                     email 'support@praqma.net'				// git user mail
                 }
+                clearCase {
+                    components 'all'
+                }
             }
             stream('Client_migr') {	// the stream to select baselines from
 				branch 'master'	// set target branch name
@@ -203,6 +206,9 @@ migrate{
                     ignore 'build.log', 'test.log'
                     user 'praqma'
                     email 'support@praqma.net'
+                }
+                clearCase {
+                    components 'all'
                 }
             }
             stream(streamName) {

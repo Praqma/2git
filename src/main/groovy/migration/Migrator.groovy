@@ -101,7 +101,7 @@ class Migrator {
 
                             //-----rebase the stream and update the view-----\\
                             Cool.rebase(baseline.source, migrationView)
-                            Cool.updateView(migrationView)
+                            Cool.updateView(migrationView, component.migrationOptions.clearCaseOptions)
                             // the .git and .gitignore file get removed during the update, add them again
                             new File(workTree, '.git').write("gitdir: $gitOptions.dir")
                             Git.writeGitIgnore(gitOptions)
