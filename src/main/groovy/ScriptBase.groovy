@@ -1,3 +1,4 @@
+import clearcase.Cool
 import dslContext.Context
 import dslContext.DslContext
 import dslContext.MigrationContext
@@ -25,6 +26,32 @@ abstract class ScriptBase extends Script implements Context {
         Migrator.migrate(migrationContext.vobs);
         log.info(migrationComplete())
         log.debug('Exiting migrate().')
+    }
+
+
+    /**
+     * Outputs stream loadComponents and dependencies to a given log file
+     * @param fullyQualifiedStreamName FQ name of the stream to output the dependencies for
+     * @param logFileName the File to output to (contents will be YAML)
+     */
+    def void logDependencies(String fullyQualifiedStreamName, String logFileName) {
+        def logFile = new File(logFileName)
+
+        if(!logFile.exists())
+            logFile.delete()
+        if(logFile.parentFile)
+            logFile.parentFile.mkdirs()
+        logFile.createNewFile()
+
+        logFile.append("components:\n")
+        Cool.getModifiableComponentSelectors(fullyQualifiedStreamName).each {
+            logFile.append("  - $it\n")
+        }
+
+        logFile.append("dependencies:\n")
+        Cool.getNonModifiableComponentSelectors(fullyQualifiedStreamName).each {
+            logFile.append("  - $it\n")
+        }
     }
 
     /**

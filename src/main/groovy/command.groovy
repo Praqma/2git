@@ -18,7 +18,7 @@ migrate{
                     email 'support@praqma.net'
                 }
                 clearCase {
-                    components 'all'
+                    loadComponents 'all'
                 }
             }
             stream(streamName) {

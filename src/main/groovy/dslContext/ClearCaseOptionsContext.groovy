@@ -23,14 +23,14 @@ class ClearCaseOptionsContext implements Context {
      * Adds given String arguments to the Git ignore file
      * @param args the String arguments to add
      */
-    def void components(String target) {
-        log.debug('Entering components().')
+    def void loadComponents(String target) {
+        log.debug('Entering loadComponents().')
         if(target.equalsIgnoreCase('all'))
-            clearCaseOptions.components = SnapshotView.Components.ALL
+            clearCaseOptions.loadComponents = SnapshotView.Components.ALL
         else if (target.equalsIgnoreCase('modifiable'))
-            clearCaseOptions.components = SnapshotView.Components.MODIFIABLE
+            clearCaseOptions.loadComponents = SnapshotView.Components.MODIFIABLE
         else
             log.warn("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
-        log.debug('Exiting components().')
+        log.debug('Exiting loadComponents().')
     }
 }

@@ -5,6 +5,7 @@ import groovy.util.logging.Slf4j
 import migration.ClearCaseOptions
 import net.praqma.clearcase.PVob as CoolPVob
 import net.praqma.clearcase.Rebase as CoolRebase
+import net.praqma.clearcase.api.Describe
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
@@ -117,6 +118,24 @@ class Cool {
     }
 
     /**
+     * Gets a list of component selectors representing all the modifiable loadComponents in the given stream
+     * @param stream The fully qualified name of the stream to get the component selectors for
+     * @return the modifiable component selectors as Strings
+     */
+    static List<String> getModifiableComponentSelectors(String stream) {
+        return new Describe(CoolStream.get(stream).project.integrationStream).addModifier(new Describe.Property("mod_comps").extended(true)).execute().first().split(" ").toList()
+    }
+
+    /**
+     * Gets a list of component selectors representing all the non-modifiable loadComponents in the given stream
+     * @param stream The fully qualified name of the stream to get the component selectors for
+     * @return the non-modifiable component selectors as Strings
+     */
+    static List<String> getNonModifiableComponentSelectors(String stream) {
+        return new Describe(CoolStream.get(stream).project.integrationStream).addModifier(new Describe.Property("non_mod_comps").extended(true)).execute().first().split(" ").toList()
+    }
+
+    /**
      * Gives a Cool PVob for the given PVob name.
      * @param pvobName The name of the PVob
      * @return The Cool PVob.
@@ -165,7 +184,7 @@ class Cool {
     static void updateView(CoolSnapshotView coolView, ClearCaseOptions clearCaseOptions) {
         log.debug("Entering updateView().")
         log.info("Updating {}", coolView.fullyQualifiedName)
-        def loadRules = new CoolSnapshotView.LoadRules2(clearCaseOptions.components);
+        def loadRules = new CoolSnapshotView.LoadRules2(clearCaseOptions.loadComponents);
         new UpdateView(coolView).setLoadRules(loadRules).update()
         log.info("Updated {}", coolView.fullyQualifiedName)
         log.debug("Exiting updateView().")
