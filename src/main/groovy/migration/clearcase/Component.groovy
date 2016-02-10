@@ -9,7 +9,7 @@ class Component {
     String name     // Component name
 
     List<Stream> streams = []   // Component Streams to migrate
-    MigrationOptions migrationOptions   // Some options used in the migration
+    MigrationOptions migrationOptions = new MigrationOptions()   // Some options used in the migration
 
     /**
      * Component constructor

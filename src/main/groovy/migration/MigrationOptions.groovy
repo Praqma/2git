@@ -1,6 +1,6 @@
 package migration
 
 class MigrationOptions {
-    GitOptions gitOptions
-    ClearCaseOptions clearCaseOptions
+    GitOptions gitOptions = new GitOptions()
+    ClearCaseOptions clearCaseOptions = new ClearCaseOptions()
 }
