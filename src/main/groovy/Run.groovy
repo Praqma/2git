@@ -16,7 +16,9 @@ class Run extends Script {
             }
         }
 
+        def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent
         def config = new CompilerConfiguration()
+        config.setClasspath(scriptDir)
         config.scriptBaseClass = 'ScriptBase'
         Binding binding
         if(args.length > 1){
