@@ -1,13 +1,16 @@
-# ClearCase to Git
+# cc2git
 A Groovy DSL to facilitate migration from ClearCase to Git. The project currently focuses on the migration of UCM components to Git repositories. 
 
 ## Concept and workflow
-The cc-to-git DSL allows you to easily select sets of baselines and assign actions for them. 
+
+The cc2git DSL allows you to easily select sets of baselines from component's streams and assign actions to them. 
 These actions can be anything but will most likely consist of Git commits, tags, etc.
 
-A temporary child stream is created for the migration, its view acts as the Git work tree in the migration.
+Per stream a git repository, a temporary child stream and view of said stream is created.
 Every selected baseline is rebased onto the child stream, the view is updated and the actions are executed.
+
 #### Mapping table
+
 | CCUCM         |   | Git        	|
 |:-------------:|:-:|:-------------:|
 | Component 	|-> | Repository 	|
@@ -15,8 +18,11 @@ Every selected baseline is rebased onto the child stream, the view is updated an
 | Baseline  	|-> | Commit      	|
 
 ## A quick example
+
 The following example shows off what the migration of a demo component looks like.
+
 #### DSL script
+
 ```groovy
 migrate{
     vob('\\2Cool_PVOB') {	// the vob to migrate from
@@ -70,23 +76,25 @@ migrate{
     }
 }
 ```
+
 #### Resulting repository
+
 * `7ffbaa4` v1.1.0 (HEAD -> master, tag: RELEASED-v1.1.0) 
 * `bb84137` v1.0.1
 * `13d4ac4` v1.0.0 (tag: RELEASED-v1.0.0)
 
 ## Running the DSL
-Write your DSL code in the `command.groovy` file and run `ClearCaseToGit.groovy`.
 
-OR
+Execute `Run.groovy` and supply your cc2git dsl script as its first parameter.
 
-Run `ClearCaseToGit.groovy` after setting your DSL code as the `CCTOGIT_COMMAND` environment variable.
+
+ex.: `groovy Run.groovy myScript.groovy`
 
 ### Arguments
 
 Both positional or named arguments can be passed into the script.
 
-`groovy ClearCaseToGit.groovy myArgument foo="bar and baz"`
+`groovy ClearCaseToGit.groovy myDslScript.groovy myArgument foo="bar and baz"`
 ```groovy
 println args[0] // myArgument
 println foo     // bar and baz
@@ -110,7 +118,7 @@ criteria {
 `afterDate (String format, String date)`
 ```groovy
 criteria {
-    afterDate 'dd-MM-yyy', '20-06-2010'
+    afterDate 'dd-MM-yyyy', '20-06-2010'
 }
 ```
 ##### Baseline name
