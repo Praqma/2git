@@ -27,8 +27,13 @@ class ActionsContext implements Context{
      * @param command the command to execute
      */
     def void cmd(String command) {
-        def scriptPath = new File(getClass().protectionDomain.codeSource.location.path).parent
-        cmd(command, scriptPath)
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
+                CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line -> println line }
+            }
+        })
     }
 
     /**

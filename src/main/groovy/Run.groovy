@@ -11,7 +11,7 @@ class Run extends Script {
         } else {
             commandFile = new File(args[0])
             if(!commandFile.exists() || commandFile.isDirectory()) {
-                println "ERROR: Cannot find command file '$commandFile' or command file is a directory."
+                println "ERROR: Cannot find command file '$commandFile'."
                 System.exit(1)
             }
         }
