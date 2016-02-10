@@ -5,5 +5,5 @@ class GitOptions {
     String user = 'migration'
     String email = 'migration@cctogit.net'
     String dir = new File("./output/.git").absolutePath
-    String workTree = new File("./output/repo").absolutePath
+    String workTree = new File("./output/view").absolutePath
 }

@@ -47,10 +47,14 @@ class Git {
      */
     static void configureRepository(GitOptions gitOptions) {
         log.debug("Entering configureRepository().")
-        callOrDie("config", "user.name", gitOptions.user)
-        log.trace("Set git user.name to {}.", gitOptions.user)
-        callOrDie("config", "user.email", gitOptions.email)
-        log.trace("Set git user.email to {}.", gitOptions.email)
+        if(gitOptions.user) {
+            callOrDie("config", "user.name", gitOptions.user)
+            log.trace("Set git user.name to {}.", gitOptions.user)
+        }
+        if(gitOptions.email) {
+            callOrDie("config", "user.email", gitOptions.email)
+            log.trace("Set git user.email to {}.", gitOptions.email)
+        }
         writeGitIgnore(gitOptions)
         log.debug("Exiting configureRepository().")
     }
