@@ -1,6 +1,5 @@
 package git
 
-@Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import migration.GitOptions
 import net.praqma.util.execute.AbnormalProcessTerminationException

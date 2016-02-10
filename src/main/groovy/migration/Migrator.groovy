@@ -1,11 +1,8 @@
 package migration
 
 import clearcase.AggregatedBaselineFilter
-@GrabResolver(name = 'praqma', root = 'http://code.praqma.net/repo/maven/', m2Compatible = 'true')
-@Grab('net.praqma:cool:0.6.45')
 import clearcase.Cool
 import git.Git
-@Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import migration.clearcase.Baseline
 import migration.clearcase.Component

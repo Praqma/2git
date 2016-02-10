@@ -1,6 +1,5 @@
 package dslContext
 
-@Grab('org.slf4j:slf4j-simple:1.7.7')
 import groovy.util.logging.Slf4j
 import migration.filter.criterias.Criteria
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
