@@ -3,8 +3,8 @@ def componentName = '_Client'
 def streamName = 'Client_migr'
 def startDate = '31-05-2015'
 
-def gitDir = "e:/cc-to-git/$componentName/.git"
-def gitWorkTree = "e:/cc-to-git/$componentName/view"
+def gitDir = "e:/cc2git/$componentName/.git"
+def gitWorkTree = "e:/cc2git/$componentName/view"
 
 migrate{
     vob(vobName) {

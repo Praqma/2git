@@ -42,7 +42,7 @@ class Git {
     }
 
     /**
-     * Configures git in the set path using the passed in cc-to-git Stream
+     * Configures git in the set path using the passed in cc2git Stream
      * @param stream The Stream to use for configuration
      */
     static void configureRepository(GitOptions gitOptions) {

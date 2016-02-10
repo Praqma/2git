@@ -29,8 +29,8 @@ migrate{
         component('_Client') {	// the component to migrate
             migrationOptions {	// some migration options
                 git {
-					dir	'e:/cc-to-git/client/repo'		// git repo path
-					workTree 'e:/cc-to-git/client/view'	// git work tree path
+					dir	'e:/cc2git/client/repo'		// git repo path
+					workTree 'e:/cc2git/client/view'	// git work tree path
                     ignore '*.log', 'tmp'					// git ignore rules
                     user 'praqma'							// git user name
                     email 'support@praqma.net'				// git user mail
@@ -56,7 +56,7 @@ migrate{
 						actions {
 							git 'add -A'
 							git 'commit -m$blName'
-							cmd 'echo $blName >> e:/cc-to-git/client/migration.log'
+							cmd 'echo $blName >> e:/cc2git/client/migration.log'
 						}
 						filter {
 							criteria {
@@ -211,8 +211,8 @@ def vobName = '\\2Cool_PVOB'
 def componentName = '_Client' 
 def streamName = 'Client_migr'  
 def startDate = '31-05-2015'
-def gitDir = "e:/cc-to-git/$componentName/.git"
-def gitWorkTree = "e:/cc-to-git/$componentName/view"
+def gitDir = "e:/cc2git/$componentName/.git"
+def gitWorkTree = "e:/cc2git/$componentName/view"
 
 migrate{
     vob(vobName) {

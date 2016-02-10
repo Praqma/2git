@@ -86,9 +86,10 @@ class Migrator {
                         //-----Set up Git work tree-----\\
                         Git.forceCheckout(stream.target)
                         Baseline startingBaseline = migrationPlan.values()[0]
-                        def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc-to-git")
+                        def id = UUID.randomUUID().toString().substring(0,8)
+                        def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc2git_" + id)
                         streamsToRemove.add(migrationStream)
-                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc-to-git")
+                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + id)
                         viewsToRemove.add(migrationView)
 
 
