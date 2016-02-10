@@ -3,8 +3,11 @@
 build/
 gradle-app.setting
 !gradle-wrapper.jar
+/.nb-gradle/
 
 # IDEA
 .idea/
 *.iml
-/.nb-gradle/
+
+# Output
+out/

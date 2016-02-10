@@ -1,6 +1,6 @@
-@Grab('org.slf4j:slf4j-simple:1.7.7')
+@Grab('org.slf4j:slf4j-simple:1.7.13')
 @GrabResolver(name = 'praqma', root = 'http://code.praqma.net/repo/maven/', m2Compatible = 'true')
-@Grab('net.praqma:cool:0.6.45')
+@Grab('net.praqma:cool:0.6.48')
 import org.codehaus.groovy.control.CompilerConfiguration
 
 class Run extends Script {
