@@ -22,8 +22,8 @@ class Run extends Script {
         config.scriptBaseClass = 'ScriptBase'
         Binding binding
         if(args.length > 1){
-            binding = new Binding(args[1..-1])
-            parseParameters(binding, args[1..-1])
+            binding = new Binding(args[1..-1] as String[])
+            parseParameters(binding, args[1..-1] as String[])
         } else
             binding = new Binding()
 

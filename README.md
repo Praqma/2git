@@ -87,16 +87,19 @@ migrate{
 
 Execute `Run.groovy` and supply your cc2git dsl script as its first parameter.
 
-
 ex.: `groovy Run.groovy myScript.groovy`
 
 ### Arguments
 
 Both positional or named arguments can be passed into the script.
 
-`groovy ClearCaseToGit.groovy myDslScript.groovy myArgument foo="bar and baz"`
+`groovy Run.groovy myDslScript.groovy myArgument`
 ```groovy
 println args[0] // myArgument
+```
+
+`groovy Run.groovy myDslScript.groovy foo="bar and baz"`
+```groovy
 println foo     // bar and baz
 ```
 
@@ -271,4 +274,16 @@ criteria {
 	afterBaseline lastBaselineName
     promotionLevels 'TESTED', 'RELEASED'
 }
+```
+
+## Other features
+
+### Output read-only/modifiable component baselines
+
+Call from script root to output read-only/modifiable component baselines to a logfile.
+Useful for managing dependencies during your migration.
+
+`logDependencies(String fullyQualifiedStreamName, String logFileName)`
+```groovy
+logDependencies('stream:myStream@\\myVob', 'e:/cc2git/log/dependencies.txt')
 ```
