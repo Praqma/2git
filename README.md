@@ -95,7 +95,7 @@ Both positional or named arguments can be passed into the script.
 
 `groovy Run.groovy myDslScript.groovy myArgument`
 ```groovy
-println args[0] // myArgument
+println args[1] // myArgument
 ```
 
 `groovy Run.groovy myDslScript.groovy foo="bar and baz"`

@@ -20,12 +20,10 @@ class Run extends Script {
         def config = new CompilerConfiguration()
         config.setClasspath(scriptDir)
         config.scriptBaseClass = 'ScriptBase'
-        Binding binding
+        def binding = new Binding(args as String[])
         if(args.length > 1){
-            binding = new Binding(args[1..-1] as String[])
             parseParameters(binding, args[1..-1] as String[])
-        } else
-            binding = new Binding()
+        }
 
         def shell = new GroovyShell(binding, config)
 
