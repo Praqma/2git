@@ -62,10 +62,10 @@ class Cool {
      * @param coolBaseline The Cool Baseline to create the child Stream at.
      * @return The new child Cool Stream.
      */
-    static CoolStream createStream(CoolStream coolStream, CoolBaseline coolBaseline, String tag) {
+    static CoolStream createStream(CoolStream coolStream, CoolBaseline coolBaseline, String tag, boolean readOnly) {
         log.debug("Entering createStream().")
         log.info("Creating child stream of {} at baseline {}", coolStream.fullyQualifiedName, coolBaseline.fullyQualifiedName)
-        def migrationStream = CoolStream.create(coolStream, tag, false, coolBaseline)
+        def migrationStream = CoolStream.create(coolStream, tag, readOnly, coolBaseline)
         log.info("Created child stream of {} at baseline {}", coolStream.fullyQualifiedName, coolBaseline.fullyQualifiedName)
         log.debug("Exiting createStream().")
         return migrationStream

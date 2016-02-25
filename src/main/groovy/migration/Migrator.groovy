@@ -15,6 +15,7 @@ import migration.clearcase.Vob
 import migration.filter.Filter
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
+import net.praqma.clearcase.ucm.entities.Project as CoolProject
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.utils.BaselineList
@@ -51,10 +52,10 @@ class Migrator {
                 for (Component component : vob.components) {
                     CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
                     log.info("Migrating Component {}.", component.name)
-
+                    def gitOptions = component.migrationOptions.gitOptions
+                    def clearCaseOptions = component.migrationOptions.clearCaseOptions
 
                     //-----set up Git repository-----\\
-                    def gitOptions = component.migrationOptions.gitOptions
                     File gitDir = new File(gitOptions.dir)
                     File workTree = new File(gitOptions.workTree)
                     Git.path = workTree
@@ -86,18 +87,23 @@ class Migrator {
                         //-----Set up Git work tree-----\\
                         Git.forceCheckout(stream.target)
                         Baseline startingBaseline = migrationPlan.values()[0]
-                        def id = UUID.randomUUID().toString().substring(0,8)
-                        def migrationStream = Cool.createStream(sourceStream, startingBaseline.source, component.name + "_cc2git_" + id)
-                        streamsToRemove.add(migrationStream)
-                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + id)
-                        viewsToRemove.add(migrationView)
+                        def migrationId = UUID.randomUUID().toString().substring(0, 8)
+                        def parentStream = sourceStream
+                        if (clearCaseOptions.migrationProject) {
+                            CoolProject targetProject = CoolProject.get(clearCaseOptions.migrationProject, sourcePVob).load();
+                            parentStream = targetProject.integrationStream
+                        }
 
+                        def migrationStream = Cool.createStream(parentStream, startingBaseline.source, component.name + "_cc2git_" + migrationId, clearCaseOptions.readOnlyMigrationStream)
+                        streamsToRemove.add(migrationStream)
+                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + migrationId)
+                        viewsToRemove.add(migrationView)
 
                         //-----execute extractions and actions per Baseline-----\\
                         def baselines = migrationPlan.values()
                         def baselineCount = baselines.size()
                         def currentBaseline = 0
-                        for (Baseline baseline : baselines){
+                        for (Baseline baseline : baselines) {
                             currentBaseline++
                             log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
 
@@ -160,7 +166,7 @@ class Migrator {
         }
 
         addMigrationSteps(migrationPlan, filter, baselines)
-        for(Filter childFilter : filter.filters){
+        for (Filter childFilter : filter.filters) {
             buildMigrationPlan(migrationPlan, childFilter, baselines)
         }
     }
@@ -181,7 +187,7 @@ class Migrator {
         }
 
         addMigrationSteps(migrationPlan, filter, baselines)
-        for(Filter childFilter : filter.filters){
+        for (Filter childFilter : filter.filters) {
             buildMigrationPlan(migrationPlan, childFilter, baselines)
         }
     }
@@ -196,7 +202,7 @@ class Migrator {
         log.info("Registering {} extraction(s) and {} action(s) to {} baseline(s).", filter.extractions.size(), filter.actions.size(), baselines.size())
         baselines.each { sourceBaseline ->
             // register baseline if necessary
-            if (!migrationPlan[sourceBaseline.fqname]){
+            if (!migrationPlan[sourceBaseline.fqname]) {
                 migrationPlan.put(sourceBaseline.fqname, new Baseline(source: sourceBaseline))
             }
 

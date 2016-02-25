@@ -32,4 +32,26 @@ class ClearCaseOptionsContext implements Context {
             log.warn("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
         log.debug('Exiting loadComponents().')
     }
+
+    /**
+     * Creates the migration stream in given project.
+     * If not set, migration stream will be created as a child stream of the migration target.
+     * @param projectName the project to create the migration stream in
+     */
+    def void migrationProject(String projectName) {
+        log.debug('Entering migrationProject().')
+        clearCaseOptions.migrationProject = projectName
+        log.debug('Exiting migrationProject().')
+    }
+
+    /**
+     * Boolean setting the migration stream to readOnly or not.
+     * If set to true, migration stream will be created as read-only.
+     * @param readOnly the migration stream's read-only state
+     */
+    def void readOnlyMigrationStream(boolean readOnly = true) {
+        log.debug('Entering readOnlyMigrationStream().')
+        clearCaseOptions.readOnlyMigrationStream = readOnly
+        log.debug('Exiting readOnlyMigrationStream().')
+    }
 }
