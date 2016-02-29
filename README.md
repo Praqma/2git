@@ -37,6 +37,8 @@ migrate{
                 }
                 clearCase {
                     components 'all'                        // components to migrate ('all'/'modifiable')
+                    readOnlyMigrationStream true            // set migration stream's read-only flag, defaults to false
+                    migrationProject 'migration'            // if set, migration stream will have this project's integration stream as parent   
                 }
             }
             stream('Client_migr') {	// the stream to select baselines from

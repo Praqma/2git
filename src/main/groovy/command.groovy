@@ -1,3 +1,5 @@
+import ScriptBase
+
 def vobName = '\\2Cool_PVOB'
 def componentName = '_Client'
 def streamName = 'Client_migr'
@@ -19,6 +21,8 @@ migrate{
                 }
                 clearCase {
                     loadComponents 'all'
+                    migrationProject 'Jenkins'
+                    readOnlyMigrationStream true
                 }
             }
             stream(streamName) {
