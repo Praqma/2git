@@ -16,8 +16,7 @@ class StreamContext implements Context {
      */
     public StreamContext(String name) {
         log.debug('Entering StreamContext().')
-        def parseResult = StringExtensions.parseClearCaseName(name)
-        this.stream = new Stream(parseResult.tag)
+        stream = new Stream(name)
         log.trace("Stream {} registered for migration.", stream.name)
         log.debug('Exiting StreamContext().')
     }

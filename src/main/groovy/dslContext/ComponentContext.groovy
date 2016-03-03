@@ -16,8 +16,7 @@ class ComponentContext implements Context {
      */
     public ComponentContext(String name) {
         log.debug('Entering ComponentContext().')
-        def parseResult = StringExtensions.parseClearCaseName(name)
-        component = new Component(parseResult.tag)
+        component = new Component(name)
         log.trace("Component {} registered for migration.", component.name)
         log.debug('Exiting ComponentContext().')
     }

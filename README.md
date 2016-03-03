@@ -24,57 +24,56 @@ The following example shows off what the migration of a demo component looks lik
 #### DSL script
 
 ```groovy
-migrate{
-    vob('\\2Cool_PVOB') {	// the vob to migrate from
-        component('_Client') {	// the component to migrate
-            migrationOptions {	// some migration options
-                git {
-					dir	'e:/cc2git/client/repo'		// git repo path
-					workTree 'e:/cc2git/client/view'	// git work tree path
-                    ignore '*.log', 'tmp'					// git ignore rules
-                    user 'praqma'							// git user name
-                    email 'support@praqma.net'				// git user mail
-                }
-                clearCase {
-                    components 'all'                        // components to migrate ('all'/'modifiable')
-                    readOnlyMigrationStream true            // set migration stream's read-only flag, defaults to false
-                    migrationProject 'migration'            // if set, migration stream will have this project's integration stream as parent   
+migrate {
+    component('_Client@\\2Cool') {    // the component to migrate
+        migrationOptions {    // some migration options
+            git {
+                dir 'e:/cc2git/client/repo'        // git repo path
+                workTree 'e:/cc2git/client/view'    // git work tree path
+                ignore '*.log', 'tmp'                    // git ignore rules
+                user 'praqma'                            // git user name
+                email 'support@praqma.net'                // git user mail
+            }
+            clearCase {
+                components 'all'                        // components to migrate ('all'/'modifiable')
+                readOnlyMigrationStream true            // set migration stream's read-only flag, defaults to false
+                migrationProject 'migration'
+                // if set, migration stream will have this project's integration stream as parent
+            }
+        }
+        stream('Client_migr@\\2Cool') {    // the stream to select baselines from
+            branch 'master'    // set target branch name
+            migrationSteps {
+                // baselines are selected and acted upon in steps through filters
+                filter {
+                    // criteria for selecting baselines
+                    criteria {
+                        afterDate 'dd-MM-yyy', '01-01-2015'    // since 2015
+                    }
+                    // register value mappings for use in actions
+                    extractions {
+                        baselineProperty([blName: 'shortname'])
+                    }
+                    // register actions to selected baselines
+                    actions {
+                        git 'add -A'
+                        git 'commit -m$blName'
+                        cmd 'echo $blName >> e:/cc2git/client/migration.log'
+                    }
+                    filter {
+                        criteria {
+                            promotionLevels 'TESTED', 'RELEASED'
+                        }
+                        extractions {
+                            baselineProperty([blLevel: 'promotionLevel'])
+                        }
+                        actions {
+                            git 'tag $blLevel-$blName'
+                        }
+                    }
                 }
             }
-            stream('Client_migr') {	// the stream to select baselines from
-				branch 'master'	// set target branch name
-                migrationSteps {
-					// baselines are selected and acted upon in steps through filters
-					filter {
-						// criteria for selecting baselines
-						criteria {
-							afterDate 'dd-MM-yyy', '01-01-2015'	// since 2015
-						}
-						// register value mappings for use in actions
-						extractions {
-							baselineProperty([blName: 'shortname']) 
-						}
-						// register actions to selected baselines
-						actions {
-							git 'add -A'
-							git 'commit -m$blName'
-							cmd 'echo $blName >> e:/cc2git/client/migration.log'
-						}
-						filter {
-							criteria {
-								promotionLevels 'TESTED', 'RELEASED'
-							}
-							extractions {
-                                baselineProperty([blLevel: 'promotionLevel'])
-							}
-                            actions {
-                                git 'tag $blLevel-$blName'
-                            }
-						}
-					}
-                }
-            }
-		}
+        }
     }
 }
 ```

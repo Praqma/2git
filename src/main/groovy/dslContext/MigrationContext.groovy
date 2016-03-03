@@ -1,25 +1,25 @@
 package dslContext
 
 import groovy.util.logging.Slf4j
-import migration.clearcase.Vob
+import migration.clearcase.Component
 
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
 class MigrationContext implements Context {
-    List<Vob> vobs = []
+    List<Component> components = [] // The Components to migrate
 
     /**
-     * Adds a Vob to the component for migration
-     * @param name The name of the Vob
-     * @param closure The configuration of the Vob
+     * Adds a Component to the Vob
+     * @param name the Component name
+     * @param closure the ComponentContext configuration
      */
-    def void vob(String name, @DslContext(VobContext) Closure closure) {
-        log.debug('Entering vob().')
-        def vobContext = new VobContext(name)
-        executeInContext(closure, vobContext)
-        vobs.add(vobContext.vob)
-        log.trace('Added Vob {}.', vobContext.vob.name)
-        log.debug('Exiting vob().')
+    def void component(String name, @DslContext(ComponentContext) Closure closure) {
+        log.debug('Entering component().')
+        def componentContext = new ComponentContext(name)
+        executeInContext(closure, componentContext)
+        components.add(componentContext.component)
+        log.trace('Added Component {}.', componentContext.component.name)
+        log.debug('Exiting component().')
     }
 }

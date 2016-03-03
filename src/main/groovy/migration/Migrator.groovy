@@ -11,7 +11,6 @@ import groovy.util.logging.Slf4j
 import migration.clearcase.Baseline
 import migration.clearcase.Component
 import migration.clearcase.Stream
-import migration.clearcase.Vob
 import migration.filter.Filter
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
@@ -30,7 +29,7 @@ class Migrator {
      * @param migrationContext MigrationContext containing what to migrate.
      * @param path path to drop Git repositories in
      */
-    def static void migrate(List<Vob> vobs) {
+    def static void migrate(List<Component> components) {
         log.debug("Entering migrate().")
         def startDate = new Date()
         log.info("Migration started at " + startDate.toTimestamp())
@@ -42,98 +41,93 @@ class Migrator {
 
         try {
             //-----VOB-----\\
-            log.info("Migrating from {} Vob(s).", vobs.size())
-            for (Vob vob : vobs) {
-                CoolVob sourcePVob = Cool.getPVob(vob.name)
-                log.info("Migrating from Vob {}.", vob.name)
+            //-----COMPONENT-----\\
+            log.info("Migrating {} Component(s).", components.size())
+            for (Component component : components) {
+                CoolVob sourcePVob = Cool.getPVob(component.vobName)
+                CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
+                log.info("Migrating Component {}.", component.name)
+                def gitOptions = component.migrationOptions.gitOptions
+                def clearCaseOptions = component.migrationOptions.clearCaseOptions
 
-                //-----COMPONENT-----\\
-                log.info("Migrating {} Component(s).", vob.components.size())
-                for (Component component : vob.components) {
-                    CoolComponent sourceComponent = Cool.getComponent(component.name, sourcePVob)
-                    log.info("Migrating Component {}.", component.name)
-                    def gitOptions = component.migrationOptions.gitOptions
-                    def clearCaseOptions = component.migrationOptions.clearCaseOptions
+                //-----set up Git repository-----\\
+                File gitDir = new File(gitOptions.dir)
+                File workTree = new File(gitOptions.workTree)
+                Git.path = workTree
+                if (!workTree.exists()) FileUtils.forceMkdir(workTree)
+                if (!gitDir.exists()) {
+                    log.info("Git dir {} does not exist, performing first time setup.", gitDir)
+                    FileUtils.forceMkdir(gitDir)
+                    Git.callOrDie("init --separate-git-dir $gitOptions.dir")
+                }
+                Git.configureRepository(gitOptions)
 
-                    //-----set up Git repository-----\\
-                    File gitDir = new File(gitOptions.dir)
-                    File workTree = new File(gitOptions.workTree)
-                    Git.path = workTree
-                    if (!workTree.exists()) FileUtils.forceMkdir(workTree)
-                    if (!gitDir.exists()) {
-                        log.info("Git dir {} does not exist, performing first time setup.", gitDir)
-                        FileUtils.forceMkdir(gitDir)
-                        Git.callOrDie("init --separate-git-dir $gitOptions.dir")
+                //-----STREAM-----\\
+                log.info("Migrating {} Stream(s)", component.streams.size())
+                for (Stream stream : component.streams) {
+                    CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
+                    log.info("Migrating Stream {}.", stream.name)
+
+                    //-----register extractions and actions with Baselines-----\\
+                    LinkedHashMap<String, Baseline> migrationPlan = [:]
+                    for (Filter filter : stream.filters) {
+                        buildMigrationPlan(migrationPlan, filter, sourceComponent, sourceStream)
                     }
-                    Git.configureRepository(gitOptions)
 
-                    //-----STREAM-----\\
-                    log.info("Migrating {} Stream(s)", component.streams.size())
-                    for (Stream stream : component.streams) {
-                        CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
-                        log.info("Migrating Stream {}.", stream.name)
-
-                        //-----register extractions and actions with Baselines-----\\
-                        LinkedHashMap<String, Baseline> migrationPlan = [:]
-                        for (Filter filter : stream.filters) {
-                            buildMigrationPlan(migrationPlan, filter, sourceComponent, sourceStream)
-                        }
-
-                        if (!migrationPlan) {
-                            log.warn("No baselines matching criteria in stream {}.", stream.name)
-                            continue
-                        }
-
-                        //-----Set up Git work tree-----\\
-                        Git.forceCheckout(stream.target)
-                        Baseline startingBaseline = migrationPlan.values()[0]
-                        def migrationId = UUID.randomUUID().toString().substring(0, 8)
-                        def parentStream = sourceStream
-                        if (clearCaseOptions.migrationProject) {
-                            CoolProject targetProject = CoolProject.get(clearCaseOptions.migrationProject, sourcePVob).load();
-                            parentStream = targetProject.integrationStream
-                        }
-
-                        def migrationStream = Cool.createStream(parentStream, startingBaseline.source, component.name + "_cc2git_" + migrationId, clearCaseOptions.readOnlyMigrationStream)
-                        streamsToRemove.add(migrationStream)
-                        def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + migrationId)
-                        viewsToRemove.add(migrationView)
-
-                        //-----execute extractions and actions per Baseline-----\\
-                        def baselines = migrationPlan.values()
-                        def baselineCount = baselines.size()
-                        def currentBaseline = 0
-                        for (Baseline baseline : baselines) {
-                            currentBaseline++
-                            log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
-
-                            //-----rebase the stream and update the view-----\\
-                            Cool.rebase(baseline.source, migrationView)
-                            Cool.updateView(migrationView, component.migrationOptions.clearCaseOptions)
-                            // the .git and .gitignore file get removed during the update, add them again
-                            new File(workTree, '.git').write("gitdir: $gitOptions.dir")
-                            Git.writeGitIgnore(gitOptions)
-
-                            log.info("Executing {} extractions.", baseline.extractions.size())
-                            def extractionMap = [:]
-                            baseline.extractions.each { extraction ->
-                                extraction.extract(baseline.source).entrySet().each { kv ->
-                                    extractionMap.put(kv.key, kv.value)
-                                }
-                            }
-                            log.info("Extracted: {}.", extractionMap)
-
-                            log.info("Executing {} actions.", baseline.actions.size())
-                            baseline.actions.each { action ->
-                                action.act(extractionMap)
-                            }
-                            log.info("Done executing actions.")
-                        }
-
-                        // migration complete, let's clean up
-                        Cool.deleteViews(viewsToRemove)
-                        Cool.deleteStreams(streamsToRemove)
+                    if (!migrationPlan) {
+                        log.warn("No baselines matching criteria in stream {}.", stream.name)
+                        continue
                     }
+
+                    //-----Set up Git work tree-----\\
+                    Git.forceCheckout(stream.target)
+                    Baseline startingBaseline = migrationPlan.values()[0]
+                    def migrationId = UUID.randomUUID().toString().substring(0, 8)
+                    def parentStream = sourceStream
+                    if (clearCaseOptions.migrationProject) {
+                        CoolProject targetProject = CoolProject.get(clearCaseOptions.migrationProject, sourcePVob).load();
+                        parentStream = targetProject.integrationStream
+                    }
+
+                    def migrationStream = Cool.createStream(parentStream, startingBaseline.source, component.name + "_cc2git_" + migrationId, clearCaseOptions.readOnlyMigrationStream)
+                    streamsToRemove.add(migrationStream)
+                    def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + migrationId)
+                    viewsToRemove.add(migrationView)
+
+                    //-----execute extractions and actions per Baseline-----\\
+                    def baselines = migrationPlan.values()
+                    def baselineCount = baselines.size()
+                    def currentBaseline = 0
+                    for (Baseline baseline : baselines) {
+                        currentBaseline++
+                        log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
+
+                        //-----rebase the stream and update the view-----\\
+                        Cool.rebase(baseline.source, migrationView)
+                        Cool.updateView(migrationView, component.migrationOptions.clearCaseOptions)
+                        // the .git and .gitignore file get removed during the update, add them again
+                        new File(workTree, '.git').write("gitdir: $gitOptions.dir")
+                        Git.writeGitIgnore(gitOptions)
+
+                        log.info("Executing {} extractions.", baseline.extractions.size())
+                        def extractionMap = [:]
+                        baseline.extractions.each { extraction ->
+                            extraction.extract(baseline.source).entrySet().each { kv ->
+                                extractionMap.put(kv.key, kv.value)
+                            }
+                        }
+                        log.info("Extracted: {}.", extractionMap)
+
+                        log.info("Executing {} actions.", baseline.actions.size())
+                        baseline.actions.each { action ->
+                            action.act(extractionMap)
+                        }
+                        log.info("Done executing actions.")
+                    }
+
+                    // migration complete, let's clean up
+                    Cool.deleteViews(viewsToRemove)
+                    Cool.deleteStreams(streamsToRemove)
                 }
             }
         } finally {

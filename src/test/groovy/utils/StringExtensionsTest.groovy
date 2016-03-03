@@ -25,14 +25,35 @@ class StringExtensionsTest extends Specification {
         !parseResult.vob
     }
 
-    def 'only vob parses'() {
-        when: 'I have a vob name'
-        def selector = '\\2Cool'
+    def 'stream parses'() {
+        when: 'I have a stream selector'
+        def selector = 'myStream@\\2Cool'
 
-        then: "the vob name should end up under the 'vob'"
-        def parseResult = StringExtensions.parseClearCaseName(selector)
-        !parseResult.identifier
-        !parseResult.tag
-        parseResult.vob == '\\2Cool'
+        then: "It should be recognized as a FQName"
+        StringExtensions.isFullyQualifiedName(selector)
+    }
+
+    def 'full stream parses'() {
+        when: 'I have a stream selector'
+        def selector = 'stream:myStream@\\2Cool'
+
+        then: "It should be recognized as a FQName"
+        StringExtensions.isFullyQualifiedName(selector)
+    }
+
+    def 'component parses'() {
+        when: 'I have a component selector'
+        def selector = 'myComponent@\\2Cool'
+
+        then: "It should be recognized as a FQName"
+        StringExtensions.isFullyQualifiedName(selector)
+    }
+
+    def 'full component parses'() {
+        when: 'I have a component selector'
+        def selector = 'component:myComponent@\\2Cool'
+
+        then: "It should be recognized as a FQName"
+        StringExtensions.isFullyQualifiedName(selector)
     }
 }
