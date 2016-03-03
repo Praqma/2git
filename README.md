@@ -28,17 +28,16 @@ migrate {
     component('_Client@\\2Cool') {    // the component to migrate
         migrationOptions {    // some migration options
             git {
-                dir 'e:/cc2git/client/repo'        // git repo path
+                dir 'e:/cc2git/client/repo'			// git repo path
                 workTree 'e:/cc2git/client/view'    // git work tree path
-                ignore '*.log', 'tmp'                    // git ignore rules
-                user 'praqma'                            // git user name
-                email 'support@praqma.net'                // git user mail
+                ignore '*.log', 'tmp'               // git ignore rules
+                user 'praqma'                       // git user name
+                email 'support@praqma.net'          // git user mail
             }
             clearCase {
-                components 'all'                        // components to migrate ('all'/'modifiable')
-                readOnlyMigrationStream true            // set migration stream's read-only flag, defaults to false
-                migrationProject 'migration'
-                // if set, migration stream will have this project's integration stream as parent
+                components 'all'                    // components to migrate ('all'/'modifiable')
+                readOnlyMigrationStream true        // set migration stream's read-only flag, defaults to false
+                migrationProject 'migration'		// if set, migration stream will have this project's integration stream as parent
             }
         }
         stream('Client_migr@\\2Cool') {    // the stream to select baselines from
@@ -211,55 +210,54 @@ actions {
 ## More examples
 Cookie cutter migration script.
 ```groovy
-def vobName = '\\2Cool_PVOB'
-def componentName = '_Client' 
-def streamName = 'Client_migr'  
+def componentName = '_Client@\\2Cool_PVOB'
+def streamName = 'Client_migr@\\2Cool_PVOB'
 def startDate = '31-05-2015'
 def gitDir = "e:/cc2git/$componentName/.git"
 def gitWorkTree = "e:/cc2git/$componentName/view"
 
 migrate{
-    vob(vobName) {
-        component(componentName) {
-            migrationOptions {
-                git {
-					dir	gitDir
-					workTree gitWorkTree
-                    ignore 'build.log', 'test.log'
-                    user 'praqma'
-                    email 'support@praqma.net'
-                }
-                clearCase {
-                    components 'all'
-                }
+    component(componentName) {
+        migrationOptions {
+            git {
+                dir	gitDir
+                workTree gitWorkTree
+                ignore 'build.log', 'test.log'
+                user 'praqma'
+                email 'support@praqma.net'
             }
-            stream(streamName) {
-				branch 'master'
-                migrationSteps {
+            clearCase {
+                components 'all'
+                readOnlyMigrationStream true
+                migrationProject 'migration'
+            }
+        }
+        stream(streamName) {
+            branch 'master'
+            migrationSteps {
+                filter {
+                    criteria {
+                        afterDate 'dd-MM-yyy', startDate
+                        promotionLevels 'INITIAL'
+                    }
+                    extractions {
+                        baselineProperty([name: 'shortname', fqname: 'fqname'])
+                    }
+                    actions {
+                        git 'add .'
+                        git 'commit -m"$name"'
+                        git 'notes add -m"$fqname" HEAD'
+                    }
                     filter {
                         criteria {
-							afterDate 'dd-MM-yyy', startDate
-							promotionLevels 'INITIAL'
+                            promotionLevels 'INITIAL'
                         }
                         extractions {
-                            baselineProperty([name: 'shortname', fqname: 'fqname'])
+                            baselineProperty([level: 'promotionLevel'])
                         }
                         actions {
-							git 'add .'
-							git 'commit -m"$name"'
-							git 'notes add -m"$fqname" HEAD' 
-                        }                    
-    					filter {
-    						criteria {
-    							promotionLevels 'INITIAL'
-    						}
-    						extractions {
-    							baselineProperty([level: 'promotionLevel'])
-						    }
-						    actions {
-						    	git 'tag $level-$name'
-					    	}
-					    }
+                            git 'tag $level-$name'
+                        }
                     }
                 }
             }
