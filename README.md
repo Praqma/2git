@@ -1,4 +1,5 @@
 # cc2git
+
 A Groovy DSL to facilitate migration from ClearCase to Git. The project currently focuses on the migration of UCM components to Git repositories. 
 
 ## Concept and workflow
@@ -7,7 +8,7 @@ The cc2git DSL allows you to easily select sets of baselines from component's st
 These actions can be anything but will most likely consist of Git commits, tags, etc.
 
 Per stream a git repository, a temporary child stream and view of said stream is created.
-Every selected baseline is rebased onto the child stream, the view is updated and the actions are executed.
+Every selected baseline is rebased onto the child stream, the view is updated, copied into the git repository and the actions are executed.
 
 #### Mapping table
 
@@ -28,22 +29,23 @@ migrate {
     component('_Client@\\2Cool') {    // the component to migrate
         migrationOptions {    // some migration options
             git {
-                dir 'e:/cc2git/client/repo'			// git repo path
-                workTree 'e:/cc2git/client/view'    // git work tree path
-                ignore '*.log', 'tmp'               // git ignore rules
-                user 'praqma'                       // git user name
-                email 'support@praqma.net'          // git user mail
+                dir 'e:/cc2git/client/repo' // git repo path
+                workTree 'e:/cc2git/client/tree'    // git work tree path
+                ignore '*.log', 'tmp'   // git ignore rules
+                user 'praqma'   // git user name
+                email 'support@praqma.net'  // git user mail
             }
             clearCase {
-                components 'all'                    // components to migrate ('all'/'modifiable')
-                readOnlyMigrationStream true        // set migration stream's read-only flag, defaults to false
-                migrationProject 'migration'		// if set, migration stream will have this project's integration stream as parent
+                components 'all'    // components to migrate ('all'/'modifiable')
+                readOnlyMigrationStream true    // set migration stream's read-only flag, defaults to false
+                migrationProject 'migration'    // if set, migration stream will have this project's integration stream as parent
+                view 'e:/cc2git/client/tree'    // ClearCase view path
+                flattenView 1  // Amount of levels to flatten the view's directory structure 
             }
         }
         stream('Client_migr@\\2Cool') {    // the stream to select baselines from
             branch 'master'    // set target branch name
-            migrationSteps {
-                // baselines are selected and acted upon in steps through filters
+            migrationSteps {    // baselines are selected and acted upon in steps through filters
                 filter {
                     // criteria for selecting baselines
                     criteria {
@@ -104,35 +106,49 @@ println foo     // bar and baz
 ```
 
 ## Filter features
+
 ### Criteria
+
 ##### Baseline creation date
+
 `afterBaseline (String baselineName)`
+
 ```groovy
 criteria {
     afterBaseline 'v1.0.0\\@myVob'
 }
 ```
+
 `afterDate (Date date)`
+
 ```groovy
 criteria {
     afterDate (new Date() - 100) // 100 days ago
 }
 ```
+
 `afterDate (String format, String date)`
+
 ```groovy
 criteria {
     afterDate 'dd-MM-yyyy', '20-06-2010'
 }
 ```
+
 ##### Baseline name
+
 `baselineName (String regex)`
+
 ```groovy
 criteria {
     baselineName(/v(\d+\.?){3}/) //ex.: v1.0.12
 }
 ```
+
 ##### Custom
+
 `custom (Closure<Boolean> closure)`
+
 ```groovy
 criteria {
     custom { baseline ->
@@ -142,16 +158,23 @@ criteria {
 }
 ```
 *Note: The parameter passed in is a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
+
 ##### Promotion level
+
 `promotionLevels (String... promotionLevels)`
+
 ```groovy
 criteria {
     promotionLevels 'TESTED', 'RELEASED'
 }
 ```
+
 ### Extractions
+
 #### Baseline properties
+
 `baselineProperty (Map<String, String> mappingValues)`
+
 ```groovy
 extractions {
     /* Map the 'shortname' property to the 'name' variable for use in the actions. */
@@ -159,8 +182,11 @@ extractions {
 }
 ```
 *Note: Runs in the context of a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
+
 #### Custom
+
 `custom (Closure<HashMap<String, Object>> closure)`
+
 ```groovy
 extractions {
     // build a custom HashMap
@@ -172,22 +198,31 @@ extractions {
 }
 ```
 *Note: The parameter passed in is a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
+
 ### Actions
+
 #### CLI commands
+
 `cmd(String command)`
+
 ```groovy
 actions {
     cmd 'echo Today is a good day.'
 }
 ```
+
 `cmd(String command, String path)`
+
 ```groovy
 actions {
     cmd 'echo Today is a good day. >> output.log', 'd:/migration/logging'
 }
 ```
+
 #### Custom
+
 `custom(Closure closure)`
+
 ```groovy
 actions {
     custom { map ->
@@ -200,7 +235,9 @@ actions {
 *Note: The parameter passed in is the extraction HashMap<String, Object> created by the extractions.*
 
 #### Git commands
+
 `git (String command)`
+
 ```groovy
 actions {
     git 'commit -m$name'
@@ -208,20 +245,23 @@ actions {
 ```
 
 ## More examples
+
 Cookie cutter migration script.
+
 ```groovy
-def componentName = '_Client@\\2Cool_PVOB'
+def componentName = '_Client@\\2Cool_PVOB' 
 def streamName = 'Client_migr@\\2Cool_PVOB'
 def startDate = '31-05-2015'
 def gitDir = "e:/cc2git/$componentName/.git"
-def gitWorkTree = "e:/cc2git/$componentName/view"
+def gitWorkTree = "e:/cc2git/$componentName/tree"
+def clearCaseView = "e:/cc2git/$componentName/view"
 
 migrate{
     component(componentName) {
         migrationOptions {
             git {
-                dir	gitDir
-                workTree gitWorkTree
+			    dir	gitDir
+				workTree gitWorkTree
                 ignore 'build.log', 'test.log'
                 user 'praqma'
                 email 'support@praqma.net'
@@ -230,43 +270,47 @@ migrate{
                 components 'all'
                 readOnlyMigrationStream true
                 migrationProject 'migration'
+                view clearCaseView
+                flattenView 1
             }
         }
         stream(streamName) {
-            branch 'master'
+		    branch 'master'
             migrationSteps {
                 filter {
                     criteria {
-                        afterDate 'dd-MM-yyy', startDate
-                        promotionLevels 'INITIAL'
+					    afterDate 'dd-MM-yyy', startDate
+						promotionLevels 'INITIAL'
                     }
                     extractions {
                         baselineProperty([name: 'shortname', fqname: 'fqname'])
                     }
                     actions {
-                        git 'add .'
-                        git 'commit -m"$name"'
-                        git 'notes add -m"$fqname" HEAD'
-                    }
-                    filter {
-                        criteria {
-                            promotionLevels 'INITIAL'
-                        }
-                        extractions {
-                            baselineProperty([level: 'promotionLevel'])
-                        }
-                        actions {
-                            git 'tag $level-$name'
-                        }
-                    }
+						git 'add .'
+						git 'commit -m"$name"'
+						git 'notes add -m"$fqname" HEAD' 
+                    }                    
+    				filter {
+    					criteria {
+    				    	promotionLevels 'INITIAL'
+    					}
+    					extractions {
+    						baselineProperty([level: 'promotionLevel'])
+						}
+						actions {
+							git 'tag $level-$name'
+					    }
+					}
                 }
             }
         }
     }
 }
 ```
+
 In the above example we add the fully qualified baseline name as a note to the commit.
 You can use this to have the migration continue from where it last left off.
+
 ```groovy
 criteria {
     def lastBaselineName = "git --git-dir $gitWorkTree notes show HEAD".execute().text
@@ -283,6 +327,7 @@ Call from script root to output read-only/modifiable component baselines to a lo
 Useful for managing dependencies during your migration.
 
 `logDependencies(String fullyQualifiedStreamName, String logFileName)`
+
 ```groovy
 logDependencies('stream:myStream@\\myVob', 'e:/cc2git/log/dependencies.txt')
 ```

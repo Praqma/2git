@@ -7,6 +7,7 @@ package migration
 import clearcase.AggregatedBaselineFilter
 import clearcase.Cool
 import git.Git
+import groovy.time.TimeCategory
 import groovy.util.logging.Slf4j
 import migration.clearcase.Baseline
 import migration.clearcase.Component
@@ -18,8 +19,10 @@ import net.praqma.clearcase.ucm.entities.Project as CoolProject
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.utils.BaselineList
+import net.praqma.clearcase.ucm.view.SnapshotView
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolView
 import org.apache.commons.io.FileUtils
+import utils.FileHelper
 
 @Slf4j
 class Migrator {
@@ -40,7 +43,6 @@ class Migrator {
         List<CoolView> viewsToRemove = []
 
         try {
-            //-----VOB-----\\
             //-----COMPONENT-----\\
             log.info("Migrating {} Component(s).", components.size())
             for (Component component : components) {
@@ -50,17 +52,8 @@ class Migrator {
                 def gitOptions = component.migrationOptions.gitOptions
                 def clearCaseOptions = component.migrationOptions.clearCaseOptions
 
-                //-----set up Git repository-----\\
-                File gitDir = new File(gitOptions.dir)
-                File workTree = new File(gitOptions.workTree)
-                Git.path = workTree
-                if (!workTree.exists()) FileUtils.forceMkdir(workTree)
-                if (!gitDir.exists()) {
-                    log.info("Git dir {} does not exist, performing first time setup.", gitDir)
-                    FileUtils.forceMkdir(gitDir)
-                    Git.callOrDie("init --separate-git-dir $gitOptions.dir")
-                }
-                Git.configureRepository(gitOptions)
+                //-----Set up Git repository-----\\
+                Git.setUpRepository(gitOptions)
 
                 //-----STREAM-----\\
                 log.info("Migrating {} Stream(s)", component.streams.size())
@@ -68,7 +61,7 @@ class Migrator {
                     CoolStream sourceStream = Cool.getStream(stream.name, sourcePVob)
                     log.info("Migrating Stream {}.", stream.name)
 
-                    //-----register extractions and actions with Baselines-----\\
+                    //-----Register extractions and actions with Baselines-----\\
                     LinkedHashMap<String, Baseline> migrationPlan = [:]
                     for (Filter filter : stream.filters) {
                         buildMigrationPlan(migrationPlan, filter, sourceComponent, sourceStream)
@@ -79,7 +72,7 @@ class Migrator {
                         continue
                     }
 
-                    //-----Set up Git work tree-----\\
+                    //-----Set up ClearCase view-----\\
                     Git.forceCheckout(stream.target)
                     Baseline startingBaseline = migrationPlan.values()[0]
                     def migrationId = UUID.randomUUID().toString().substring(0, 8)
@@ -88,27 +81,30 @@ class Migrator {
                         CoolProject targetProject = CoolProject.get(clearCaseOptions.migrationProject, sourcePVob).load();
                         parentStream = targetProject.integrationStream
                     }
-
                     def migrationStream = Cool.createStream(parentStream, startingBaseline.source, component.name + "_cc2git_" + migrationId, clearCaseOptions.readOnlyMigrationStream)
                     streamsToRemove.add(migrationStream)
-                    def migrationView = Cool.createView(migrationStream, workTree, component.name + "_cc2git_" + migrationId)
+                    def migrationView = Cool.createView(migrationStream, new File(clearCaseOptions.view), component.name + "_cc2git_" + migrationId)
                     viewsToRemove.add(migrationView)
 
-                    //-----execute extractions and actions per Baseline-----\\
+                    //-----Execute extractions and actions per Baseline-----\\
                     def baselines = migrationPlan.values()
-                    def baselineCount = baselines.size()
                     def currentBaseline = 0
                     for (Baseline baseline : baselines) {
                         currentBaseline++
-                        log.info("Handling baseline {} of {}", currentBaseline, baselineCount)
+                        log.info("Handling baseline {} of {}", currentBaseline, baselines.size())
 
-                        //-----rebase the stream and update the view-----\\
+                        //-----Rebase the stream and update the view-----\\
                         Cool.rebase(baseline.source, migrationView)
                         Cool.updateView(migrationView, component.migrationOptions.clearCaseOptions)
-                        // the .git and .gitignore file get removed during the update, add them again
-                        new File(workTree, '.git').write("gitdir: $gitOptions.dir")
-                        Git.writeGitIgnore(gitOptions)
 
+                        //-----Update the git work tree-----\\
+                        copyToGitWorkTree(migrationView)
+                        log.info("Flattening view $clearCaseOptions.flattenView times.")
+                        clearCaseOptions.flattenView.times {
+                            FileHelper.emptySubDirectories(Git.path)
+                        }
+
+                        //-----Execute extractions-----\\
                         log.info("Executing {} extractions.", baseline.extractions.size())
                         def extractionMap = [:]
                         baseline.extractions.each { extraction ->
@@ -118,6 +114,7 @@ class Migrator {
                         }
                         log.info("Extracted: {}.", extractionMap)
 
+                        //-----Execute actions-----\\
                         log.info("Executing {} actions.", baseline.actions.size())
                         baseline.actions.each { action ->
                             action.act(extractionMap)
@@ -125,7 +122,7 @@ class Migrator {
                         log.info("Done executing actions.")
                     }
 
-                    // migration complete, let's clean up
+                    // Migration complete, let's clean up
                     Cool.deleteViews(viewsToRemove)
                     Cool.deleteStreams(streamsToRemove)
                 }
@@ -135,11 +132,26 @@ class Migrator {
             Cool.deleteStreams(streamsToRemove)
             def endDate = new Date()
             log.info("Migration ended at " + endDate.toTimestamp())
-            use(groovy.time.TimeCategory) {
+            use(TimeCategory) {
                 def duration = endDate - startDate
                 log.info("Migration took " + duration.toString())
             }
             log.debug("Exiting migrate().")
+        }
+    }
+
+    /**
+     * Updates the git work tree with the contents of the given SnapShotView
+     * @param migrationView the SnapShotView whose contents to copy over
+     */
+    private static void copyToGitWorkTree(SnapshotView migrationView) {
+        Git.path.listFiles().findAll { !it.name.startsWith(".git") }.each {
+            if (it.directory) it.deleteDir()
+            else it.delete()
+        }
+        migrationView.viewRoot.listFiles().each {
+            if (it.directory) FileUtils.copyDirectory(it, new File(Git.path, it.name))
+            else FileUtils.copyFile(it, new File(Git.path, it.name))
         }
     }
 

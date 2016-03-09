@@ -79,4 +79,21 @@ class Git {
             callOrDie("checkout --orphan " + branch)
         }
     }
+
+    /**
+     * Do the first time setup of a migration Git repository
+     * @param gitOptions the configuration of the git repo
+     */
+    static void setUpRepository(GitOptions gitOptions) {
+        File gitDir = new File(gitOptions.dir)
+        File workTree = new File(gitOptions.workTree)
+        path = workTree
+        if (!workTree.exists()) FileUtils.forceMkdir(workTree)
+        if (!gitDir.exists()) {
+            log.info("Git dir {} does not exist, performing first time setup.", gitDir)
+            FileUtils.forceMkdir(gitDir)
+            callOrDie("init --separate-git-dir $gitOptions.dir")
+        }
+        configureRepository(gitOptions)
+    }
 }

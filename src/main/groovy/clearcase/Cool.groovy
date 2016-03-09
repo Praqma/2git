@@ -185,7 +185,7 @@ class Cool {
         log.debug("Entering updateView().")
         log.info("Updating view {}", coolView.fullyQualifiedName)
         def loadRules = new CoolSnapshotView.LoadRules2(clearCaseOptions.loadComponents);
-        new UpdateView(coolView).setLoadRules(loadRules).update()
+        new UpdateView(coolView).swipe().setLoadRules(loadRules).update()
         log.info("Updated view {}", coolView.fullyQualifiedName)
         log.debug("Exiting updateView().")
     }

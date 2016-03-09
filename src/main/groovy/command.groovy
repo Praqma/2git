@@ -3,7 +3,8 @@ def streamName = 'Client_migr@\\2Cool_PVOB'
 def startDate = '31-05-2015'
 
 def gitDir = "e:/cc2git/$componentName/.git"
-def gitWorkTree = "e:/cc2git/$componentName/view"
+def gitWorkTree = "e:/cc2git/$componentName/tree"
+def clearCaseView = "e:/cc2git/$componentName/view"
 
 migrate {
     component(componentName) {
@@ -16,9 +17,11 @@ migrate {
                 email 'support@praqma.net'
             }
             clearCase {
+                view clearCaseView
                 loadComponents 'all'
                 migrationProject 'Jenkins'
                 readOnlyMigrationStream true
+                flattenView 1
             }
         }
         stream(streamName) {

@@ -54,4 +54,24 @@ class ClearCaseOptionsContext implements Context {
         clearCaseOptions.readOnlyMigrationStream = readOnly
         log.debug('Exiting readOnlyMigrationStream().')
     }
+
+    /**
+     * Sets the ClearCase view path
+     */
+    def void view(String path) {
+        log.debug('Entering view().')
+        clearCaseOptions.view = path
+        log.trace('Set view to: {}', path)
+        log.debug('Exiting view().')
+    }
+
+    /*
+     * Integer for setting the amount of times the view directory structure is flattened
+     * @param count How many times the view's child directories are emptied into the root
+     */
+    def void flattenView(int count = 1) {
+        log.debug('Entering flattenView().')
+        clearCaseOptions.flattenView = count
+        log.debug('Exiting flattenView().')
+    }
 }
