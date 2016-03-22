@@ -23,7 +23,11 @@ abstract class ScriptBase extends Script implements Context {
         def migrationContext = new MigrationContext()
         executeInContext(closure, migrationContext)
         log.info('Finished building migration tree.')
-        Migrator.migrate(migrationContext.components);
+        log.info("Executing befores.")
+        migrationContext.befores.each {executeInContext(it, this)}
+        Migrator.migrate(migrationContext.components)
+        log.info("Executing afters.")
+        migrationContext.afters.each {executeInContext(it, this)}
         log.info(migrationComplete())
         log.debug('Exiting migrate().')
     }
