@@ -1,6 +1,7 @@
 package dslContext
 
-import git.Git
+import dslContext.base.Context
+import migration.git.Git
 import groovy.text.SimpleTemplateEngine
 import migration.filter.actions.Action
 import net.praqma.util.execute.CommandLine

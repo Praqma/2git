@@ -4,9 +4,9 @@ package migration
 @GrabResolver(name = 'praqma', root = 'http://code.praqma.net/repo/maven/', m2Compatible = 'true')
 @Grab('net.praqma:cool:0.6.48')
 
-import clearcase.AggregatedBaselineFilter
-import clearcase.Cool
-import git.Git
+import migration.clearcase.AggregatedBaselineFilter
+import migration.clearcase.Cool
+import migration.git.Git
 import groovy.time.TimeCategory
 import groovy.util.logging.Slf4j
 import migration.clearcase.Baseline

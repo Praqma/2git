@@ -1,5 +1,6 @@
 package dslContext
 
+import dslContext.base.Context
 import groovy.util.logging.Slf4j
 import migration.ClearCaseOptions
 import net.praqma.clearcase.ucm.view.SnapshotView

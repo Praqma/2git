@@ -1,4 +1,4 @@
-package git
+package migration.git
 
 import groovy.util.logging.Slf4j
 import migration.GitOptions

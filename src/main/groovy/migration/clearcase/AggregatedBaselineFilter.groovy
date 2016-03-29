@@ -1,4 +1,4 @@
-package clearcase
+package migration.clearcase
 
 import migration.filter.criterias.Criteria
 import net.praqma.clearcase.ucm.utils.BaselineFilter

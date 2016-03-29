@@ -1,4 +1,0 @@
-package dslContext
-
-interface Context {
-}

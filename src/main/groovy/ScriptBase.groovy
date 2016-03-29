@@ -1,6 +1,6 @@
-import clearcase.Cool
-import dslContext.Context
-import dslContext.DslContext
+import migration.clearcase.Cool
+import dslContext.base.Context
+import dslContext.base.DslContext
 import dslContext.MigrationContext
 import groovy.util.logging.Slf4j
 import migration.Migrator

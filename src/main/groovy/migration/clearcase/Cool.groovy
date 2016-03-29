@@ -1,4 +1,4 @@
-package clearcase
+package migration.clearcase
 
 
 import groovy.util.logging.Slf4j

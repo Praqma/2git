@@ -1,8 +1,9 @@
 package dslContext
 
+import dslContext.base.Context
+import dslContext.base.DslContext
 import groovy.util.logging.Slf4j
 import migration.clearcase.Stream
-import utils.StringExtensions
 
 import static dslContext.ContextHelper.executeInContext
 

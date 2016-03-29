@@ -1,14 +1,16 @@
 package dslContext
 
+import dslContext.base.Context
+import dslContext.base.DslContext
 import groovy.util.logging.Slf4j
 import migration.clearcase.Component
-import utils.StringExtensions
 
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
 class ComponentContext implements Context {
     Component component
+
 
     /**
      * ComponentContext constructor

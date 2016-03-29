@@ -1,5 +1,7 @@
 package dslContext
 
+import dslContext.base.Context
+
 class ContextHelper {
     private ContextHelper() {
     }
