@@ -26,6 +26,7 @@ import utils.FileHelper
 
 @Slf4j
 class Migrator {
+
     /**
      * Migrates what's defined in the MigrationContext from ClearCase to Git
      *

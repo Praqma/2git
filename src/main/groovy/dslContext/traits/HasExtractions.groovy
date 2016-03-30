@@ -7,7 +7,7 @@ import migration.filter.extractions.Extraction
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
-trait TExtractionsContext {
+trait HasExtractions {
     List<Extraction> extractions = []
 
     /**
@@ -15,7 +15,7 @@ trait TExtractionsContext {
      * @param closure the Extractions configuration
      */
     def void extractions(@DelegatesTo(ExtractionsContext) Closure closure) {
-        log.debug('Entering before().')
+        log.debug('Entering extractions().')
         def extractionsContext = new ExtractionsContext()
         executeInContext(closure, extractionsContext)
         addExtractions(extractionsContext.extractions)

@@ -7,7 +7,7 @@ import migration.filter.actions.Action
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
-trait TActionsContext {
+trait HasActions {
     List<Action> actions = []
 
     /**
@@ -15,7 +15,7 @@ trait TActionsContext {
      * @param closure the Actions configuration
      */
     def void actions(@DelegatesTo(ActionsContext) Closure closure) {
-        log.debug('Entering before().')
+        log.debug('Entering actions().')
         def actionsContext = new ActionsContext()
         executeInContext(closure, actionsContext)
         addActions(actionsContext.actions)

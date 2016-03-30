@@ -7,7 +7,7 @@ import migration.filter.criterias.Criteria
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
-trait TCriteriaContext {
+trait HasCriteria {
     List<Criteria> criteria = []
 
     /**
@@ -15,7 +15,7 @@ trait TCriteriaContext {
      * @param closure the Criteria configuration
      */
     def void criteria(@DelegatesTo(CriteriaContext) Closure closure) {
-        log.debug('Entering before().')
+        log.debug('Entering criteria().')
         def criteriaContext = new CriteriaContext()
         executeInContext(closure, criteriaContext)
         addCriteria(criteriaContext.criteria)

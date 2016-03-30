@@ -7,8 +7,8 @@ import utils.StringExtensions
 @Slf4j
 class Stream {
     String name     // Stream name
-    String target   // Target branch name
     String vob      // Vob name
+    String target   // Target branch name
     List<Filter> filters = []
 
     /**

@@ -7,14 +7,14 @@ import migration.filter.Filter
 import migration.filter.actions.Action
 import migration.filter.criterias.Criteria
 import migration.filter.extractions.Extraction
-import dslContext.traits.TActionsContext
-import dslContext.traits.TCriteriaContext
-import dslContext.traits.TExtractionsContext
+import dslContext.traits.HasActions
+import dslContext.traits.HasCriteria
+import dslContext.traits.HasExtractions
 
 import static dslContext.ContextHelper.executeInContext
 
 @Slf4j
-class FilterContext implements Context, TActionsContext, TCriteriaContext, TExtractionsContext {
+class FilterContext implements Context, HasActions, HasCriteria, HasExtractions {
     Filter filter
 
     /**

@@ -11,7 +11,6 @@ import static dslContext.ContextHelper.executeInContext
 class ComponentContext implements Context {
     Component component
 
-
     /**
      * ComponentContext constructor
      * @param name the Component name

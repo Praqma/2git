@@ -8,7 +8,6 @@ import utils.StringExtensions
 class Component {
     String name     // Component name
     String vobName      // Vob name
-
     List<Stream> streams = []   // Component Streams to migrate
     MigrationOptions migrationOptions = new MigrationOptions()   // Some options used in the migration
 
