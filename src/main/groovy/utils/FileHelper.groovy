@@ -16,7 +16,7 @@ class FileHelper {
                 def target = new File(subDirectory.parentFile, source.name)
                 if (target.exists()) {
                     log.debug("Deleting $target")
-                    if(target.isDirectory()) target.deleteDir()
+                    if (target.isDirectory()) target.deleteDir()
                     else target.delete()
                 }
                 log.debug("Moving $source to $target")

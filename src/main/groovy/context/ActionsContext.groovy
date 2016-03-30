@@ -1,0 +1,54 @@
+package context
+
+import context.base.Context
+import context.traits.HasActions
+import groovy.text.SimpleTemplateEngine
+import migration.plan.Action
+import net.praqma.util.execute.CommandLine
+
+class ActionsContext implements Context, HasActions {
+
+    /**
+     * Registers a command line action to execute
+     * @param command the command to execute
+     */
+    void cmd(String command) {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
+                CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line -> println line }
+            }
+        })
+    }
+
+    /**
+     * Registers a command line action to execute
+     * @param command the command to execute
+     * @param path the path to execute the command in
+     */
+    void cmd(String command, String path) {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
+                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line }
+            }
+        })
+    }
+
+    /**
+     * Executes a custom groovy command
+     * @param closure the closure to run
+     */
+    void custom(Closure closure) {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                closure.delegate = this
+                closure.resolveStrategy = Closure.DELEGATE_FIRST
+                closure.call(extractionMap)
+            }
+        })
+    }
+}

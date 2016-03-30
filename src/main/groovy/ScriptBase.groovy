@@ -1,11 +1,15 @@
-import migration.clearcase.Cool
-import dslContext.base.Context
-import dslContext.base.DslContext
-import dslContext.MigrationContext
+import context.MigrationContext
+import context.base.Context
+import context.base.DslContext
+import context.traits.HasSource
+import context.traits.HasTarget
 import groovy.util.logging.Slf4j
 import migration.Migrator
+import migration.sources.ccucm.Cool
+import migration.sources.ccucm.context.CcucmSourceContext
+import migration.targets.git.context.GitTargetContext
 
-import static dslContext.ContextHelper.executeInContext
+import static context.ContextHelper.executeInContext
 
 /**
  * Script base for the DSL.
@@ -13,37 +17,54 @@ import static dslContext.ContextHelper.executeInContext
  */
 @Slf4j
 abstract class ScriptBase extends Script implements Context {
+
+    //TODO dynamically load at one point
+    Map<String, HasSource> sources = ['ccucm': new CcucmSourceContext()]
+    Map<String, HasTarget> targets = ['git': new GitTargetContext()]
+
+    void from(String identifier, @DslContext(Context) Closure closure) {
+        if (!sources.containsKey(identifier)) throw new Exception('Target not supported.')
+
+        def sourceContext = sources[identifier]
+        executeInContext(closure, sourceContext)
+        Migrator.instance.source = sourceContext.source
+        Migrator.instance.criteriaContext = Migrator.instance.source.withCriteria(Migrator.instance.criteriaContext)
+        Migrator.instance.extractionsContext = Migrator.instance.source.withExtractions(Migrator.instance.extractionsContext)
+    }
+
+    void to(String identifier, @DslContext(Context) Closure closure) {
+        if (!targets.containsKey(identifier)) throw new Exception('Target not supported.')
+
+        def targetContext = targets[identifier]
+        executeInContext(closure, targetContext)
+        Migrator.instance.target = targetContext.target
+        Migrator.instance.actionsContext = Migrator.instance.target.withActions(Migrator.instance.actionsContext)
+    }
+
     /**
      * Closure containing DSL methods used for the migration
      * @param closure The DSL code
      */
-    def void migrate(@DslContext(MigrationContext) Closure closure) {
+    void migrate(@DslContext(MigrationContext) Closure closure) {
         log.debug('Entering migrate().')
-        log.info('Building migration tree.')
         def migrationContext = new MigrationContext()
         executeInContext(closure, migrationContext)
-        log.info('Finished building migration tree.')
-        log.info("Executing befores.")
-        migrationContext.befores.each {executeInContext(it, this)}
-        Migrator.migrate(migrationContext.components)
-        log.info("Executing afters.")
-        migrationContext.afters.each {executeInContext(it, this)}
+        Migrator.instance.migrate()
         log.info(migrationComplete())
         log.debug('Exiting migrate().')
     }
-
 
     /**
      * Outputs stream loadComponents and dependencies to a given log file
      * @param fullyQualifiedStreamName FQ name of the stream to output the dependencies for
      * @param logFileName the File to output to (contents will be YAML)
      */
-    def void logDependencies(String fullyQualifiedStreamName, String logFileName) {
+    void logDependencies(String fullyQualifiedStreamName, String logFileName) {
         def logFile = new File(logFileName)
 
-        if(!logFile.exists())
+        if (!logFile.exists())
             logFile.delete()
-        if(logFile.parentFile)
+        if (logFile.parentFile)
             logFile.parentFile.mkdirs()
         logFile.createNewFile()
 
@@ -62,7 +83,7 @@ abstract class ScriptBase extends Script implements Context {
      * We're done! Weeee!
      * @return The fancy 'Finished' banner to end migration with.
      */
-    static def String migrationComplete() {
+    static String migrationComplete() {
         "\n" +
                 "  ______ _____ _   _ _____  _____ _    _ ______ _____  \n" +
                 " |  ____|_   _| \\ | |_   _|/ ____| |  | |  ____|  __ \\ \n" +
