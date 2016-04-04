@@ -1,6 +1,7 @@
 package migration.targets.git
 
 import context.ActionsContext
+import context.base.Context
 import migration.Migrator
 import migration.targets.MigrationTarget
 import migration.targets.git.context.GitActionsContext
@@ -20,7 +21,7 @@ class GitTarget implements MigrationTarget {
     }
 
     @Override
-    ActionsContext withActions(ActionsContext actionsContext) {
+    Context withActions(ActionsContext actionsContext) {
         return actionsContext as GitActionsContext
     }
 

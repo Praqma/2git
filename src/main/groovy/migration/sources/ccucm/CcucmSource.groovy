@@ -2,6 +2,7 @@ package migration.sources.ccucm
 
 import context.CriteriaContext
 import context.ExtractionsContext
+import context.base.Context
 import groovy.util.logging.Slf4j
 import migration.plan.Criteria
 import migration.sources.MigrationSource
@@ -46,12 +47,12 @@ class CcucmSource implements MigrationSource {
     }
 
     @Override
-    CriteriaContext withCriteria(CriteriaContext criteriaContext) {
+    Context withCriteria(CriteriaContext criteriaContext) {
         return criteriaContext as CcucmCriteriaContext
     }
 
     @Override
-    ExtractionsContext withExtractions(ExtractionsContext extractionsContext) {
+    Context withExtractions(ExtractionsContext extractionsContext) {
         return extractionsContext as CcucmExtractionsContext
     }
 

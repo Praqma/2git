@@ -18,7 +18,7 @@ class GitActions {
     class Git extends Action {
         String command
 
-        public Git(String command){
+        Git(String command){
             this.command = command
         }
 

@@ -2,6 +2,7 @@ package migration.sources
 
 import context.CriteriaContext
 import context.ExtractionsContext
+import context.base.Context
 import migration.plan.Criteria
 
 interface MigrationSource {
@@ -13,7 +14,7 @@ interface MigrationSource {
 
     void cleanup()
 
-    CriteriaContext withCriteria(CriteriaContext criteriaContext)
+    Context withCriteria(CriteriaContext criteriaContext)
 
-    ExtractionsContext withExtractions(ExtractionsContext extractionsContext)
+    Context withExtractions(ExtractionsContext extractionsContext)
 }
