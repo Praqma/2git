@@ -22,7 +22,7 @@ class Migrator {
     def extractionsContext = new ExtractionsContext()
     def actionsContext = new ActionsContext()
 
-    def migrate() {
+    void migrate() {
         def extractionMap = [:]
 
         source.prepare()
@@ -31,7 +31,7 @@ class Migrator {
         //Build plan
         Map<String, SnapshotPlan> migrationPlan = [:]
         filters.each { filter ->
-            buildMigrationPlan(migrationPlan, filter)
+            fillMigrationPlan(migrationPlan, filter)
         }
 
         //Execute befores
@@ -62,17 +62,33 @@ class Migrator {
         target.cleanup()
     }
 
-    void buildMigrationPlan(Map<String, SnapshotPlan> migrationPlan, Filter filter) {
+    /**
+     * Entry point for filling up the migration plan.
+     * Retrieves and registers snapshots with the plan, then runs the filter.
+     * @param migrationPlan The migration plan, a map of SnapshotPlans, with the Snapshot identifiers as keys
+     * @param filter A top-level filter
+     */
+    void fillMigrationPlan(Map<String, SnapshotPlan> migrationPlan, Filter filter) {
+        // Retrieve snapshots
         def snapshots = source.getSnapshots(filter.criteria)
+
+        // Register snapshots
         snapshots.each { snapshot ->
             if (!migrationPlan.containsKey(snapshot.identifier))
                 migrationPlan.put(snapshot.identifier, new SnapshotPlan(snapshot))
         }
 
-        buildMigrationPlan(migrationPlan, migrationPlan.values().toList(), filter)
+        // Run top-level filter
+        applyFilter(migrationPlan, migrationPlan.values(), filter)
     }
 
-    void buildMigrationPlan(Map<String, SnapshotPlan> migrationPlan, List<SnapshotPlan> snapshotPlans, Filter filter) {
+    /**
+     * Fills the migration plan by registering actions and extractions to snapshots matching its criteria
+     * @param migrationPlan The migration plan, a map of SnapshotPlans, with the Snapshot identifiers as keys
+     * @param snapshotPlans The set of snapshots the filter will be applied to.
+     * @param filter The filter that will be applied.
+     */
+    void applyFilter(Map<String, SnapshotPlan> migrationPlan, Collection<SnapshotPlan> snapshotPlans, Filter filter) {
         def matchingSnapshotPlans = snapshotPlans.findAll { snapshotPlan ->
             snapshotPlan.matches(filter.criteria)
         }
@@ -84,7 +100,7 @@ class Migrator {
         }
 
         for (def childFilter : filter.filters) {
-            buildMigrationPlan(migrationPlan, matchingSnapshotPlans, childFilter)
+            applyFilter(migrationPlan, matchingSnapshotPlans, childFilter)
         }
     }
 }
