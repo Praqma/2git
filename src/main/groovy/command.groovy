@@ -12,7 +12,7 @@ to('git') {
 migrate {
     before {
         actions {
-            git 'pull'
+            git 'pull origin master'
         }
     }
     filters {
@@ -31,7 +31,7 @@ migrate {
     }
     after {
         actions {
-            git 'push'
+            git 'push origin master'
         }
     }
 }

@@ -28,15 +28,15 @@ class Migrator {
         source.prepare()
         target.prepare()
 
-        //Execute befores
-        befores.each { action ->
-            action.act(extractionMap)
-        }
-
         //Build plan
         Map<String, SnapshotPlan> migrationPlan = [:]
         filters.each { filter ->
             buildMigrationPlan(migrationPlan, filter)
+        }
+
+        //Execute befores
+        befores.each { action ->
+            action.act(extractionMap)
         }
 
         //Run plan
@@ -73,8 +73,8 @@ class Migrator {
     }
 
     void buildMigrationPlan(Map<String, SnapshotPlan> migrationPlan, List<SnapshotPlan> snapshotPlans, Filter filter) {
-        def matchingSnapshotPlans = snapshotPlans.findAll { snapShotPlan ->
-            snapShotPlan.matches(filter.criteria)
+        def matchingSnapshotPlans = snapshotPlans.findAll { snapshotPlan ->
+            snapshotPlan.matches(filter.criteria)
         }
         if (!matchingSnapshotPlans) return
 
@@ -84,7 +84,7 @@ class Migrator {
         }
 
         for (def childFilter : filter.filters) {
-            buildMigrationPlan(migrationPlan, matchingSnapshotPlans, filter)
+            buildMigrationPlan(migrationPlan, matchingSnapshotPlans, childFilter)
         }
     }
 }
