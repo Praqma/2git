@@ -13,7 +13,7 @@ class MigrationContext implements Context {
      * @param closure the After configuration
      */
     void after(@DslContext(AfterContext) Closure closure) {
-        executeInContext(closure, new BeforeContext())
+        executeInContext(closure, new AfterContext())
     }
 
     /**
