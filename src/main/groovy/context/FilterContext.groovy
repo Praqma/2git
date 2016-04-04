@@ -6,7 +6,7 @@ import migration.Migrator
 import migration.plan.Filter
 
 class FilterContext implements Context {
-    Filter filter
+    Filter filter = new Filter()
 
     /**
      * Adds child {@link Filter}s to the current {@link Filter}.
