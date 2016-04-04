@@ -1,8 +1,10 @@
 package migration.targets.git.context
 
 import context.traits.HasActions
-import migration.targets.git.GitActions
 import migration.targets.git.GitOptions
+import migration.targets.git.actions.Clear
+import migration.targets.git.actions.Git
+import migration.targets.git.actions.Setup
 
 trait GitActionsContext implements HasActions {
 
@@ -10,7 +12,7 @@ trait GitActionsContext implements HasActions {
      * Deletes all but '.git*' files/dirs in the Git path
      */
     void clear() {
-        actions.add(new GitActions.Clear())
+        actions.add(new Clear())
     }
 
     /**
@@ -18,7 +20,7 @@ trait GitActionsContext implements HasActions {
      * @param command the Git command to execute
      */
     void git(String command) {
-        actions.add(new GitActions.Git(command))
+        actions.add(new Git(command))
     }
 
     /**
@@ -26,6 +28,6 @@ trait GitActionsContext implements HasActions {
      * @param options the GitOptions to use
      */
     void setup(GitOptions options) {
-        actions.add(new GitActions.Setup(options))
+        actions.add(new Setup(options))
     }
 }

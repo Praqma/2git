@@ -4,6 +4,7 @@ import context.ActionsContext
 import context.base.Context
 import migration.Migrator
 import migration.targets.MigrationTarget
+import migration.targets.git.actions.Setup
 import migration.targets.git.context.GitActionsContext
 
 class GitTarget implements MigrationTarget {
@@ -12,7 +13,7 @@ class GitTarget implements MigrationTarget {
     @Override
     void prepare() {
         if (options.defaultSetup)
-            Migrator.instance.befores.add(GitActionsContext.setup(options))
+            Migrator.instance.befores.add(new Setup(options))
     }
 
     @Override

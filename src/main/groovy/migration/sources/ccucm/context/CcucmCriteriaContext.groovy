@@ -2,7 +2,9 @@ package migration.sources.ccucm.context
 
 import context.base.Context
 import context.traits.HasCriteria
-import migration.sources.ccucm.CcucmCriteria
+import migration.sources.ccucm.criteria.AfterDate
+import migration.sources.ccucm.criteria.BaselineName
+import migration.sources.ccucm.criteria.PromotionLevels
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
 trait CcucmCriteriaContext implements Context, HasCriteria {
@@ -12,7 +14,7 @@ trait CcucmCriteriaContext implements Context, HasCriteria {
      * @param name the name of the baseline
      */
     void afterBaseline(String name) {
-        criteria.add(new CcucmCriteria.AfterDate(CoolBaseline.get(name).date))
+        criteria.add(new AfterDate(CoolBaseline.get(name).date))
     }
 
     /**
@@ -21,7 +23,7 @@ trait CcucmCriteriaContext implements Context, HasCriteria {
      * @param date the date
      */
     void afterDate(String format, String date) {
-        criteria.add(new CcucmCriteria.AfterDate(format, date))
+        criteria.add(new AfterDate(format, date))
     }
 
     /**
@@ -29,7 +31,7 @@ trait CcucmCriteriaContext implements Context, HasCriteria {
      * @param date the date
      */
     void afterDate(Date date) {
-        criteria.add(new CcucmCriteria.AfterDate(date))
+        criteria.add(new AfterDate(date))
     }
 
     /**
@@ -37,7 +39,7 @@ trait CcucmCriteriaContext implements Context, HasCriteria {
      * @param regex the regex to test baseline names against
      */
     void baselineName(String regex) {
-        criteria.add(new CcucmCriteria.BaselineName(regex))
+        criteria.add(new BaselineName(regex))
     }
 
     /**
@@ -45,6 +47,6 @@ trait CcucmCriteriaContext implements Context, HasCriteria {
      * @param levels the promotion levels to test baselines against
      */
     void promotionLevels(String... levels) {
-        criteria.add(new CcucmCriteria.PromotionLevels(levels))
+        criteria.add(new PromotionLevels(levels))
     }
 }

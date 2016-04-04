@@ -14,11 +14,11 @@ class CcucmSourceContext implements Context, HasSource {
         source = new CcucmSource(options: new CcucmOptions())
     }
 
-    void stream(String streamName){
+    void stream(String streamName) {
         source.options.stream = streamName
     }
 
-    void component(String componentName){
+    void component(String componentName) {
         source.options.component = componentName
     }
 
