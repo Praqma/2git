@@ -3,7 +3,7 @@ from('ccucm') {
     stream "bloop@\\sisi"
 }
 
-to('git') { // Here we also add the GitActions trait
+to('git') {
     user 'thierry'
     email 'thi@praqma.net'
     ignore '*.tmp', '*.bk'
