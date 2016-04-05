@@ -55,12 +55,4 @@ class CcucmSourceContext implements Context, HasSource {
     void view(String path) {
         source.options.view = path
     }
-
-    /**
-     * Integer for setting the amount of times the view directory structure is flattened
-     * @param count How many times the view's child directories are emptied into the root
-     */
-    void flattenView(int count = 1) {
-        source.options.flattenView = count
-    }
 }

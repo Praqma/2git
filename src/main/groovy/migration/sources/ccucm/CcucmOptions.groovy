@@ -11,5 +11,4 @@ class CcucmOptions {
 
     CoolSnapshotView.Components loadComponents = CoolSnapshotView.Components.MODIFIABLE
     boolean readOnlyMigrationStream = false
-    int flattenView = 0
 }

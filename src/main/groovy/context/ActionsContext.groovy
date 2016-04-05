@@ -5,6 +5,7 @@ import context.traits.HasActions
 import groovy.text.SimpleTemplateEngine
 import migration.plan.Action
 import net.praqma.util.execute.CommandLine
+import utils.FileHelper
 
 class ActionsContext implements Context, HasActions {
 
@@ -60,5 +61,21 @@ class ActionsContext implements Context, HasActions {
      */
     void methodMissing(String name, Object args) {
         cmd("$name $args")
+    }
+
+    /**
+     * Flattens the directory structure a given amount of times, emptying subdirectories into the root and deleting the empty subdirectories.
+     * @param dir the directory to flatten
+     * @param amount the amount of times to flatten the directory structure
+     */
+    void flattenDir(String dir, int amount){
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                amount.times {
+                    FileHelper.emptySubDirectories(new File(dir))
+                }
+            }
+        })
     }
 }
