@@ -13,12 +13,12 @@ class GitTarget implements MigrationTarget {
     @Override
     void prepare() {
         if (options.defaultSetup)
-            Migrator.instance.befores.add(new Setup(options))
+            Migrator.instance.befores.add(new Setup(new File(dir), options))
     }
 
     @Override
     void cleanup() {
-        GitUtil.call("clean -f") //TODO should this be default?
+
     }
 
     @Override

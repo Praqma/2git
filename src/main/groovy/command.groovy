@@ -1,9 +1,9 @@
-from('ccucm') {
+source('ccucm') {
     component "myComp@\\vob"
     stream "bloop@\\sisi"
 }
 
-to('git') {
+target('git') {
     user 'thierry'
     email 'thi@praqma.net'
     ignore '*.tmp', '*.bk'
@@ -12,6 +12,8 @@ to('git') {
 migrate {
     before {
         actions {
+            println source.dir
+            println target.dir
             git 'pull origin master'
         }
     }
