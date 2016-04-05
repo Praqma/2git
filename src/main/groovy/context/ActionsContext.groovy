@@ -51,4 +51,14 @@ class ActionsContext implements Context, HasActions {
             }
         })
     }
+
+    /**
+     * Runs missing methods as command line calls.
+     * ex.: mkdir '/home/me/repository'
+     * @param name the name of the method that was called
+     * @param args the arguments the method was called with
+     */
+    void methodMissing(String name, Object args) {
+        cmd("$name $args")
+    }
 }
