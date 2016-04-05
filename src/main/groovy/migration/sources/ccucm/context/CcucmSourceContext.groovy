@@ -52,7 +52,7 @@ class CcucmSourceContext implements Context, HasSource {
     /**
      * Sets the ClearCase view path
      */
-    void view(String path) {
-        source.options.view = path
+    void dir(String path) {
+        source.dir = path
     }
 }

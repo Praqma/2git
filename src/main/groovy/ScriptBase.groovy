@@ -5,10 +5,8 @@ import context.traits.HasSource
 import context.traits.HasTarget
 import groovy.util.logging.Slf4j
 import migration.Migrator
-import migration.sources.MigrationSource
 import migration.sources.ccucm.Cool
 import migration.sources.ccucm.context.CcucmSourceContext
-import migration.targets.MigrationTarget
 import migration.targets.git.context.GitTargetContext
 
 import static context.ContextHelper.executeInContext

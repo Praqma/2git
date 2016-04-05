@@ -68,7 +68,7 @@ class ActionsContext implements Context, HasActions {
      * @param dir the directory to flatten
      * @param amount the amount of times to flatten the directory structure
      */
-    void flattenDir(String dir, int amount){
+    void flattenDir(String dir, int amount) {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {

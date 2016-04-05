@@ -11,3 +11,6 @@ gradle-app.setting
 
 # Output
 out/
+
+# Specific command files
+customers/*

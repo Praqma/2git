@@ -3,7 +3,6 @@ package migration.targets.git.context
 import context.traits.HasActions
 import migration.targets.git.GitOptions
 import migration.targets.git.actions.Clear
-import migration.targets.git.actions.Git
 import migration.targets.git.actions.Setup
 
 trait GitActionsContext implements HasActions {
@@ -16,18 +15,10 @@ trait GitActionsContext implements HasActions {
     }
 
     /**
-     * Executes a Git command in the branch repository
-     * @param command the Git command to execute
-     */
-    void git(String command) {
-        actions.add(new Git(command))
-    }
-
-    /**
      * Sets up a default repository using defined {@link GitOptions}
      * @param options the GitOptions to use
      */
-    void setup(GitOptions options) {
-        actions.add(new Setup(options))
+    void setup(File path, GitOptions options) {
+        actions.add(new Setup(path, options))
     }
 }

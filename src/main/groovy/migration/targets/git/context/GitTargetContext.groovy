@@ -39,16 +39,9 @@ class GitTargetContext implements Context, HasTarget {
     }
 
     /**
-     * Sets the Git dir path
+     * Sets the Git path
      */
     void dir(String path) {
-        target.options.dir = path
-    }
-
-    /**
-     * Sets the Git work tree path
-     */
-    void workTree(String path) {
-        target.options.workTree = path
+        target.dir = path
     }
 }

@@ -3,10 +3,12 @@ package migration.targets
 import context.ActionsContext
 import context.base.Context
 
-interface MigrationTarget {
-    void prepare()
+trait MigrationTarget {
+    String dir = new File("./output/target").absolutePath
 
-    void cleanup()
+    abstract void prepare()
 
-    Context withActions(ActionsContext actionsContext)
+    abstract void cleanup()
+
+    abstract Context withActions(ActionsContext actionsContext)
 }

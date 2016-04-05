@@ -23,43 +23,45 @@ class Migrator {
     def actionsContext = new ActionsContext()
 
     void migrate() {
-        def extractionMap = [:]
+        try {
+            def extractionMap = [:]
 
-        source.prepare()
-        target.prepare()
+            source.prepare()
+            target.prepare()
 
-        //Build plan
-        Map<String, SnapshotPlan> migrationPlan = [:]
-        filters.each { filter ->
-            fillMigrationPlan(migrationPlan, filter)
-        }
+            //Build plan
+            Map<String, SnapshotPlan> migrationPlan = [:]
+            filters.each { filter ->
+                fillMigrationPlan(migrationPlan, filter)
+            }
 
-        //Execute befores
-        befores.each { action ->
-            action.act(extractionMap)
-        }
+            //Execute befores
+            befores.each { action ->
+                action.act(extractionMap)
+            }
 
-        //Run plan
-        migrationPlan.values().each { step ->
-            source.checkout(step.snapshot)
-            step.extractions.each { extraction ->
-                extraction.extract(step.snapshot).entrySet().each { kv ->
-                    extractionMap.put(kv.key, kv.value)
+            //Run plan
+            migrationPlan.values().each { step ->
+                source.checkout(step.snapshot)
+                step.extractions.each { extraction ->
+                    extraction.extract(step.snapshot).entrySet().each { kv ->
+                        extractionMap.put(kv.key, kv.value)
+                    }
+                }
+
+                step.actions.each { action ->
+                    action.act(extractionMap)
                 }
             }
 
-            step.actions.each { action ->
+            //Execute afters
+            afters.each { action ->
                 action.act(extractionMap)
             }
+        } finally {
+            source.cleanup()
+            target.cleanup()
         }
-
-        //Execute afters
-        afters.each { action ->
-            action.act(extractionMap)
-        }
-
-        source.cleanup()
-        target.cleanup()
     }
 
     /**

@@ -5,16 +5,18 @@ import context.ExtractionsContext
 import context.base.Context
 import migration.plan.Criteria
 
-interface MigrationSource {
-    List<Snapshot> getSnapshots(List<Criteria> initialFilter)
+trait MigrationSource {
+    String dir = new File("./output/source").absolutePath
 
-    void checkout(Snapshot snapshot)
+    abstract List<Snapshot> getSnapshots(List<Criteria> initialFilter)
 
-    void prepare()
+    abstract void checkout(Snapshot snapshot)
 
-    void cleanup()
+    abstract void prepare()
 
-    Context withCriteria(CriteriaContext criteriaContext)
+    abstract void cleanup()
 
-    Context withExtractions(ExtractionsContext extractionsContext)
+    abstract Context withCriteria(CriteriaContext criteriaContext)
+
+    abstract Context withExtractions(ExtractionsContext extractionsContext)
 }

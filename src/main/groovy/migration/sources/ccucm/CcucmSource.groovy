@@ -42,8 +42,8 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void cleanup() {
-        migrationView.remove()
-        migrationStream.remove()
+        if (migrationView) migrationView.remove()
+        if (migrationStream) migrationStream.remove()
     }
 
     @Override
@@ -70,9 +70,12 @@ class CcucmSource implements MigrationSource {
     void checkout(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
 
-        if (!migrationStream) { // Move this to setup? Too intense for setup?
-            migrationStream = Cool.createStream(parentStream, baseline, component.shortname + "_cc2git_" + id, options.readOnlyMigrationStream)
-            migrationView = Cool.createView(migrationStream, new File(options.dir), component.shortname + "_cc2git_" + id)
+        //TODO Move this to setup? Too intense for setup?
+        if (!migrationStream) {
+            migrationStream = Cool.createStream(parentStream, baseline, component.shortname + "_cc2git_" + UUID.randomUUID(), options.readOnlyMigrationStream)
+        }
+        if (!migrationView) {
+            migrationView = Cool.createView(migrationStream, new File(dir), component.shortname + "_cc2git_" + UUID.randomUUID())
         }
 
         Cool.rebase(baseline, migrationView)
