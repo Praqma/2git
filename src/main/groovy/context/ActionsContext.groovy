@@ -3,12 +3,46 @@ package context
 import context.base.Context
 import context.traits.HasActions
 import groovy.text.SimpleTemplateEngine
+import migration.Migrator
 import migration.plan.Action
 import net.praqma.util.execute.CommandLine
+import org.apache.commons.io.FileUtils
 import utils.FileHelper
 
 class ActionsContext implements Context, HasActions {
 
+    /**
+     * Copies the contents of the source directory to the target directory.
+     */
+    void copy() {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                def sourceDir = new File(Migrator.instance.source.dir)
+                def targetDir = new File(Migrator.instance.target.dir)
+                sourceDir.listFiles().each{ file ->
+                    FileUtils.copyFileToDirectory(file, targetDir)
+                }
+            }
+        })
+    }
+
+    /**
+     * Moves the contents of the source directory to the target directory.
+     */
+    void move() {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                def sourceDir = new File(Migrator.instance.source.dir)
+                def targetDir = new File(Migrator.instance.target.dir)
+                sourceDir.listFiles().each{ file ->
+                    FileUtils.moveFileToDirectory(file, targetDir, false)
+                }
+            }
+        })
+    }
+    
     /**
      * Registers a command line action to execute
      * @param command the command to execute
