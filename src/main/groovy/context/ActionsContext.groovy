@@ -18,8 +18,8 @@ class ActionsContext implements Context, HasActions {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                def sourceDir = new File(Migrator.instance.source.dir)
-                def targetDir = new File(Migrator.instance.target.dir)
+                def sourceDir = new File(Migrator.instance.source.workspace)
+                def targetDir = new File(Migrator.instance.target.workspace)
                 sourceDir.listFiles().each{ file ->
                     FileUtils.copyFileToDirectory(file, targetDir)
                 }
@@ -34,8 +34,8 @@ class ActionsContext implements Context, HasActions {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                def sourceDir = new File(Migrator.instance.source.dir)
-                def targetDir = new File(Migrator.instance.target.dir)
+                def sourceDir = new File(Migrator.instance.source.workspace)
+                def targetDir = new File(Migrator.instance.target.workspace)
                 sourceDir.listFiles().each{ file ->
                     FileUtils.moveFileToDirectory(file, targetDir, false)
                 }

@@ -9,6 +9,7 @@ import migration.sources.MigrationSource
 import migration.sources.ccucm.Cool
 import migration.sources.ccucm.context.CcucmSourceContext
 import migration.targets.MigrationTarget
+import migration.sources.mercurial.context.MercurialSourceContext
 import migration.targets.git.context.GitTargetContext
 
 import static context.ContextHelper.executeInContext
@@ -21,7 +22,7 @@ import static context.ContextHelper.executeInContext
 abstract class ScriptBase extends Script implements Context {
 
     //TODO dynamically load at one point
-    Map<String, HasSource> sources = ['ccucm': new CcucmSourceContext()]
+    Map<String, HasSource> sources = ['ccucm': new CcucmSourceContext(), 'mercurial': new MercurialSourceContext()]
     Map<String, HasTarget> targets = ['git': new GitTargetContext()]
 
     void source(String identifier, @DslContext(Context) Closure closure) {
@@ -54,12 +55,10 @@ abstract class ScriptBase extends Script implements Context {
      * @param closure The DSL code
      */
     void migrate(@DslContext(MigrationContext) Closure closure) {
-        log.debug('Entering migrate().')
         def migrationContext = new MigrationContext()
         executeInContext(closure, migrationContext)
         Migrator.instance.migrate()
         log.info(migrationComplete())
-        log.debug('Exiting migrate().')
     }
 
     /**

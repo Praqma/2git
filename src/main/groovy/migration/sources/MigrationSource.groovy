@@ -6,7 +6,7 @@ import context.base.Context
 import migration.plan.Criteria
 
 trait MigrationSource {
-    String dir = new File("./output/source").absolutePath
+    String workspace = new File("./output/source/temp").absolutePath
 
     abstract List<Snapshot> getSnapshots(List<Criteria> initialFilter)
 

@@ -50,7 +50,7 @@ class GitUtil {
             callOrDie(path, "config", "user.email", options.email)
             log.trace("Set git user.email to $options.user.")
         }
-        writeGitIgnore(options)
+        //writeGitIgnore(options)
     }
 
     static void writeGitIgnore(File path, GitOptions options) {

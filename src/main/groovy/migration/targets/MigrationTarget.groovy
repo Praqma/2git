@@ -4,7 +4,7 @@ import context.ActionsContext
 import context.base.Context
 
 trait MigrationTarget {
-    String dir = new File("./output/target").absolutePath
+    String workspace = new File("./output/target").absolutePath
 
     abstract void prepare()
 
