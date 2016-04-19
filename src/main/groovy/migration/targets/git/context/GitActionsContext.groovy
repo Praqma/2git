@@ -1,11 +1,11 @@
 package migration.targets.git.context
 
-import context.traits.HasActions
+import context.base.Context
 import migration.targets.git.GitOptions
 import migration.targets.git.actions.Clear
 import migration.targets.git.actions.Setup
 
-trait GitActionsContext implements HasActions {
+trait GitActionsContext implements Context {
 
     /**
      * Deletes all but '.git*' files/dirs in the Git path

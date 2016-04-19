@@ -12,8 +12,8 @@ target('git') {
 migrate {
     before {
         actions {
-            println source.dir
-            println target.dir
+            println source.workspace
+            println target.workspace
             git 'pull origin master'
         }
     }
@@ -26,6 +26,7 @@ migrate {
                 baselineProperty([myBaselineName: 'shortname'])
             }
             actions {
+                copy()
                 git 'add .'
                 git 'commit -m "$myBaselineName"'
             }

@@ -10,7 +10,7 @@ class ChangeSetProperties {
     String user, message
     Date date
 
-    ChangeSetProperties(Snapshot snapshot){
+    ChangeSetProperties(Snapshot snapshot) {
 
     }
 }

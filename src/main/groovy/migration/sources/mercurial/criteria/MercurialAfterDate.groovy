@@ -17,6 +17,7 @@ class MercurialAfterDate extends Criteria {
     MercurialAfterDate(Date date) {
         this.date = date
     }
+
     @Override
     boolean appliesTo(Snapshot snapshot) {
         def commit = ((MercurialChangeSet) snapshot)

@@ -13,7 +13,7 @@ class GitTarget implements MigrationTarget {
     @Override
     void prepare() {
         if (options.defaultSetup)
-            Migrator.instance.befores.add(new Setup(new File(dir), options))
+            Migrator.instance.befores.add(new Setup(new File(workspace), options))
     }
 
     @Override

@@ -6,7 +6,7 @@ import groovy.util.logging.Slf4j
 import migration.sources.mercurial.MercurialSource
 
 @Slf4j
-class MercurialSourceContext implements Context, HasSource{
+class MercurialSourceContext implements Context, HasSource {
 
     public MercurialSourceContext() {
         source = new MercurialSource()
@@ -25,8 +25,6 @@ class MercurialSourceContext implements Context, HasSource{
     void hasSubRepos(boolean b) {
         source.hasSubrepos = b
     }
-
-
 
 
 }

@@ -1,13 +1,12 @@
 package migration.sources.ccucm.context
 
 import context.base.Context
-import context.traits.HasCriteria
 import migration.sources.ccucm.criteria.AfterDate
 import migration.sources.ccucm.criteria.BaselineName
 import migration.sources.ccucm.criteria.PromotionLevels
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
-trait CcucmCriteriaContext implements Context, HasCriteria {
+trait CcucmCriteriaContext implements Context {
 
     /**
      * Filters out baselines that were created before a baseline

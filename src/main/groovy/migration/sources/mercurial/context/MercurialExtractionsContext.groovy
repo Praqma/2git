@@ -1,10 +1,9 @@
 package migration.sources.mercurial.context
 
 import context.base.Context
-import context.traits.HasExtractions
 import migration.sources.mercurial.extractions.ChangeSetProperties
 
-trait MercurialExtractionsContext implements Context, HasExtractions {
+trait MercurialExtractionsContext implements Context {
 
     /**
      * Extracts a CoolBaseline property

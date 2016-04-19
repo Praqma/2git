@@ -8,8 +8,8 @@ import migration.Migrator
 import migration.sources.MigrationSource
 import migration.sources.ccucm.Cool
 import migration.sources.ccucm.context.CcucmSourceContext
-import migration.targets.MigrationTarget
 import migration.sources.mercurial.context.MercurialSourceContext
+import migration.targets.MigrationTarget
 import migration.targets.git.context.GitTargetContext
 
 import static context.ContextHelper.executeInContext
@@ -90,7 +90,8 @@ abstract class ScriptBase extends Script implements Context {
      * We're done! Weeee!
      * @return The fancy 'Finished' banner to end migration with.
      */
-    static String migrationComplete() { def finished = $/
+    static String migrationComplete() {
+        def finished = $/
          ______ _____ _   _ _____  _____ _    _ ______ _____
         |  ____|_   _| \ | |_   _|/ ____| |  | |  ____|  __ \
         | |__    | | |  \| | | | | (___ | |__| | |__  | |  | |
@@ -104,7 +105,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the source as 'source' in the DSL front-end
      * @return the Migrator's MigrationSource
      */
-    MigrationSource getSource(){
+    MigrationSource getSource() {
         return Migrator.instance.source
     }
 
@@ -112,7 +113,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the target as 'target' in the DSL front-end
      * @return the Migrator's MigrationTarget
      */
-    MigrationTarget getTarget(){
+    MigrationTarget getTarget() {
         return Migrator.instance.target
     }
 }

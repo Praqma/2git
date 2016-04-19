@@ -1,10 +1,9 @@
 package migration.sources.ccucm.context
 
 import context.base.Context
-import context.traits.HasExtractions
 import migration.sources.ccucm.extractions.BaselineProperty
 
-trait CcucmExtractionsContext implements Context, HasExtractions {
+trait CcucmExtractionsContext implements Context {
 
     /**
      * Extracts a CoolBaseline property

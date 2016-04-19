@@ -9,8 +9,6 @@ import migration.sources.Snapshot
 import migration.sources.mercurial.context.MercurialCriteriaContext
 import migration.sources.mercurial.context.MercurialExtractionsContext
 
-import java.nio.file.Files
-
 class MercurialSource implements MigrationSource {
 
     String branch
@@ -24,7 +22,7 @@ class MercurialSource implements MigrationSource {
     @Override
     List<Snapshot> getSnapshots(List<Criteria> criteria) {
         builder = new ProcessBuilder(
-                "bash", "-c","cd output/source/sourceClone/$repoName; hg log  -T \"{node},{date|shortdate}\\n\"")
+                "bash", "-c", "cd output/source/sourceClone/$repoName; hg log  -T \"{node},{date|shortdate}\\n\"")
         builder.redirectErrorStream(true);
         pr = builder.start();
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
@@ -33,7 +31,7 @@ class MercurialSource implements MigrationSource {
         while ((output = stdInput.readLine()) != null) {
             def values = output.split(',')
             MercurialChangeSet commit = new MercurialChangeSet(values[0])
-            commit.date = new Date().parse("yyyy-MM-dd",values[1])
+            commit.date = new Date().parse("yyyy-MM-dd", values[1])
             snapshots.add(commit)
         }
         return snapshots
@@ -66,7 +64,7 @@ class MercurialSource implements MigrationSource {
             pr = rt.exec("rm -R $workspace")
         }
         builder = new ProcessBuilder(
-                "bash", "-c","cd output;mkdir source; cd source;mkdir temp; cd temp;  hg clone -r $id $sourceRepo")
+                "bash", "-c", "cd output;mkdir source; cd source;mkdir temp; cd temp;  hg clone -r $id $sourceRepo")
         builder.redirectErrorStream(true);
         Process p = builder.start();
     }
@@ -85,8 +83,8 @@ class MercurialSource implements MigrationSource {
 
     @Override
     void prepare() {
-        if(hasSubrepos){
-            setupSubrepos(){}
+        if (hasSubrepos) {
+            setupSubrepos() {}
         }
 
         cloneRemote()
@@ -112,7 +110,7 @@ class MercurialSource implements MigrationSource {
 
     void cloneRemote() {
         builder = new ProcessBuilder(
-                "bash", "-c","cd output;mkdir source; cd source; mkdir sourceClone; cd sourceClone; hg clone $sourceRepo")
+                "bash", "-c", "cd output;mkdir source; cd source; mkdir sourceClone; cd sourceClone; hg clone $sourceRepo")
         builder.redirectErrorStream(true);
         Process p = builder.start();
     }
