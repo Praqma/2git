@@ -94,7 +94,8 @@ class ActionsContext implements Context, HasActions {
      * @param args the arguments the method was called with
      */
     void methodMissing(String name, Object args) {
-        cmd("$name $args")
+        def arguments = args.join()
+        cmd("$name $arguments")
     }
 
     /**

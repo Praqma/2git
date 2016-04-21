@@ -7,6 +7,7 @@ import migration.plan.Action
 import migration.plan.Filter
 import migration.plan.SnapshotPlan
 import migration.sources.MigrationSource
+import migration.sources.Snapshot
 import migration.targets.MigrationTarget
 
 @Singleton
@@ -74,14 +75,8 @@ class Migrator {
         // Retrieve snapshots
         def snapshots = source.getSnapshots(filter.criteria)
 
-        // Register snapshots
-        snapshots.each { snapshot ->
-            if (!migrationPlan.containsKey(snapshot.identifier))
-                migrationPlan.put(snapshot.identifier, new SnapshotPlan(snapshot))
-        }
-
         // Run top-level filter
-        applyFilter(migrationPlan, migrationPlan.values(), filter)
+        applyFilter(migrationPlan, snapshots, filter)
     }
 
     /**
@@ -90,19 +85,22 @@ class Migrator {
      * @param snapshotPlans The set of snapshots the filter will be applied to.
      * @param filter The filter that will be applied.
      */
-    void applyFilter(Map<String, SnapshotPlan> migrationPlan, Collection<SnapshotPlan> snapshotPlans, Filter filter) {
-        def matchingSnapshotPlans = snapshotPlans.findAll { snapshotPlan ->
-            snapshotPlan.matches(filter.criteria)
+    void applyFilter(Map<String, SnapshotPlan> migrationPlan, Collection<Snapshot> snapshots, Filter filter) {
+        def matchingSnapshots = snapshots.findAll { snapshot ->
+            snapshot.matches(filter.criteria)
         }
-        if (!matchingSnapshotPlans) return
+        if (!matchingSnapshots) return
 
-        for (def snapshotPlan : matchingSnapshotPlans) {
-            snapshotPlan.extractions.addAll(filter.extractions)
-            snapshotPlan.actions.addAll(filter.actions)
+        for (def snapshot : matchingSnapshots) {
+            if(!migrationPlan.containsKey(snapshot.identifier))
+                migrationPlan.put(snapshot.identifier, new SnapshotPlan(snapshot))
+
+            migrationPlan[snapshot.identifier].extractions.addAll(filter.extractions)
+            migrationPlan[snapshot.identifier].actions.addAll(filter.actions)
         }
 
         for (def childFilter : filter.filters) {
-            applyFilter(migrationPlan, matchingSnapshotPlans, childFilter)
+            applyFilter(migrationPlan, matchingSnapshots, childFilter)
         }
     }
 }
