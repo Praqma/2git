@@ -1,6 +1,6 @@
 source('ccucm') {
     component "myComp@\\vob"
-    stream "bloop@\\sisi"
+    stream "myStream@\\vob"
 }
 
 target('git') {
@@ -12,9 +12,8 @@ target('git') {
 migrate {
     before {
         actions {
-            println source.workspace
-            println target.workspace
-            git 'pull origin master'
+            println "Source: $source.workspace"
+            println "Target: $target.workspace"
         }
     }
     filters {

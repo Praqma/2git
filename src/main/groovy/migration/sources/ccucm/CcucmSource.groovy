@@ -31,9 +31,14 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void prepare() {
-        vob = Cool.getPVob(StringExtensions.parseClearCaseName(options.stream).vob)
-        component = Cool.getComponent(options.component, vob)
-        stream = Cool.getStream(options.stream, vob)
+        def vobName = StringExtensions.parseClearCaseName(options.stream).vob
+        def componentName = StringExtensions.parseClearCaseName(options.component).tag
+        def streamName = StringExtensions.parseClearCaseName(options.stream).tag
+
+        vob = Cool.getPVob(vobName)
+        component = Cool.getComponent(componentName, vob)
+        stream = Cool.getStream(streamName, vob)
+
         if (options.migrationProject) {
             CoolProject targetProject = CoolProject.get(options.migrationProject, vob).load();
             parentStream = targetProject.integrationStream
@@ -75,7 +80,7 @@ class CcucmSource implements MigrationSource {
             migrationStream = Cool.createStream(parentStream, baseline, component.shortname + "_cc2git_" + UUID.randomUUID(), options.readOnlyMigrationStream)
         }
         if (!migrationView) {
-            migrationView = Cool.createView(migrationStream, new File(dir), component.shortname + "_cc2git_" + UUID.randomUUID())
+            migrationView = Cool.createView(migrationStream, new File(workspace), component.shortname + "_cc2git_" + UUID.randomUUID())
         }
 
         Cool.rebase(baseline, migrationView)

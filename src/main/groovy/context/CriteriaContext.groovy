@@ -2,9 +2,11 @@ package context
 
 import context.base.Context
 import context.traits.HasCriteria
+import groovy.util.logging.Slf4j
 import migration.plan.Criteria
 import migration.sources.Snapshot
 
+@Slf4j
 class CriteriaContext implements Context, HasCriteria {
 
     /**
@@ -23,5 +25,6 @@ class CriteriaContext implements Context, HasCriteria {
                 return result
             }
         })
+        log.info("Added 'custom' criteria.")
     }
 }

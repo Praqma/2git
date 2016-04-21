@@ -13,6 +13,7 @@ class AfterContext implements Context {
      * @param closure the closure defining the {@link migration.plan.Action}s
      */
     void actions(@DslContext(ActionsContext) Closure closure) {
+        log.info("Registering afters...")
         def actionsContext = Migrator.instance.actionsContext
         executeInContext(closure, actionsContext)
         Migrator.instance.afters.addAll(actionsContext.actions)

@@ -20,5 +20,6 @@ class ExtractionsContext implements Context, HasExtractions {
                 return closure.call(snapshot)
             }
         })
+        log.info("Added 'custom' extraction.")
     }
 }

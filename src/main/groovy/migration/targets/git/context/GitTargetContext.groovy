@@ -2,9 +2,11 @@ package migration.targets.git.context
 
 import context.base.Context
 import context.traits.HasTarget
+import groovy.util.logging.Slf4j
 import migration.targets.git.GitOptions
 import migration.targets.git.GitTarget
 
+@Slf4j
 class GitTargetContext implements Context, HasTarget {
 
     /**
@@ -20,6 +22,7 @@ class GitTargetContext implements Context, HasTarget {
      */
     void ignore(String... args) {
         target.options.ignore.addAll(args)
+        log.info("Added $args to git ignore.")
     }
 
     /**
@@ -28,6 +31,7 @@ class GitTargetContext implements Context, HasTarget {
      */
     void user(String user) {
         target.options.user = user
+        log.info("Set user to $user.")
     }
 
     /**
@@ -36,12 +40,14 @@ class GitTargetContext implements Context, HasTarget {
      */
     void email(String email) {
         target.options.email = email
+        log.info("Set email to $email.")
     }
 
     /**
      * Sets the Git path
      */
-    void dir(String path) {
-        target.dir = path
+    void workspace(String path) {
+        target.workspace = path
+        log.info("Set workspace to $path.")
     }
 }

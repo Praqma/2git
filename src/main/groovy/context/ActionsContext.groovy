@@ -3,12 +3,14 @@ package context
 import context.base.Context
 import context.traits.HasActions
 import groovy.text.SimpleTemplateEngine
+import groovy.util.logging.Slf4j
 import migration.Migrator
 import migration.plan.Action
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
 import utils.FileHelper
 
+@Slf4j
 class ActionsContext implements Context, HasActions {
 
     /**
@@ -21,10 +23,14 @@ class ActionsContext implements Context, HasActions {
                 def sourceDir = new File(Migrator.instance.source.workspace)
                 def targetDir = new File(Migrator.instance.target.workspace)
                 sourceDir.listFiles().each { file ->
-                    FileUtils.copyFileToDirectory(file, targetDir)
+                    if(file.isDirectory())
+                        FileUtils.copyDirectoryToDirectory(file, targetDir)
+                    else
+                        FileUtils.copyFileToDirectory(file, targetDir)
                 }
             }
         })
+        log.info("Registered 'copy' action.")
     }
 
     /**
@@ -37,10 +43,14 @@ class ActionsContext implements Context, HasActions {
                 def sourceDir = new File(Migrator.instance.source.workspace)
                 def targetDir = new File(Migrator.instance.target.workspace)
                 sourceDir.listFiles().each { file ->
-                    FileUtils.moveFileToDirectory(file, targetDir, false)
+                    if(file.isDirectory())
+                        FileUtils.moveDirectoryToDirectory(file, targetDir, true)
+                    else
+                        FileUtils.moveFileToDirectory(file, targetDir, true)
                 }
             }
         })
+        log.info("Registered 'move' action.")
     }
 
     /**
@@ -55,6 +65,7 @@ class ActionsContext implements Context, HasActions {
                 CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line -> println line }
             }
         })
+        log.info("Registered 'cmd' action.")
     }
 
     /**
@@ -70,6 +81,7 @@ class ActionsContext implements Context, HasActions {
                 CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line }
             }
         })
+        log.info("Registered 'cmd' action.")
     }
 
     /**
@@ -85,6 +97,7 @@ class ActionsContext implements Context, HasActions {
                 closure.call(extractionMap)
             }
         })
+        log.info("Registered 'custom' action.")
     }
 
     /**
@@ -94,6 +107,7 @@ class ActionsContext implements Context, HasActions {
      * @param args the arguments the method was called with
      */
     void methodMissing(String name, Object args) {
+        log.info("Method '$name' not found. Attempting to register as a 'cmd' action.")
         def arguments = args.join()
         cmd("$name $arguments")
     }
@@ -112,5 +126,6 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
+        log.info("Registered 'flattenDir' action.")
     }
 }

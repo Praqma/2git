@@ -6,6 +6,7 @@ import groovy.util.logging.Slf4j
 import migration.sources.ccucm.CcucmOptions
 import migration.sources.ccucm.CcucmSource
 import net.praqma.clearcase.ucm.view.SnapshotView
+import org.codehaus.groovy.tools.StringHelper
 
 @Slf4j
 class CcucmSourceContext implements Context, HasSource {
@@ -16,18 +17,22 @@ class CcucmSourceContext implements Context, HasSource {
 
     void stream(String streamName) {
         source.options.stream = streamName
+        log.info("Set stream to $streamName.")
     }
 
     void component(String componentName) {
         source.options.component = componentName
+        log.info("Set component to $componentName.")
     }
 
     void loadComponents(String target) {
-        if (target.equalsIgnoreCase('all'))
+        if (target.equalsIgnoreCase('all')) {
             source.options.loadComponents = SnapshotView.Components.ALL
-        else if (target.equalsIgnoreCase('modifiable'))
+            log.info("Set loadComponents to $target.")
+        } else if (target.equalsIgnoreCase('modifiable')) {
             source.options.loadComponents = SnapshotView.Components.MODIFIABLE
-        else
+            log.info("Set loadComponents to $target.")
+        } else
             log.warn("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
     }
 
@@ -38,6 +43,7 @@ class CcucmSourceContext implements Context, HasSource {
      */
     void migrationProject(String projectName) {
         source.options.migrationProject = projectName
+        log.info("Set migrationProject to $projectName.")
     }
 
     /**
@@ -47,12 +53,14 @@ class CcucmSourceContext implements Context, HasSource {
      */
     void readOnlyMigrationStream(boolean readOnly = true) {
         source.options.readOnlyMigrationStream = readOnly
+        log.info("Set readOnlyMigrationStream to $readOnly.")
     }
 
     /**
      * Sets the ClearCase view path
      */
-    void dir(String path) {
-        source.dir = path
+    void workspace(String path) {
+        source.workspace = path
+        log.info("Set workspace to $path.")
     }
 }

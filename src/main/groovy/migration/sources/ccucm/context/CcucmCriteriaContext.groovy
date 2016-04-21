@@ -1,11 +1,13 @@
 package migration.sources.ccucm.context
 
 import context.base.Context
+import groovy.util.logging.Slf4j
 import migration.sources.ccucm.criteria.AfterDate
 import migration.sources.ccucm.criteria.BaselineName
 import migration.sources.ccucm.criteria.PromotionLevels
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 
+@Slf4j
 trait CcucmCriteriaContext implements Context {
 
     /**
@@ -14,6 +16,7 @@ trait CcucmCriteriaContext implements Context {
      */
     void afterBaseline(String name) {
         criteria.add(new AfterDate(CoolBaseline.get(name).date))
+        log.info("Added 'afterBaseline' criteria.")
     }
 
     /**
@@ -23,6 +26,7 @@ trait CcucmCriteriaContext implements Context {
      */
     void afterDate(String format, String date) {
         criteria.add(new AfterDate(format, date))
+        log.info("Added 'afterDate' criteria.")
     }
 
     /**
@@ -31,6 +35,7 @@ trait CcucmCriteriaContext implements Context {
      */
     void afterDate(Date date) {
         criteria.add(new AfterDate(date))
+        log.info("Added 'afterDate' criteria.")
     }
 
     /**
@@ -39,6 +44,7 @@ trait CcucmCriteriaContext implements Context {
      */
     void baselineName(String regex) {
         criteria.add(new BaselineName(regex))
+        log.info("Added 'baselineName' criteria.")
     }
 
     /**
@@ -47,5 +53,6 @@ trait CcucmCriteriaContext implements Context {
      */
     void promotionLevels(String... levels) {
         criteria.add(new PromotionLevels(levels))
+        log.info("Added 'promotionLevels' criteria.")
     }
 }

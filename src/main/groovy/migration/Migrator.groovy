@@ -9,6 +9,7 @@ import migration.plan.SnapshotPlan
 import migration.sources.MigrationSource
 import migration.sources.Snapshot
 import migration.targets.MigrationTarget
+import net.praqma.util.xml.feed.FeedException
 
 @Singleton
 class Migrator {
