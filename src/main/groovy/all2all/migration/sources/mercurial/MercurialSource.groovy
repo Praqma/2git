@@ -32,7 +32,7 @@ class MercurialSource implements MigrationSource {
             commit.date = new Date().parse("yyyy-MM-dd", values[1])
             snapshots.add(commit)
         }
-        return snapshots
+        return snapshots.reverse()
     }
 
 //    //wo criteria test version
@@ -81,6 +81,7 @@ class MercurialSource implements MigrationSource {
 
     @Override
     void prepare() {
+
         if (hasSubrepos) {
             setupSubrepos() {}
         }

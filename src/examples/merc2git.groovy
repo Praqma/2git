@@ -1,8 +1,6 @@
-package all2all
-
 source('mercurial') {
-    sourceRepo('/Users/angeloron/Repos/Merc2')
-    branch('default')
+    sourceRepo('/Users/angeloron/Repos/mercurial2')
+    //branch('default')
 }
 
 target('git') {
@@ -15,12 +13,12 @@ migrate {
     filters {
         filter {
             criteria {
-                afterDate('yyyy-MM-dd', '2016-04-12')
+                //afterDate('yyyy-MM-dd', '2016-04-12')
             }
             actions {
-                copy()
-                git 'add .'
-                git 'commit -m "fhdsuihfsd"'
+//                copy()
+//                git 'add .'
+//                git 'commit -m "fhdsuihfsd"'
             }
         }
     }
