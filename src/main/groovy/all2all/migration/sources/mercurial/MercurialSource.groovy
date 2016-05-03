@@ -16,11 +16,12 @@ class MercurialSource implements MigrationSource {
     Runtime rt = Runtime.getRuntime()
     ProcessBuilder builder
     Process pr, pr2
+    String sourceClonePath = "output/source/sourceClone/$repoName"
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> criteria) {
         builder = new ProcessBuilder(
-                "bash", "-c", "cd output/source/sourceClone/$repoName; hg log  -T \"{node},{date|shortdate}\\n\"")
+                "bash", "-c", "cd $sourceClonePath; hg log  -T \"{node},{date|shortdate}\\n\"")
         builder.redirectErrorStream(true);
         pr = builder.start();
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
