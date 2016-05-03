@@ -5,10 +5,6 @@ import all2all.migration.plan.Snapshot
 
 class MercurialRepo {
 
-    Runtime rt = Runtime.getRuntime()
-    ProcessBuilder builder
-    Process pr
-
     //the id is the where/it/is from the .hgsub defining all the subrepos in mercurial
     String id, repoName
 
@@ -25,12 +21,12 @@ class MercurialRepo {
         this.repoName = repoName
     }
 
-    void export() {
-        builder = new ProcessBuilder(
+    Process export() {
+        def builder = new ProcessBuilder(
                 "bash", "-c", "cd output/source/sourceClone/$repoName; hg bookmark -r default master;hg gexport --debug;" +
                 " git config --bool core.bare false;git reset HEAD  -- .")
         builder.redirectErrorStream(true);
-        pr = builder.start();
+        return builder.start();
     }
 
     void extractRevisionNumbers(boolean isMerc) {
@@ -39,11 +35,11 @@ class MercurialRepo {
             {command = "hg log  -T \"{node},{date|shortdate}\\n\""}
         else
             {command = "git log --pretty=%H"}
-        builder = new ProcessBuilder(
+        def builder = new ProcessBuilder(
                 "bash", "-c", "cd output/source/sourceClone/$repoName; $command"
         )
         builder.redirectErrorStream(true);
-        pr = builder.start();
+        def pr = builder.start();
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         String output = null;
         while ((output = stdInput.readLine()) != null) {
@@ -65,11 +61,7 @@ class MercurialRepo {
 
     void setMergedList() {
         mercChangeSets.eachWithIndex { val, idx ->
-            println "${idx}. ${val.identifier}"
             mercGitShas[val.identifier] = gitShas.get(idx).identifier
-        }
-        for ( e in mercGitShas ) {
-            print "key = ${e.key}, value = ${e.value}\n"
         }
     }
 

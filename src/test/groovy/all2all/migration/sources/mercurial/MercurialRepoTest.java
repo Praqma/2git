@@ -20,7 +20,6 @@ public class MercurialRepoTest {
     String firstGitCommit = "02fbc008b0c0bd99686900fc891cedea61c6e49b";
     String lastGitCommit = "29321a9bb60d8dc4c633ef417897376ea7164138";
     String repoPath = "output/source/sourceClone/mercurial2";
-    int threadSleepingInMs = 4000;
     ProcessBuilder builder;
     Process pr;
 
@@ -35,17 +34,17 @@ public class MercurialRepoTest {
         Process pr = builder.start();
     }
 
-//    @After
-//    public void tearDown() throws Exception {
-//        ProcessBuilder builder = new ProcessBuilder(
-//                "bash", "-c", "cd "+ repoPath + "; hg gclear");
-//        builder.redirectErrorStream(true);
-//        Process pr = builder.start();
-//    }
+    @After
+    public void tearDown() throws Exception {
+        ProcessBuilder builder = new ProcessBuilder(
+                "bash", "-c", "cd "+ repoPath + "; hg gclear");
+        builder.redirectErrorStream(true);
+        Process pr = builder.start();
+    }
 
     // **************************************** extractRevisionNumbers / merc ****************************************
 
-    //Precondotion: the original mercurial repo under migration needs to be cloned in the proper place - output/source/sourceClone/name_of_repo
+    //Precondition: the original mercurial repo under migration needs to be cloned in the proper place - output/source/sourceClone/name_of_repo
     @Test
     public void testExtractRevisionNumbersMercArrayLength()  {
         repo.extractRevisionNumbers(true);
@@ -71,16 +70,14 @@ public class MercurialRepoTest {
     //Precondotion: the original mercurial repo under migration needs to be cloned in the proper place - output/source/sourceClone/name_of_repo
     @Test
     public void testExtractRevisionNumbersGitArrayLength() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(false);
         assertEquals("Length of the gitShas Array is ", 4, repo.getGitShas().size());
     }
 
     @Test
     public void testExtractRevisionNumbersGitArrayContainsFirst() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(false);
         List<Snapshot> temp = repo.getGitShas();
         assertEquals("First item of the gitShas Array is ", firstGitCommit , temp.get(0).getIdentifier());
@@ -88,8 +85,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testExtractRevisionNumbersGitArrayContainsLast() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(false);
         List<Snapshot> temp = repo.getGitShas();
         assertEquals("First item of the gitShas Array is ", lastGitCommit , temp.get(temp.size() - 1).getIdentifier());
@@ -100,16 +96,14 @@ public class MercurialRepoTest {
     //afterClass deletes the generated .git folder
     @Test
     public void testExportFolderFound() throws InterruptedException {
-        repo.export();
+        repo.export().waitFor();
         File git = new File(repoPath +"/.git");
-        Thread.sleep(threadSleepingInMs);
         assertTrue("Check if the .git folder has been created", git.exists());
     }
 
     @Test
     public void testExportHasSameAmountOfCommits() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(true);
         repo.extractRevisionNumbers(false);
         int mercCommits = repo.getMercChangeSets().size();
@@ -119,8 +113,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testExportCompareFirstCommitMessage() throws InterruptedException, IOException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         builder = new ProcessBuilder(
                 "bash", "-c", "cd "+ repoPath + "; hg log --template '{desc}\\n' -r0" );
         builder.redirectErrorStream(true);
@@ -138,8 +131,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testExportCompareLastCommitMessage() throws InterruptedException, IOException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         builder = new ProcessBuilder(
                 "bash", "-c", "cd "+ repoPath + "; hg log --template '{desc}\\n' --limit 1" );
         builder.redirectErrorStream(true);
@@ -159,8 +151,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testSetMergedListLength() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(true);
         repo.extractRevisionNumbers(false);
         repo.setMergedList();
@@ -169,8 +160,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testSetMergedListFirstsMatch() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(true);
         repo.extractRevisionNumbers(false);
         repo.setMergedList();
@@ -182,8 +172,7 @@ public class MercurialRepoTest {
 
     @Test
     public void testSetMergedListLastMatch() throws InterruptedException {
-        repo.export();
-        Thread.sleep(threadSleepingInMs);
+        repo.export().waitFor();
         repo.extractRevisionNumbers(true);
         repo.extractRevisionNumbers(false);
         repo.setMergedList();
