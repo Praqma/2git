@@ -8,29 +8,23 @@ import java.nio.file.Paths
 class MercurialRepoPlan  {
 
     String sourceRepoPath
-    String repoName
+    String sourceRepoName
     List<MercurialRepo> repos = []
     Map<String,String> structure = [:]
 
 
 
 
-    void MercurialPlan(sourceRepoPath, reponame) {
+    void MercurialPlan(sourceRepoPath, sourceRepoName) {
         this.sourceRepoPath = sourceRepoPath
-        this.repoName = reponame
+        this.sourceRepoName = sourceRepoName
     }
 
     void modelAllRepos(String repoName){
         readStructure()
         createRepos()
         exportRepos()
-        //create the Repo objects
-        //read all mercurial commits
-        //add them to the object
-        //export the changes to git
-        //add all the git shas to the object
-        //add the object to the list of repos above
-
+        buildPlan()
     }
 
     void readStructure() {
