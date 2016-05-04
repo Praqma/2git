@@ -32,7 +32,7 @@ class GitUtil {
      * @param args the arguments to call Git with
      */
     static void callOrDie(File path, String... args) {
-        String cmd = "git " + args.join(" ");
+        String cmd = "git " + args.join(" ")
         log.info("Executing '{}' in {}", cmd, path)
         CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line -> println line }
     }
@@ -54,7 +54,7 @@ class GitUtil {
     }
 
     static void writeGitIgnore(File path, GitOptions options) {
-        def gitIgnore = new File(path, '.gitignore');
+        def gitIgnore = new File(path, '.gitignore')
         if (gitIgnore.exists()) FileUtils.forceDelete(gitIgnore)
         options.ignore.each { rule ->
             FileUtils.writeStringToFile(gitIgnore, rule + '\n', true)

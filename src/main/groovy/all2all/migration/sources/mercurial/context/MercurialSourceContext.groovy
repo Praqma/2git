@@ -18,8 +18,7 @@ class MercurialSourceContext implements Context, HasSource {
 
     void sourceRepo(String absolutePath) {
         source.sourceRepo = absolutePath
-        def values = absolutePath.split('/')
-        source.repoName = values.last()
+        source.repoName = absolutePath.split('/').last()
     }
 
     void hasSubRepos(boolean b) {

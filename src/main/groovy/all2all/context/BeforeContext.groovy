@@ -5,8 +5,6 @@ import all2all.context.base.DslContext
 import all2all.migration.MigrationManager
 import groovy.util.logging.Slf4j
 
-import static ContextHelper.executeInContext
-
 /**
  * Defines {@link all2all.migration.plan.Action}s to execute before the migration
  * @param closure the closure defining the {@link all2all.migration.plan.Action}s

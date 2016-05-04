@@ -38,7 +38,7 @@ class CcucmSource implements MigrationSource {
         stream = Cool.getStream(streamName, vob)
 
         if (options.migrationProject) {
-            CoolProject targetProject = CoolProject.get(options.migrationProject, vob).load();
+            CoolProject targetProject = CoolProject.get(options.migrationProject, vob).load()
             parentStream = targetProject.integrationStream
         }
     }

@@ -1,11 +1,11 @@
-package all2all.context;
+package all2all.context
 
-import all2all.Executor;
+import all2all.Executor
 import all2all.TestHelper
 import all2all.migration.MigrationManager
 import all2all.migration.sources.dummy.DummySource
-import all2all.migration.targets.dummy.DummyTarget;
-import org.junit.Test;
+import all2all.migration.targets.dummy.DummyTarget
+import org.junit.Test
 
 public class ExtractionsContextTest {
 

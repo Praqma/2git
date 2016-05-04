@@ -23,7 +23,7 @@ class DummySource implements MigrationSource {
     private void writeDummyFile(String contents) {
         def codeFile = new File(workspace, "code")
         codeFile.parentFile.mkdirs()
-        if(codeFile.exists())
+        if (codeFile.exists())
             codeFile.delete()
         codeFile.createNewFile()
         codeFile.write(contents)

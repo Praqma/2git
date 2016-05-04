@@ -60,6 +60,9 @@ class Plan_cc2gitBasicTest {
     }
 
 
+    /**
+     * TODO: Prototyping functional tests. Ignored for now.
+     */
     @Test
     @Ignore
     void cc2git_basic() {

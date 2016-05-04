@@ -17,19 +17,6 @@ class MigrationManager {
     def extractionsContext
     def actionsContext
 
-    void migrate(boolean dryRun = false) {
-        try {
-            source.prepare()
-            target.prepare()
-            plan.fill()
-            if(!dryRun)
-                plan.execute()
-        } finally {
-            source.cleanup()
-            target.cleanup()
-        }
-    }
-
     void reset() {
         source = null
         target = null
@@ -37,5 +24,18 @@ class MigrationManager {
         criteriaContext = new CriteriaContext()
         extractionsContext = new ExtractionsContext()
         actionsContext = new ActionsContext()
+    }
+
+    void migrate(boolean dryRun = false) {
+        try {
+            source.prepare()
+            target.prepare()
+            plan.fill()
+            if (!dryRun)
+                plan.execute()
+        } finally {
+            source.cleanup()
+            target.cleanup()
+        }
     }
 }

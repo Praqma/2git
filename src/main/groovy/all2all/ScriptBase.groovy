@@ -110,7 +110,7 @@ abstract class ScriptBase extends Script implements Context {
         |  __|   | | | . ` | | |  \___ \|  __  |  __| | |  | |
         | |     _| |_| |\  |_| |_ ____) | |  | | |____| |__| |
         |_|    |_____|_| \_|_____|_____/|_|  |_|______|_____//$
-        return finished.stripIndent();
+        return finished.stripIndent()
     }
 
     /**

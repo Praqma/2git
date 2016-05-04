@@ -165,7 +165,7 @@ class Cool {
      */
     static void updateView(CoolSnapshotView coolView, CoolSnapshotView.Components loadComponents) {
         log.info("Updating view {}", coolView.fullyQualifiedName)
-        def loadRules = new LoadRules2(loadComponents);
+        def loadRules = new LoadRules2(loadComponents)
         new UpdateView(coolView).swipe().setLoadRules(loadRules).update()
         log.info("Updated view {}", coolView.fullyQualifiedName)
     }

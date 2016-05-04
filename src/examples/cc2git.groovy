@@ -1,5 +1,3 @@
-package all2all
-
 source('ccucm') {
     component "myComp@\\vob"
     stream "myStream@\\vob"
