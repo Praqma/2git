@@ -17,7 +17,7 @@ public class MercurialRepoSubrepoTest {
 
     @Before
     public void setUp() throws Exception {
-        repo = new MercurialRepo("nested", "mercurial2", true)
+        repo = new MercurialRepo("nested", "nested", "mercurial2", true)
         ProcessBuilder builder = new ProcessBuilder("bash", "-c", "cd $repoPath; hg gclear")
         builder.redirectErrorStream(true)
         builder.start()

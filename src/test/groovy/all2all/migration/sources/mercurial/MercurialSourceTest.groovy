@@ -3,8 +3,6 @@ package all2all.migration.sources.mercurial
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 
 public class MercurialSourceTest {
 

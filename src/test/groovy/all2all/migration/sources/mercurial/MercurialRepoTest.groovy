@@ -17,7 +17,7 @@ public class MercurialRepoTest {
 
     @Before
     public void setUp() throws Exception {
-        repo = new MercurialRepo("/mercurial2", "mercurial2", false)
+        repo = new MercurialRepo("mercurial2", "mercurial2", "mercurial2", false)
         ProcessBuilder builder = new ProcessBuilder("bash", "-c", "cd $repoPath; hg gclear")
         builder.redirectErrorStream(true)
         builder.start()

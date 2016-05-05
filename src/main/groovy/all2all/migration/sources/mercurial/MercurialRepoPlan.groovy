@@ -30,13 +30,16 @@ class MercurialRepoPlan {
     }
 
     void createRepos() {
-        //TODO modify the path of the bash commands with the ID of the repo
-        //for all in structure
-            //create repo
-            //extractMerc
-            //export
-            //extractGit
-            //setMergedList
+        structure.each { key, value ->
+            MercurialRepo r = new MercurialRepo(key, value, sourceRepoName, true)
+            repos.add(r)
+        }
+    }
+
+    void exportRepos() {
+        //run the export method on all repos
+        //run the extract revision numbers
+        //run the setMerged lists on all
     }
 
 }

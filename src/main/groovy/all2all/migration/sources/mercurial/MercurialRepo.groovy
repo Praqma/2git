@@ -6,7 +6,8 @@ import all2all.migration.plan.Snapshot
 class MercurialRepo {
 
     //the id is the where/it/is from the .hgsub defining all the subrepos in mercurial
-    String id, repoName
+    //from is different from id if the repo is a remote repo
+    String id, from, repoName
     boolean isSubrepo
 
     //maps mercurial changeset ids to git shas
@@ -17,9 +18,10 @@ class MercurialRepo {
     Map<String, String> mercGitShas = [:]
 
 
-    MercurialRepo(id, repoName, isSubrepo) {
+    MercurialRepo(id, from, repoName, isSubrepo) {
 
         this.id = id
+        this.from = from
         this.repoName = repoName
         this.isSubrepo = isSubrepo
 
