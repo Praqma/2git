@@ -7,6 +7,7 @@ class MercurialRepo {
 
     //the id is the where/it/is from the .hgsub defining all the subrepos in mercurial
     String id, repoName
+    boolean isSubrepo
 
     //maps mercurial changeset ids to git shas
     List<Snapshot> mercChangesets = new ArrayList<Snapshot>()
@@ -15,9 +16,18 @@ class MercurialRepo {
 
     Map<String, String> mercGitShas = [:]
 
-    MercurialRepo(id, repoName) {
+
+    MercurialRepo(id, repoName, isSubrepo) {
+
         this.id = id
         this.repoName = repoName
+        this.isSubrepo = isSubrepo
+
+        if(isSubrepo) extendRepoNameIfSubrepo()
+    }
+
+    void extendRepoNameIfSubrepo(){
+        repoName = repoName+"/"+id;
     }
 
     Process export() {

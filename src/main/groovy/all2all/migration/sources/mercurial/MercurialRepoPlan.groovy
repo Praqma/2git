@@ -28,4 +28,15 @@ class MercurialRepoPlan {
             structure.put(whereIs, fromWhere)
         }
     }
+
+    void createRepos() {
+        //TODO modify the path of the bash commands with the ID of the repo
+        //for all in structure
+            //create repo
+            //extractMerc
+            //export
+            //extractGit
+            //setMergedList
+    }
+
 }
