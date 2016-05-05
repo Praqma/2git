@@ -17,6 +17,7 @@ class MercurialSource implements MigrationSource {
     ProcessBuilder builder
     Process pr
     String sourceClonePath = "output/source/sourceClone/$repoName"
+    MercurialRepoPlan repoPlan
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> criteria) {
@@ -81,12 +82,13 @@ class MercurialSource implements MigrationSource {
 
     @Override
     void prepare() {
+        cloneRemote()
 
         if (hasSubrepos) {
-            setupSubrepos() {}
+            cloneSubrepos()
         }
 
-        cloneRemote()
+
 
         //checkout ("66c87efa37b1")
         //getSnapshots()
@@ -108,8 +110,20 @@ class MercurialSource implements MigrationSource {
     }
 
     void cloneRemote() {
-        builder = new ProcessBuilder("bash", "-c", "cd output;mkdir source; cd source; mkdir sourceClone; cd sourceClone; hg clone $sourceRepo")
+        builder = new ProcessBuilder("bash", "-c", "cd output;mkdir source; cd source; mkdir sourceClone; cd sourceClone; " +
+                "hg clone $sourceRepo")
         builder.redirectErrorStream(true)
         builder.start()
+    }
+
+    Process cloneSubrepos() {
+        repoPlan = new MercurialRepoPlan(sourceRepo, repoName)
+        repoPlan.readStructure()
+        repoPlan.structure.each { key, value ->
+            builder = new ProcessBuilder("bash", "-c", "cd output/source/sourceClone/$repoName; hg clone $sourceRepo/$key")
+            builder.redirectErrorStream(true)
+            pr = builder.start()
+        }
+        return pr
     }
 }

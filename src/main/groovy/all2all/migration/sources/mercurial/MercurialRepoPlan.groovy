@@ -8,7 +8,7 @@ class MercurialRepoPlan {
     Map<String, String> structure = [:]
 
 
-    void MercurialPlan(sourceRepoPath, sourceRepoName) {
+    MercurialRepoPlan(String sourceRepoPath, String sourceRepoName) {
         this.sourceRepoPath = sourceRepoPath
         this.sourceRepoName = sourceRepoName
     }
