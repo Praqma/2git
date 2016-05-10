@@ -1,0 +1,12 @@
+# Site settings
+title: 2git
+tag_text: The anything 2git conversion engine
+description: Migrate to Git like a Pro! 2Git allows you to script your tranformation from anything to Git using a specially develop DSL language and a genreic transformation engine.
+css-path: /css/praqmacode.css
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+exclude: ["README.md"]
+sass:
+  style: compressed
