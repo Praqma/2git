@@ -11,3 +11,7 @@ gradle-app.setting
 
 # Output
 out/
+
+# Jekyll
+_site
+.sass-cache
