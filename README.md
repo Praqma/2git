@@ -1,5 +1,3 @@
-# cc2git
+# 2git
 
-A Groovy DSL to migrate from ClearCase UCM to Git!
-
-Check out [the wiki](https://github.com/Praqma/cc2git/wiki) for more information/documentation.
+The 2git project is a conversion engine that enables you to migrate any VCS to Git using a Groovy DSL.

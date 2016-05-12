@@ -15,3 +15,6 @@ out/
 # Jekyll
 _site
 .sass-cache
+
+# Specific command files
+customers/*
