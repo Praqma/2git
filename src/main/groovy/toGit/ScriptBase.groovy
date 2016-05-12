@@ -10,7 +10,6 @@ import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.Cool
 import toGit.migration.sources.ccucm.context.CcucmSourceContext
 import toGit.migration.sources.dummy.DummySourceContext
-import toGit.migration.sources.mercurial.context.MercurialSourceContext
 import toGit.migration.targets.MigrationTarget
 import toGit.migration.targets.dummy.DummyTargetContext
 import toGit.migration.targets.git.context.GitTargetContext
@@ -29,11 +28,10 @@ abstract class ScriptBase extends Script implements Context {
     Map<String, HasSource> sources = [
             'dummy'    : new DummySourceContext(),
             'ccucm'    : new CcucmSourceContext(),
-            'mercurial': new MercurialSourceContext()
     ]
     Map<String, HasTarget> targets = [
             'dummy': new DummyTargetContext(),
-            'git'  : new GitTargetContext()
+            'git'  : new GitTargetContext(),
     ]
 
     void source(String identifier, @DslContext(Context) Closure closure = null) {
