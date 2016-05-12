@@ -1,4 +1,3 @@
-# all2all
+# 2Git
 
-all2all is the working name for our redesign of the cc2git solution.
-It's a WIP which will eventually evolve into a 'VCS migration DSL', allowing people to migrate to and from supported VCS easily.
+The 2Git project is a conversion engine that enables you to migrate any VCS to Git using a Groovy DSL.

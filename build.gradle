@@ -24,6 +24,6 @@ task uberjar(type: Jar) {
     from configurations.runtime.asFileTree.files.collect { zipTree(it) }
 
     manifest {
-        attributes 'Main-Class': 'all2all.Run'
+        attributes 'Main-Class': 'toGit.Run'
     }
 }
