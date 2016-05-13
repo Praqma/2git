@@ -7,12 +7,12 @@ import toGit.migration.sources.ccucm.Baseline
 class AfterDate extends Criteria {
     Date date
 
-    AfterDate(String format, String date) {
-        this.date = Date.parse(format, date)
-    }
-
     AfterDate(Date date) {
         this.date = date
+    }
+
+    AfterDate(String format, String date) {
+        this(Date.parse(format, date))
     }
 
     @Override

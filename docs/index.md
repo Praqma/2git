@@ -1,49 +1,144 @@
 ---
-layout:            default
+layout:            2git
 organization:      Praqma
 repo:              cc2git
 github-issues:     true
 javadoc:           false
 ---
 
-The 2git project is a conversion engine that will enable you to convert _anything_ 2git using the special designed DSL language and the generic migration engine
+The 2git project is an SCM migration engine that enables you to migrate to git using a custom DSL language
 {: .cuff}
 
-If you start using 2git you will eventually fall in love with Git - and in the end leave your current Version Control System. We do not want to encourage adultery, so make sure that you're ready for the journey. Be a gentleman about it!
-{: .warning }
+## Introduction
 
-_"Why another conversion kit for Git?"_" you might ask?
+2git is a Groovy DSL, a small language that is designed to describe what you want to migrate - from source VCS to target VCS.
 
-_"Why use different conversion kits for the same thing - you all wanna go 2git right?"_" ...we might ask back!
+You write your migration recipe and feed it into the 2git engine, which will then execute your migration, resulting in your git repository.
 
-The thing is that we have migrated teams from Subversion, ClearCase, ClearCase UCM, CVS, Perforce, Mercurial, SurroundCM to Git. And always using the same approach.
+If you don't like what you see, you can easily tweak your recipe and run it again, until you get the perfect migration.
 
-## This is the conversion challenge
-Git is doing clones, and a clone is clone - basta! It has some impact on how you (should) organize your Git repositories, It' very likely that they will be organized differently than the repository you're moving away from. Both performance and security issues needs to be considered.
+## Workflow
 
-### Security
-Git does not support that different areas of your clone has different security levels, that kinda comes with the _clone_ concept. Once you have the clone on your local file system, you have access to the files - _all_ the files.
+Independent of the source or target VCS, 2git follows a simple migration workflow.
+The 2git DSL is used to build up a migration plan, which is then executed by the migration engine. 
 
-So you might wanna think about how you organize stuff.
+ * Build a migration plan
+   1. Select source snapshots matching defined criteria
+   2. Assign actions to selected snapshots
+ * Execute the migration plan
+   1. Check out the next source snapshot
+   2. Execute the snapshot's assigned actions
+   3. Repeat
 
-### Performance
-Many of the older client/server oriented VCS supports that your can do partial checkouts, views, work-trees or what ever you call'em. So you might have one big, fat, monolithic repo, where users do partial workspaces.
+### Building the migration plan
 
-But Git does clones, and it kinda goes with the clone concept, that it's all or nothing.
+The migration plan is built by defining filters in the 2git DSL. 
 
-So you might wanna think about how you organize stuff.
 
-### The things we left behind
-If you have been in an _old_ VCS, you have probably been doing old-style branching: _early branching_, _cascading branches_, _feature branches_ or any other old-style branching pattern which essentially had the purpose, of compensating for either poor merging abilities, poor performance, expensive license, pessimistic file locking - or some other not-very-desirable ability.
+*Filters* are used to structure your migration plan, they can contain `criteria`, `extractions`, `actions` and child `filters`.
 
-Git doesn't do poor X or expensive Y. So you probably wanna change your branching strategy in Git. (Make is _simple_ for gods sake!!)
 
-## What it is
+*Criteria* are used to select your source's snapshots (commits, baselines, etc.). 
+Snapshots that match a filter's criteria will have that filter's extractions and actions mapped to it in the migration plan.
 
-2git is a DSL extension to groovy, so you can say that it's a small language that is designed to describe what you want to migrate - from source to target.
+_Examples:_ Created after a certain date, commit message matches a regex... 
 
-You feed the recipe to a engine that knows how to deal with all kinds of version control systems and it will then take what you've filtered out and commit it into Git.
 
-Then you get a new repository containing what you specified, and you can try to use your new repo in the context your normally use your VCS, for instance try feed it to your continuous delivery pipeline and see what happens.
+*Extractions* are executed per snapshot during the actual migration to extract metadata which can be used in the actions.
 
-If you don't like it, go back, change the recipe and run it again. Keep doing it till you get it right!
+_Examples:_ Read a file's contents from your workspace, read certain commit attributes...  
+
+
+*Actions* are executed per snapshot during the migration to perform various actions. This is where the bulk of the actual migration will take place
+
+_Examples:_ Commit files to git, delete some files, execute a script... 
+
+#### Example
+
+The following repository contains some commits with metadata. 
+
+![commits](images/workflow_1.png){: .pic .center .large }
+
+We'll define an example filter structure to build up our migration plan:
+
+```
+filter {
+    criteria {
+        afterDate('15-05-2015')
+    }
+    actions {
+        commit()
+    }
+    filter {
+        criteria {
+            minX(5)
+        }
+        extractions {
+            custom {
+                return  [myVersion: readFile('version.txt')]
+            }
+        }
+        actions {
+            tag("qualified-$myVersion")
+        }
+    }
+}
+```
+
+The first filter selects all snapshots created past the defined date and assigns the 'commit' action to them.
+The second filter, being a child of the first, _further_ filters on the selected snapshots.
+It selects those with 'x' at 5 or above and assigns the custom extraction and 'tag' action to them.
+
+The resulting migration plan that will be executed is the following:
+ 
+| Snapshot | Extractions | Actions     |
+|----------|-------------|-------------|
+| A        | N/A         | N/A         |
+| B        | N/A         | N/A         |
+| C        | readFile    | commit, tag |
+| D        | N/A         | commit      |
+| E        | readFile    | commit, tag |
+
+
+## Hello, 2git!
+
+```
+def migrationDir = 'C:/temp/migration'
+
+source('ccucm') {
+    component 'component:RedBlox@\\bloxVob'
+    stream 'stream:RedBlox_Int@\\bloxVob'
+    workspace "$migrationDir/ccucm"
+}
+
+target('git') {
+    workspace "$migrationDir/git"
+}
+
+migrate {
+    filters {
+        filter {
+            criteria {
+                afterDate 'dd-MM-yyy', '01-05-2016'
+            }
+            extractions {
+                baselineProperty([myBaselineName: 'shortname'])
+            }
+            actions {
+                copy()
+                cmd 'git add .', target.workspace
+                cmd 'git commit -m "$myBaselineName"', target.workspace
+            }
+        }
+    }
+}
+
+```
+
+## Documentation
+
+Look forward to our updated wiki, soon coming to a GitHub near you!
+
+## Requests and contributions
+
+If you're missing a feature or feel like contributing to the 2git project, drop us a line or open an issue on GitHub and we'll get back to you ASAP.

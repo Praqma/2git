@@ -14,16 +14,28 @@ class CcucmSourceContext implements Context, HasSource {
         source = new CcucmSource(options: new CcucmOptions())
     }
 
+    /**
+     * Sets the target stream to migrate from
+     * @param streamName Fully qualified stream name
+     */
     void stream(String streamName) {
         source.options.stream = streamName
         log.info("Set stream to $streamName.")
     }
 
+    /**
+     * Sets the target component to migrate
+     * @param streamName Fully qualified component name
+     */
     void component(String componentName) {
         source.options.component = componentName
         log.info("Set component to $componentName.")
     }
 
+    /**
+     * Sets which subcomponents to load
+     * @param target String representation of target components (all, modifiable)
+     */
     void loadComponents(String target) {
         if (target.equalsIgnoreCase('all')) {
             source.options.loadComponents = SnapshotView.Components.ALL

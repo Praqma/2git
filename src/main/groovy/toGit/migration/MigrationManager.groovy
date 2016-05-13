@@ -30,7 +30,7 @@ class MigrationManager {
         try {
             source.prepare()
             target.prepare()
-            plan.fill()
+            plan.build()
             if (!dryRun)
                 plan.execute()
         } finally {

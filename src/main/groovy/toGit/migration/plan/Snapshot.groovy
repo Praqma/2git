@@ -1,5 +1,9 @@
 package toGit.migration.plan
 
+/**
+ * Represents a VCS snapshot.
+ * e.g.: Commit, Baseline, State
+ */
 abstract class Snapshot {
     String identifier
 

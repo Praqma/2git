@@ -2,6 +2,9 @@ package toGit.migration.plan
 
 import toGit.migration.MigrationManager
 
+/**
+ * A plan built from filters, mapping select Snapshots with extractions and actions
+ */
 class MigrationPlan {
     List<Filter> filters = []
 
@@ -9,10 +12,16 @@ class MigrationPlan {
     Map<String, SnapshotPlan> steps = [:]
     List<Action> afters = []
 
-    void fill() {
+    /**
+     * Builds the migration plan using predefined filters
+     */
+    void build() {
         steps = PlanBuilder.buildMigrationPlan(filters)
     }
 
+    /**
+     * Executes the migration plan.
+     */
     void execute() {
         def extractionMap = [:]
 

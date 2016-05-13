@@ -1,5 +1,8 @@
 package toGit.migration.plan
 
+/**
+ * Represents the migration plan for a single Snapshot
+ */
 class SnapshotPlan {
     Snapshot snapshot
     List<Extraction> extractions = []

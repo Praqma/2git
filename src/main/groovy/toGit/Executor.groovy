@@ -8,7 +8,6 @@ public class Executor {
         File commandFile = null
         if (!args) {
             println "ERROR: Missing command file parameter."
-            println "Usage: groovy Run [command file] [command parameters...]"
             System.exit(1)
         } else {
             commandFile = new File(args[0])
