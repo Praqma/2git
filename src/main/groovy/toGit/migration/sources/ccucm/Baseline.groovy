@@ -6,12 +6,8 @@ import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 class Baseline extends Snapshot {
     CoolBaseline source
 
-    Baseline(String identifier) {
-        super(identifier)
-    }
-
-    Baseline(String identifier, CoolBaseline source) {
-        this(identifier)
+    Baseline(CoolBaseline source){
+        super(source.fullyQualifiedName)
         this.source = source
     }
 }

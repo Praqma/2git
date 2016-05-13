@@ -64,8 +64,8 @@ class CcucmSource implements MigrationSource {
         BaselineFilter baselineFilter = new AggregatedBaselineFilter(criteria)
         def baselines = Cool.getBaselines(component, stream, baselineFilter)
         log.info("Found {} baseline(s) matching given requirements: {}", baselines.size(), baselines)
-        return baselines.collect { it ->
-            new Baseline(it.fullyQualifiedName, it)
+        return baselines.collect { bl ->
+            new Baseline(bl)
         }
     }
 

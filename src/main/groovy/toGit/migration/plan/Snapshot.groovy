@@ -12,7 +12,7 @@ abstract class Snapshot {
      * @param criteria A List of Criteria to match the Snapshot against
      * @return true if the Snapshot matches all Criteria, otherwise false
      */
-    boolean matches(ArrayList<Criteria> criteria) {
+    boolean matches(List<Criteria> criteria) {
         for (def crit : criteria) {
             if (!crit.appliesTo(this))
                 return false
