@@ -6,12 +6,12 @@ github-issues:     true
 javadoc:           false
 ---
 
-The 2git project is an SCM migration engine that enables you to migrate to git using a custom DSL language
+The 2git project is an SCM migration engine that enables you to migrate to git using a Groovy DSL.
 {: .cuff}
 
 ## Introduction
 
-2git is a Groovy DSL, a small language that is designed to describe what you want to migrate - from source VCS to target VCS.
+2git is a Groovy DSL, a small language that is designed to describe what you want to migrate - from a source VCS to git.
 
 You write your migration recipe and feed it into the 2git engine, which will then execute your migration, resulting in your git repository.
 
