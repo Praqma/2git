@@ -8,5 +8,5 @@ class CcucmOptions {
     String migrationProject
 
     CoolSnapshotView.Components loadComponents = CoolSnapshotView.Components.MODIFIABLE
-    boolean readOnlyMigrationStream = false
+    boolean readOnlyMigrationStream
 }
