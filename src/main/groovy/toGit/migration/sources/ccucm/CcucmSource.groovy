@@ -6,6 +6,7 @@ import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
+import toGit.utils.FileHelper
 import toGit.utils.StringExtensions
 import groovy.util.logging.Slf4j
 import net.praqma.clearcase.PVob as CoolVob
@@ -76,14 +77,13 @@ class CcucmSource implements MigrationSource {
         def baseline = ((Baseline) snapshot).source
 
         //TODO Move this to setup? Too intense for setup?
-        if (!migrationStream) {
+        if (!migrationStream)
             migrationStream = Cool.createStream(parentStream, baseline, component.shortname + "_cc2git_" + UUID.randomUUID(), options.readOnlyMigrationStream)
-        }
-        if (!migrationView) {
+        if (!migrationView)
             migrationView = Cool.createView(migrationStream, new File(workspace), component.shortname + "_cc2git_" + UUID.randomUUID())
-        }
 
         Cool.rebase(baseline, migrationView)
+        FileHelper.emptyDirectory(migrationView.viewRoot)
         Cool.updateView(migrationView, options.loadComponents)
     }
 }

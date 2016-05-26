@@ -9,7 +9,7 @@ class FileHelper {
      * Empties the given directory's subdirectories into the given directory, then deletes them.
      * @param directory The directory whose subdirectories to empty/delete
      */
-    static void emptySubDirectories(File directory) {
+    static void singleFlattenDirectory(File directory) {
         def subDirectories = directory.listFiles().findAll { it.isDirectory() }
         subDirectories.each { subDirectory ->
             subDirectory.listFiles().each { source ->
@@ -24,6 +24,18 @@ class FileHelper {
                 else FileUtils.moveFile(source, target)
             }
             subDirectory.deleteDir()
+        }
+    }
+
+    /**
+     * Deletes the contents of the given directory
+     */
+    static void emptyDirectory(File directory) {
+        directory.listFiles().each {
+            if(it.isDirectory())
+                it.deleteDir()
+            else
+                it.delete()
         }
     }
 }

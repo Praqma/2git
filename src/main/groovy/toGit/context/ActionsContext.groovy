@@ -122,7 +122,7 @@ class ActionsContext implements Context, HasActions {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 amount.times {
-                    FileHelper.emptySubDirectories(new File(dir))
+                    FileHelper.singleFlattenDirectory(new File(dir))
                 }
             }
         })
