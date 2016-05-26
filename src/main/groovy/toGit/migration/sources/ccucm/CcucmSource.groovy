@@ -18,6 +18,7 @@ import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 
 @Slf4j
 class CcucmSource implements MigrationSource {
+    UUID id = UUID.randomUUID()
     CoolSnapshotView migrationView
     CoolStream migrationStream
 
@@ -78,9 +79,9 @@ class CcucmSource implements MigrationSource {
 
         //TODO Move this to setup? Too intense for setup?
         if (!migrationStream)
-            migrationStream = Cool.createStream(parentStream, baseline, component.shortname + "_cc2git_" + UUID.randomUUID(), options.readOnlyMigrationStream)
+            migrationStream = Cool.createStream(parentStream, baseline, "$component.shortname-2git-$id", options.readOnlyMigrationStream)
         if (!migrationView)
-            migrationView = Cool.createView(migrationStream, new File(workspace), component.shortname + "_cc2git_" + UUID.randomUUID())
+            migrationView = Cool.createView(migrationStream, new File(workspace), "$component.shortname-2git-$id")
 
         Cool.rebase(baseline, migrationView)
         FileHelper.emptyDirectory(migrationView.viewRoot)

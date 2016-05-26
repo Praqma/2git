@@ -10,6 +10,7 @@ class FileHelper {
      * @param directory The directory whose subdirectories to empty/delete
      */
     static void singleFlattenDirectory(File directory) {
+        log.info("Flattening directory $directory")
         def subDirectories = directory.listFiles().findAll { it.isDirectory() }
         subDirectories.each { subDirectory ->
             subDirectory.listFiles().each { source ->
@@ -31,6 +32,7 @@ class FileHelper {
      * Deletes the contents of the given directory
      */
     static void emptyDirectory(File directory) {
+        log.info("Emptying directory $directory")
         directory.listFiles().each {
             if(it.isDirectory())
                 it.deleteDir()
