@@ -17,11 +17,18 @@ class ActionsContext implements Context, HasActions {
      * Copies the contents of the source directory to the target directory.
      */
     void copy() {
+        copy(MigrationManager.instance.source.workspace, MigrationManager.instance.target.workspace)
+    }
+
+    /**
+     * Copies the contents of the source directory to the target directory.
+     */
+    void copy(String source, String target) {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                def sourceDir = new File(MigrationManager.instance.source.workspace)
-                def targetDir = new File(MigrationManager.instance.target.workspace)
+                def sourceDir = new File(source)
+                def targetDir = new File(target)
                 sourceDir.listFiles().each { file ->
                     if (file.isDirectory())
                         FileUtils.copyDirectoryToDirectory(file, targetDir)
