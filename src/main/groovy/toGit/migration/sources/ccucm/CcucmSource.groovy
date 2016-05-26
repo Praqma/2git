@@ -84,7 +84,6 @@ class CcucmSource implements MigrationSource {
             migrationView = Cool.createView(migrationStream, new File(workspace), "$component.shortname-2git-$id")
 
         Cool.rebase(baseline, migrationView)
-        FileHelper.emptyDirectory(migrationView.viewRoot)
         Cool.updateView(migrationView, options.loadComponents)
     }
 }
