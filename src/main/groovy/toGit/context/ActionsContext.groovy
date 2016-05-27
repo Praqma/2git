@@ -107,16 +107,14 @@ class ActionsContext implements Context, HasActions {
         log.info("Registered 'custom' action.")
     }
 
-    /**
-     * Runs missing methods as command line calls.
-     * ex.: mkdir '/home/me/repository'
-     * @param name the name of the method that was called
-     * @param args the arguments the method was called with
-     */
-    void methodMissing(String name, Object args) {
-        log.info("Method '$name' not found. Attempting to register as a 'cmd' action.")
-        def arguments = args.join()
-        cmd("$name $arguments")
+    void emptyDir(String dir) {
+        actions.add(new Action() {
+            @Override
+            void act(HashMap<String, Object> extractionMap) {
+                FileHelper.emptyDirectory(new File(dir))
+            }
+        })
+        log.info("Registered 'emptyDir' action.")
     }
 
     /**
@@ -134,5 +132,17 @@ class ActionsContext implements Context, HasActions {
             }
         })
         log.info("Registered 'flattenDir' action.")
+    }
+
+    /**
+     * Runs missing methods as command line calls.
+     * ex.: mkdir '/home/me/repository'
+     * @param name the name of the method that was called
+     * @param args the arguments the method was called with
+     */
+    void methodMissing(String name, Object args) {
+        log.info("Method '$name' not found. Attempting to register as a 'cmd' action.")
+        def arguments = args.join()
+        cmd("$name $arguments")
     }
 }

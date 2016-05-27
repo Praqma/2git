@@ -27,4 +27,16 @@ class FileHelper {
             subDirectory.deleteDir()
         }
     }
+
+    /**
+     * Deletes the contents of the given directory
+     * @param directory the directory to empty
+     */
+    static void emptyDirectory(File directory) {
+        log.info("Emptying directory $directory")
+        directory.listFiles().each {
+            if (it.isDirectory()) it.deleteDir()
+            else it.delete()
+        }
+    }
 }
