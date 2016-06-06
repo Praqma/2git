@@ -8,7 +8,7 @@ import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
 import toGit.utils.FileHelper
 import toGit.utils.StringExtensions
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
 import net.praqma.clearcase.ucm.entities.Project as CoolProject
@@ -16,7 +16,7 @@ import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 
-@Slf4j
+@Log
 class CcucmSource implements MigrationSource {
     UUID id = UUID.randomUUID()
     CoolSnapshotView migrationView
@@ -67,7 +67,8 @@ class CcucmSource implements MigrationSource {
     List<Snapshot> getSnapshots(List<Criteria> criteria) {
         BaselineFilter baselineFilter = new AggregatedBaselineFilter(criteria)
         def baselines = Cool.getBaselines(component, stream, baselineFilter)
-        log.info("Found {} baseline(s) matching given requirements: {}", baselines.size(), baselines)
+        def baselineCount = baselines.size()
+        log.info("Found $baselineCount baseline(s) matching given requirements: $baselines")
         return baselines.collect { bl ->
             new Baseline(bl)
         }

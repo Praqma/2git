@@ -1,7 +1,7 @@
 package toGit.migration.sources.ccucm
 
 
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import net.praqma.clearcase.PVob as CoolPVob
 import net.praqma.clearcase.Rebase as CoolRebase
 import net.praqma.clearcase.api.Describe
@@ -17,7 +17,7 @@ import net.praqma.clearcase.ucm.view.UpdateView
 /**
  * A Cool wrapper that adds logging.
  */
-@Slf4j
+@Log
 class Cool {
 
     /**

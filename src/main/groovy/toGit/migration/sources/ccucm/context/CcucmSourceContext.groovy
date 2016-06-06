@@ -4,10 +4,10 @@ import toGit.context.base.Context
 import toGit.context.traits.HasSource
 import toGit.migration.sources.ccucm.CcucmOptions
 import toGit.migration.sources.ccucm.CcucmSource
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import net.praqma.clearcase.ucm.view.SnapshotView
 
-@Slf4j
+@Log
 class CcucmSourceContext implements Context, HasSource {
 
     public CcucmSourceContext() {
@@ -44,7 +44,7 @@ class CcucmSourceContext implements Context, HasSource {
             source.options.loadComponents = SnapshotView.Components.MODIFIABLE
             log.info("Set loadComponents to $target.")
         } else
-            log.warn("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
+            log.warning("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
     }
 
     /**

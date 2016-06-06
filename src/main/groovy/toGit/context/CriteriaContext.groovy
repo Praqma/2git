@@ -4,9 +4,9 @@ import toGit.context.base.Context
 import toGit.context.traits.HasCriteria
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 
-@Slf4j
+@Log
 class CriteriaContext implements Context, HasCriteria {
 
     /**

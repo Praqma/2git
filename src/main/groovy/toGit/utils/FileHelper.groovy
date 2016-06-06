@@ -1,9 +1,9 @@
 package toGit.utils
 
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import org.apache.commons.io.FileUtils
 
-@Slf4j
+@Log
 class FileHelper {
     /**
      * Empties the given directory's subdirectories into the given directory, then deletes them.
@@ -16,11 +16,11 @@ class FileHelper {
             subDirectory.listFiles().each { source ->
                 def target = new File(subDirectory.parentFile, source.name)
                 if (target.exists()) {
-                    log.debug("Deleting $target")
+                    log.fine("Deleting $target")
                     if (target.isDirectory()) target.deleteDir()
                     else target.delete()
                 }
-                log.debug("Moving $source to $target")
+                log.fine("Moving $source to $target")
                 if (source.directory) FileUtils.moveDirectory(source, target)
                 else FileUtils.moveFile(source, target)
             }

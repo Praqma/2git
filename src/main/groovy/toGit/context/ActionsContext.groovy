@@ -6,11 +6,11 @@ import toGit.migration.MigrationManager
 import toGit.migration.plan.Action
 import toGit.utils.FileHelper
 import groovy.text.SimpleTemplateEngine
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
 
-@Slf4j
+@Log
 class ActionsContext implements Context, HasActions {
 
     /**

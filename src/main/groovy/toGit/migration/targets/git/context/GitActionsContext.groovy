@@ -7,7 +7,7 @@ import toGit.migration.targets.git.actions.Setup
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-//@Slf4j
+//@Log
 trait GitActionsContext implements Context {
     final static Logger log = LoggerFactory.getLogger(GitActionsContext.class)
 

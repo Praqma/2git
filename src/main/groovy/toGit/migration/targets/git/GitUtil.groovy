@@ -1,6 +1,6 @@
 package toGit.migration.targets.git
 
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 import net.praqma.util.execute.AbnormalProcessTerminationException
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 /**
  * A class that facilitates calling Git commands
  */
-@Slf4j
+@Log
 class GitUtil {
 
     /**
@@ -20,7 +20,7 @@ class GitUtil {
         try {
             callOrDie(path, args)
         } catch (AbnormalProcessTerminationException ex) {
-            log.warn("Command exited with status code {}", ex.exitValue)
+            log.warning("Command exited with status code {}", ex.exitValue)
             return ex.exitValue
         }
         return 0
@@ -44,11 +44,11 @@ class GitUtil {
     static void configureRepository(File path, GitOptions options) {
         if (options.user) {
             callOrDie(path, "config", "user.name", options.user)
-            log.trace("Set git user.name to $options.user.")
+            log.fine("Set git user.name to $options.user.")
         }
         if (options.email) {
             callOrDie(path, "config", "user.email", options.email)
-            log.trace("Set git user.email to $options.user.")
+            log.fine("Set git user.email to $options.user.")
         }
         writeGitIgnore(path, options)
     }

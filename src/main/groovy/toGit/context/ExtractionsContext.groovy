@@ -4,9 +4,9 @@ import toGit.context.base.Context
 import toGit.context.traits.HasExtractions
 import toGit.migration.plan.Extraction
 import toGit.migration.plan.Snapshot
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 
-@Slf4j
+@Log
 class ExtractionsContext implements Context, HasExtractions {
 
     /**

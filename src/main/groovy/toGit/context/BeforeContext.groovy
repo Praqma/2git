@@ -3,13 +3,13 @@ package toGit.context
 import toGit.context.base.Context
 import toGit.context.base.DslContext
 import toGit.migration.MigrationManager
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 
 /**
  * Defines {@link toGit.migration.plan.Action}s to execute before the migration
  * @param closure the closure defining the {@link toGit.migration.plan.Action}s
  */
-@Slf4j
+@Log
 class BeforeContext implements Context {
     void actions(@DslContext(ActionsContext) Closure closure) {
         log.info("Registering befores...")

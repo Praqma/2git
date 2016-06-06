@@ -1,5 +1,6 @@
 package toGit
 
+import groovy.util.logging.Log
 import toGit.context.MigrationContext
 import toGit.context.base.Context
 import toGit.context.base.DslContext
@@ -13,7 +14,6 @@ import toGit.migration.sources.dummy.DummySourceContext
 import toGit.migration.targets.MigrationTarget
 import toGit.migration.targets.dummy.DummyTargetContext
 import toGit.migration.targets.git.context.GitTargetContext
-import groovy.util.logging.Slf4j
 
 import static toGit.context.ContextHelper.executeInContext
 
@@ -21,7 +21,7 @@ import static toGit.context.ContextHelper.executeInContext
  * Script base for the DSL.
  * The script the user provides is run from this context.
  */
-@Slf4j
+@Log
 abstract class ScriptBase extends Script implements Context {
 
     //TODO dynamically load at one point

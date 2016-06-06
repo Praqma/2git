@@ -3,11 +3,11 @@ package toGit.context
 import toGit.context.base.Context
 import toGit.context.base.DslContext
 import toGit.migration.MigrationManager
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log
 
 import static ContextHelper.executeInContext
 
-@Slf4j
+@Log
 class AfterContext implements Context {
 
     /**
