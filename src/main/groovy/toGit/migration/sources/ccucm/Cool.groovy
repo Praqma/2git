@@ -88,7 +88,8 @@ class Cool {
     static BaselineList getBaselines(CoolComponent coolComponent, CoolStream coolStream, BaselineFilter baselineFilter) {
         log.info("Retrieving Cool baselines for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
         def baselines = new BaselineList(coolStream, coolComponent, null).addFilter(baselineFilter).apply()
-        log.info("Retrieved {} Cool baseline(s) for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.", baselines.size())
+        def baselineCount = baselines.size()
+        log.info("Retrieved $baselineCount Cool baseline(s) for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
         return baselines
     }
 
