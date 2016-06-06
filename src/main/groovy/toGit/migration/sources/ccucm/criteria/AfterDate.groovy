@@ -20,7 +20,7 @@ class AfterDate extends Criteria {
         def baseline = ((Baseline) snapshot).source
         println "Testing '" + baseline.shortname + " (" + baseline.date + ")' against date '" + date + "'."
         def result = baseline.date > date
-        println "Result: " + (result ? "SUCCESS" : "FAILURE")
+        println "Result: " + (result ? "MATCH" : "no match")
         return result
     }
 }

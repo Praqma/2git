@@ -16,7 +16,7 @@ class PromotionLevels extends Criteria {
         def baseline = ((Baseline) snapshot).source
         println "Testing '" + baseline.shortname + " (" + baseline.promotionLevel + ")' against promotionLevels '" + promotionLevels + "'."
         def result = levels.contains(baseline.promotionLevel.toString())
-        println "Result: " + (result ? "SUCCESS" : "FAILURE")
+        println "Result: " + (result ? "MATCH" : "no match")
         return result
     }
 }

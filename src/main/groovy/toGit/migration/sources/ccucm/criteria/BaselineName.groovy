@@ -17,7 +17,7 @@ class BaselineName extends Criteria {
         println "Testing '" + baseline.shortname + "' against regex '" + regex + "'."
         def matcher = baseline.shortname =~ regex
         def result = matcher.matches()
-        println "Result: " + (result ? "SUCCESS" : "FAILURE")
+        println "Result: " + (result ? "MATCH" : "no match")
         return result
     }
 }
