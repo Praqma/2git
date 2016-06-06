@@ -1,12 +1,12 @@
 package toGit.migration.sources.ccucm
 
+import org.apache.commons.io.filefilter.WildcardFileFilter
 import toGit.context.base.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
-import toGit.utils.FileHelper
 import toGit.utils.StringExtensions
 import groovy.util.logging.Log
 import net.praqma.clearcase.PVob as CoolVob
@@ -87,5 +87,17 @@ class CcucmSource implements MigrationSource {
 
         Cool.rebase(baseline, migrationView)
         Cool.updateView(migrationView, options.loadComponents)
+        removeIgnoredFiles()
+    }
+
+    /**
+     * Deletes files from the View matching the filters specified in the option's 'ignore'
+     */
+    void removeIgnoredFiles() {
+        def view = new File(migrationView.path)
+        def filter = new WildcardFileFilter(options.ignore)
+        view.listFiles(filter as FilenameFilter).each {
+            it.delete()
+        }
     }
 }
