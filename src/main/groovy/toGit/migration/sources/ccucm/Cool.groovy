@@ -21,38 +21,6 @@ import net.praqma.clearcase.ucm.view.UpdateView
 class Cool {
 
     /**
-     * Removes given Views. Doesn't delete the View directory.
-     * @param coolViews The Cool Views to remove.
-     */
-    static void deleteViews(List<CoolSnapshotView> coolViews) {
-        def viewIterator = coolViews.iterator()
-        while (viewIterator.hasNext()) {
-            CoolSnapshotView coolView = viewIterator.next()
-            String viewName = coolView.fullyQualifiedName
-            log.info("Removing view $viewName.")
-            coolView.remove()
-            log.info("Removed view $viewName.")
-            viewIterator.remove()
-        }
-    }
-
-    /**
-     * Removes given Streams.
-     * @param coolStreams The Cool Streams to remove.
-     */
-    static void deleteStreams(List<CoolStream> coolStreams) {
-        def streamIterator = coolStreams.iterator()
-        while (streamIterator.hasNext()) {
-            CoolStream coolStream = streamIterator.next()
-            def streamName = coolStream.fullyQualifiedName
-            log.info("Removing stream $streamName.")
-            coolStream.remove()
-            log.info("Removed stream $streamName.")
-            streamIterator.remove()
-        }
-    }
-
-    /**
      * Creates a child Stream for the given Stream at the given Baseline
      * @param coolStream The Cool Stream to create a child Stream for.
      * @param coolBaseline The Cool Baseline to create the child Stream at.
@@ -131,7 +99,8 @@ class Cool {
      */
     static CoolPVob getPVob(String pvobName) {
         log.info("Retrieving Cool vob $pvobName.")
-        def coolPVob = CoolPVob.get(pvobName)
+        CoolPVob
+        CoolPVob coolPVob = new CoolPVob(pvobName).load()
         log.info("Retrieved Cool vob $coolPVob.fullyQualifiedName.")
         return coolPVob
     }

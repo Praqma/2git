@@ -49,9 +49,11 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void cleanup() {
-        if (migrationView) migrationView.remove()
+        if (migrationView) {
+            migrationView.remove()
+            new File(migrationView.path).deleteDir()
+        }
         if (migrationStream) migrationStream.remove()
-        new File(migrationView.path).deleteDir()
     }
 
     @Override
