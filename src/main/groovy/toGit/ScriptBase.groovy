@@ -71,7 +71,7 @@ abstract class ScriptBase extends Script implements Context {
     }
 
     /**
-     * Outputs stream loadComponents and dependencies to a given log file
+     * Outputs stream loadComponents and dependencies to a given simpleLog file
      * @param fullyQualifiedStreamName FQ name of the stream to output the dependencies for
      * @param logFileName the File to output to (contents will be YAML)
      */

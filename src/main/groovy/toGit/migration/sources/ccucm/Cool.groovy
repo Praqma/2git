@@ -99,8 +99,8 @@ class Cool {
      */
     static CoolPVob getPVob(String pvobName) {
         log.info("Retrieving Cool vob $pvobName.")
-        CoolPVob
-        CoolPVob coolPVob = new CoolPVob(pvobName).load()
+        CoolPVob coolPVob = new CoolPVob(pvobName)
+        coolPVob.load()
         log.info("Retrieved Cool vob $coolPVob.fullyQualifiedName.")
         return coolPVob
     }

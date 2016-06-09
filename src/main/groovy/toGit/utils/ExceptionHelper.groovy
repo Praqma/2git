@@ -4,7 +4,7 @@ import groovy.util.logging.Log
 
 @Log
 class ExceptionHelper {
-    static void log(Exception e) {
+    static void simpleLog(Exception e) {
         while(e){
             def name = e.class.simpleName
             def message = e.message

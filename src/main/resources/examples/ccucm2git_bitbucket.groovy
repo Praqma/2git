@@ -1,3 +1,5 @@
+package examples
+
 @Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.7.1')
 import groovyx.net.http.*
 

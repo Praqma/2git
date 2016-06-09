@@ -38,8 +38,9 @@ class MigrationManager {
                 plan.execute()
         } catch (Exception e) {
             log.severe('An error occurred during the migration.')
-            ExceptionHelper.log(e)
+            ExceptionHelper.simpleLog(e)
             log.severe('The migration has been stopped.')
+            throw e
         } finally {
             log.info('Cleaning up.')
             source.cleanup()

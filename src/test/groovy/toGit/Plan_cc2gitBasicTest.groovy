@@ -61,7 +61,7 @@ class Plan_cc2gitBasicTest {
 
 
     /**
-     * TODO: Prototyping functional tests. Ignored for now.
+     * TODO: Prototyping toGit.functional tests. Ignored for now.
      */
     @Test
     @Ignore

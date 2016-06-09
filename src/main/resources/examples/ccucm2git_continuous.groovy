@@ -1,3 +1,4 @@
+package examples
 /*
  The following setup allows you to migrate baselines starting from where you last left off.
  This is useful when you plan on keeping both VCS's alive during a bigger migration project.

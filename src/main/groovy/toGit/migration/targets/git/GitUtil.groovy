@@ -20,7 +20,7 @@ class GitUtil {
         try {
             callOrDie(path, args)
         } catch (AbnormalProcessTerminationException ex) {
-            log.warning("Command exited with status code {}", ex.exitValue)
+            log.warning("Command exited with status code $ex.exitValue")
             return ex.exitValue
         }
         return 0
@@ -33,7 +33,7 @@ class GitUtil {
      */
     static void callOrDie(File path, String... args) {
         String cmd = "git " + args.join(" ")
-        log.info("Executing '{}' in {}", cmd, path)
+        log.info("Executing '$cmd' in $path")
         CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line -> println line }
     }
 
