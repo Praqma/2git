@@ -1,9 +1,7 @@
 package toGit.migration.sources.ccucm.context
 
 import toGit.context.base.Context
-import toGit.migration.sources.ccucm.criteria.AfterDate
-import toGit.migration.sources.ccucm.criteria.BaselineName
-import toGit.migration.sources.ccucm.criteria.PromotionLevels
+import toGit.migration.sources.ccucm.criteria.*
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -47,6 +45,15 @@ trait CcucmCriteriaContext implements Context {
     void baselineName(String regex) {
         criteria.add(new BaselineName(regex))
         log.info("Added 'baselineName' criteria.")
+    }
+
+    /**
+     * Filters out baselines whose names aren't specified
+     * @param names The baseline names to select
+     */
+    void baselineNames(String... names) {
+        criteria.add(new BaselineNames(names))
+        log.info("Added 'baselineNames' criteria.")
     }
 
     /**

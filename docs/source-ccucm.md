@@ -142,6 +142,16 @@ criteria {
 }
 ```
 
+#### baselineNames
+
+`baselineNames (String... names)`
+
+```groovy
+criteria {
+    baselineNames 'v1.0.0\\@myVob', 'v1.2.5\\@myVob', 'v1.5.0\\@myVob'
+}
+```
+
 ### Promotion level
 
 #### promotionLevels
