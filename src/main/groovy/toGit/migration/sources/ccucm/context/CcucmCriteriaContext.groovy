@@ -57,6 +57,15 @@ trait CcucmCriteriaContext implements Context {
     }
 
     /**
+     * Filters out baselines whose names aren't specified
+     * @param names The baseline names to select
+     */
+    void baselineNames(List<String> names) {
+        criteria.add(new BaselineNames(names))
+        log.info("Added 'baselineNames' criteria.")
+    }
+
+    /**
      * Filters out baselines that don't have given promotion levels
      * @param levels the promotion levels to test baselines against
      */

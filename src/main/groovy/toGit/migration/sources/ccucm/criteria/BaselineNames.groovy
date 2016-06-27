@@ -5,9 +5,13 @@ import toGit.migration.plan.Snapshot
 import toGit.migration.sources.ccucm.Baseline
 
 class BaselineNames extends Criteria {
-    String[] baselines
+    List<String> baselines
 
     BaselineNames(String... baselines) {
+        this.baselines = baselines
+    }
+
+    BaselineNames(List<String> baselines) {
         this.baselines = baselines
     }
 
