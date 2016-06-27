@@ -156,7 +156,7 @@ criteria {
 
 ```groovy
 criteria {
-    baselineNames ['v1.0.0\\@myVob', 'v1.2.5\\@myVob', 'v1.5.0\\@myVob']
+    baselineNames(['v1.0.0\\@myVob', 'v1.2.5\\@myVob', 'v1.5.0\\@myVob'])
 }
 ```
 
@@ -183,7 +183,7 @@ criteria {
 ```groovy
 extractions {
     /* Map the 'shortname' property to the 'name' variable for use in the actions. */
-    baselineProperty [name: 'shortname', level: 'promotionLevel']
+    baselineProperty([name: 'shortname', level: 'promotionLevel'])
 }
 ```
 *Note: Property context of a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
