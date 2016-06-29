@@ -18,8 +18,10 @@ class BaselineNames extends Criteria {
     @Override
     boolean appliesTo(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
-        println "Testing '" + baseline.shortname + "' against baseline list $baselines."
-        def result = baselines.contains(baseline.shortname)
+        // String.equals(GString) fails, hence the extra toString
+        def baselineName = "${baseline.shortname}@${baseline.PVob.name}".toString()
+        println "Testing '$baselineName' against baseline list $baselines."
+        def result = baselines.contains(baselineName)
         println "Result: " + (result ? "MATCH" : "no match")
         return result
     }
