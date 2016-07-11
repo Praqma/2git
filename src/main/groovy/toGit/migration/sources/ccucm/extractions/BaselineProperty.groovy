@@ -15,7 +15,8 @@ class BaselineProperty extends Extraction {
     HashMap<String, Object> extract(Snapshot snapshot) {
         def result = [:]
         map.each { mv ->
-            result.put(mv.key, ((Baseline) snapshot).source.properties."$mv.value")
+            println "Extracting baseline property '$mv.value'"
+            result.put(mv.key, ((Baseline) snapshot).source."$mv.value")
         }
         return result
     }
