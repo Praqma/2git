@@ -52,3 +52,13 @@ target('git') {
     email 'wil@sshake.org'
 }
 ```
+
+##### lfs
+
+Tracks entries with [Git LFS](https://git-lfs.github.com/).
+
+```
+target('git') {
+    lfs '*.pdf', '*.iso'
+}
+```

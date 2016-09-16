@@ -51,6 +51,13 @@ class GitUtil {
             log.fine("Set git user.email to $options.user.")
         }
         writeGitIgnore(path, options)
+        setGitLfs(path, options)
+    }
+
+    static void setGitLfs(File path, GitOptions options) {
+        options.lfs.each { file ->
+            callOrDie(path, "lfs", "track", "'$file'")
+        }
     }
 
     static void writeGitIgnore(File path, GitOptions options) {

@@ -26,6 +26,15 @@ class GitTargetContext implements Context, HasTarget {
     }
 
     /**
+     * Tracks given String arguments under Git LFS
+     * @param args the String arguments to add
+     */
+    void lfs(String... args) {
+        target.options.lfs.addAll(args)
+        log.info("Added $args to git lfs.")
+    }
+
+    /**
      * Sets the Git user
      * @param user the user name
      */
