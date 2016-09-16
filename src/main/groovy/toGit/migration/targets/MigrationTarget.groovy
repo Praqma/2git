@@ -4,7 +4,7 @@ import toGit.context.base.Context
 
 trait MigrationTarget {
     /**
-     * The workspace where source contents will be copied to
+     * The workspace where target contents will be copied to
      */
     String workspace = new File("./output/target").absolutePath
 
@@ -19,9 +19,9 @@ trait MigrationTarget {
     abstract void cleanup()
 
     /**
-     * Adds source-specific contexts to the global ActionsContext
+     * Adds target-specific contexts to the global ActionsContext
      * @param actionsContext the global ActionsContext
-     * @return the global ActionsContext enriched with the source-specific contexts
+     * @return the global ActionsContext enriched with the target   -specific contexts
      */
     abstract Context withActions(Context actionsContext)
 }

@@ -1,11 +1,11 @@
 package toGit.context
 
+import org.junit.Test
 import toGit.Executor
 import toGit.TestHelper
 import toGit.migration.MigrationManager
 import toGit.migration.sources.dummy.DummySource
 import toGit.migration.targets.dummy.DummyTarget
-import org.junit.Test
 
 public class CriteriaContextTest {
     private static void testCriteria(String criteria) {

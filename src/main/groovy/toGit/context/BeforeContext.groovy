@@ -1,9 +1,9 @@
 package toGit.context
 
+import groovy.util.logging.Log
 import toGit.context.base.Context
 import toGit.context.base.DslContext
 import toGit.migration.MigrationManager
-import groovy.util.logging.Log
 
 import static toGit.context.ContextHelper.executeInContext
 

@@ -10,7 +10,7 @@ import toGit.migration.targets.git.GitTarget
 class ccucm2gitExamplesTest {
 
     @Test
-    public void ccucm2git(){
+    public void ccucm2git() {
         def commandFile = TestHelper.cloneExampleCommandFile("ccucm2git")
         new Executor().execute(commandFile.absolutePath)
 

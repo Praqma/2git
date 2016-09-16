@@ -26,7 +26,7 @@ migrate {
         filter {
             criteria {
                 def lastBaselineName = "git --git-dir $target.workspace notes show HEAD".execute().text
-                if(lastBaselineName){
+                if (lastBaselineName) {
                     println "Picking up migration from $lastBaselineName."
                     afterBaseline lastBaselineName
                 } else {

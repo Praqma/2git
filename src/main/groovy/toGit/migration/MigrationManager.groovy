@@ -33,7 +33,7 @@ class MigrationManager {
     void migrate(boolean dryRun = false) {
         try {
             source.prepare()
-            targets.values().each {t -> t.prepare()}
+            targets.values().each { t -> t.prepare() }
             plan.build()
             if (!dryRun)
                 plan.execute()
@@ -45,7 +45,7 @@ class MigrationManager {
         } finally {
             log.info('Cleaning up.')
             source.cleanup()
-            targets.values().each {t -> t.cleanup()}
+            targets.values().each { t -> t.cleanup() }
         }
     }
 }

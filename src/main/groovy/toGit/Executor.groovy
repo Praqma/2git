@@ -1,7 +1,7 @@
 package toGit
 
-import toGit.migration.MigrationManager
 import org.codehaus.groovy.control.CompilerConfiguration
+import toGit.migration.MigrationManager
 
 public class Executor {
     GroovyShell execute(String[] args) {

@@ -9,11 +9,12 @@ import toGit.context.traits.TargetContext
 import toGit.migration.MigrationManager
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.Cool
-import toGit.migration.sources.ccucm.context.CcucmSourceContextContext
-import toGit.migration.sources.dummy.DummySourceContextContext
+import toGit.migration.sources.ccucm.context.CcucmSourceContext
+import toGit.migration.sources.dummy.DummySourceContext
 import toGit.migration.targets.MigrationTarget
-import toGit.migration.targets.dummy.DummyTargetContextContext
-import toGit.migration.targets.git.context.GitTargetContextContext
+import toGit.migration.targets.artifactory.context.ArtifactoryTargetContext
+import toGit.migration.targets.dummy.DummyTargetContext
+import toGit.migration.targets.git.context.GitTargetContext
 
 import static toGit.context.ContextHelper.executeInContext
 
@@ -26,12 +27,13 @@ abstract class ScriptBase extends Script implements Context {
 
     //TODO dynamically load at one point
     Map<String, SourceContext> sourceTypes = [
-            'dummy'    : new DummySourceContextContext(),
-            'ccucm'    : new CcucmSourceContextContext(),
+            'dummy': new DummySourceContext(),
+            'ccucm': new CcucmSourceContext(),
     ]
     Map<String, TargetContext> targetTypes = [
-            'dummy': new DummyTargetContextContext(),
-            'git'  : new GitTargetContextContext(),
+            'dummy': new DummyTargetContext(),
+            'git'  : new GitTargetContext(),
+            'artifactory' : new ArtifactoryTargetContext()
     ]
 
     void source(String type, @DslContext(Context) Closure closure = null) {

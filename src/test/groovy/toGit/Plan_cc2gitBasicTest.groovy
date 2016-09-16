@@ -1,12 +1,12 @@
 package toGit
 
-import toGit.migration.MigrationManager
-import toGit.migration.sources.ccucm.CcucmSource
-import toGit.migration.targets.git.GitTarget
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import toGit.migration.MigrationManager
+import toGit.migration.sources.ccucm.CcucmSource
+import toGit.migration.targets.git.GitTarget
 
 class Plan_cc2gitBasicTest {
     static String script = $/
@@ -58,7 +58,6 @@ class Plan_cc2gitBasicTest {
         commandFile.write script
         commandFile.deleteOnExit()
     }
-
 
     /**
      * TODO: Prototyping toGit.functional tests. Ignored for now.

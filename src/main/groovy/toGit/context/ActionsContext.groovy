@@ -1,14 +1,14 @@
 package toGit.context
 
+import groovy.text.SimpleTemplateEngine
+import groovy.util.logging.Log
+import net.praqma.util.execute.CommandLine
+import org.apache.commons.io.FileUtils
 import toGit.context.base.Context
 import toGit.context.traits.HasActions
 import toGit.migration.MigrationManager
 import toGit.migration.plan.Action
 import toGit.utils.FileHelper
-import groovy.text.SimpleTemplateEngine
-import groovy.util.logging.Log
-import net.praqma.util.execute.CommandLine
-import org.apache.commons.io.FileUtils
 
 @Log
 class ActionsContext implements Context, HasActions {

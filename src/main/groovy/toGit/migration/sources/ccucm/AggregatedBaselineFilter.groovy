@@ -1,8 +1,8 @@
 package toGit.migration.sources.ccucm
 
-import toGit.migration.plan.Criteria
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.utils.BaselineList
+import toGit.migration.plan.Criteria
 
 /**
  * BaselineFilter that aggregates passed in Criteria
@@ -28,7 +28,7 @@ class AggregatedBaselineFilter extends BaselineFilter {
         def baselineIterator = baselines.iterator()
         while (baselineIterator.hasNext()) {
             def snapshot = new Baseline(baselineIterator.next())
-            if(!snapshot.matches(criteria)) {
+            if (!snapshot.matches(criteria)) {
                 baselineIterator.remove()
                 removed++
             }

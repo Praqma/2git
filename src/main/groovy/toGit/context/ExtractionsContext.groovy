@@ -1,10 +1,10 @@
 package toGit.context
 
+import groovy.util.logging.Log
 import toGit.context.base.Context
 import toGit.context.traits.HasExtractions
 import toGit.migration.plan.Extraction
 import toGit.migration.plan.Snapshot
-import groovy.util.logging.Log
 
 @Log
 class ExtractionsContext implements Context, HasExtractions {

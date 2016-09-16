@@ -1,10 +1,10 @@
 package toGit.context
 
+import groovy.util.logging.Log
 import toGit.context.base.Context
 import toGit.context.traits.HasCriteria
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
-import groovy.util.logging.Log
 
 @Log
 class CriteriaContext implements Context, HasCriteria {

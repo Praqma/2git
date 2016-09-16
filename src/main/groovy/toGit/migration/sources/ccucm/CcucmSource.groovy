@@ -1,5 +1,12 @@
 package toGit.migration.sources.ccucm
 
+import groovy.util.logging.Log
+import net.praqma.clearcase.PVob as CoolVob
+import net.praqma.clearcase.ucm.entities.Component as CoolComponent
+import net.praqma.clearcase.ucm.entities.Project as CoolProject
+import net.praqma.clearcase.ucm.entities.Stream as CoolStream
+import net.praqma.clearcase.ucm.utils.BaselineFilter
+import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 import org.apache.commons.io.filefilter.WildcardFileFilter
 import toGit.context.base.Context
 import toGit.migration.plan.Criteria
@@ -8,13 +15,6 @@ import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
 import toGit.utils.StringExtensions
-import groovy.util.logging.Log
-import net.praqma.clearcase.PVob as CoolVob
-import net.praqma.clearcase.ucm.entities.Component as CoolComponent
-import net.praqma.clearcase.ucm.entities.Project as CoolProject
-import net.praqma.clearcase.ucm.entities.Stream as CoolStream
-import net.praqma.clearcase.ucm.utils.BaselineFilter
-import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 
 @Log
 class CcucmSource implements MigrationSource {

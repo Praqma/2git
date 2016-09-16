@@ -2,6 +2,8 @@ package examples
 
 @Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.7.1')
 import groovyx.net.http.*
+@Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.7.1')
+import groovyx.net.http.*
 
 def tempDir = "c:/tmp"
 def repo = new BitbucketRepo("http://localhost:7990", "PROJ/funky-repo", "admin:password")
@@ -39,7 +41,7 @@ migrate {
     after {
         actions {
             custom {
-                if(!repo.exists())
+                if (!repo.exists())
                     repo.create()
                 repo.push(target.workspace)
             }
@@ -68,7 +70,7 @@ class BitbucketRepo {
         this.repo = repo.split("/")[1]
     }
 
-    boolean exists(){
+    boolean exists() {
         println "Checking if $project/$repo exists"
 
         boolean exists = false
@@ -89,14 +91,14 @@ class BitbucketRepo {
         return exists
     }
 
-    def create(){
+    def create() {
         println "Creating $project/$repo"
         http.request(Method.POST) { req ->
             uri.path = "/rest/api/1.0/projects/$project/repos"
             headers.'Authorization' = "Basic $credentialsBase64"
             requestContentType = ContentType.JSON
 
-            body = [name : repo]
+            body = [name: repo]
 
             response.success = { resp ->
                 println "Success! ${resp.status}"
@@ -108,7 +110,7 @@ class BitbucketRepo {
         }
     }
 
-    def push(String directory){
+    def push(String directory) {
         println "Pushing $directory to Bitbucket"
         def dir = new File(directory)
         def serverName = server.split("://")[1]
