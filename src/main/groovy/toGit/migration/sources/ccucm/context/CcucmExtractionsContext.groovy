@@ -5,7 +5,6 @@ import toGit.migration.sources.ccucm.extractions.BaselineProperty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-//@Log
 trait CcucmExtractionsContext implements Context {
     final static Logger log = LoggerFactory.getLogger(CcucmExtractionsContext.class)
 

@@ -6,7 +6,6 @@ import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-//@Log
 trait CcucmCriteriaContext implements Context {
     final static Logger log = LoggerFactory.getLogger(CcucmCriteriaContext.class)
 

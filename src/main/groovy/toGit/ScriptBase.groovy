@@ -4,16 +4,16 @@ import groovy.util.logging.Log
 import toGit.context.MigrationContext
 import toGit.context.base.Context
 import toGit.context.base.DslContext
-import toGit.context.traits.HasSource
-import toGit.context.traits.HasTarget
+import toGit.context.traits.SourceContext
+import toGit.context.traits.TargetContext
 import toGit.migration.MigrationManager
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.Cool
-import toGit.migration.sources.ccucm.context.CcucmSourceContext
-import toGit.migration.sources.dummy.DummySourceContext
+import toGit.migration.sources.ccucm.context.CcucmSourceContextContext
+import toGit.migration.sources.dummy.DummySourceContextContext
 import toGit.migration.targets.MigrationTarget
-import toGit.migration.targets.dummy.DummyTargetContext
-import toGit.migration.targets.git.context.GitTargetContext
+import toGit.migration.targets.dummy.DummyTargetContextContext
+import toGit.migration.targets.git.context.GitTargetContextContext
 
 import static toGit.context.ContextHelper.executeInContext
 
@@ -25,38 +25,44 @@ import static toGit.context.ContextHelper.executeInContext
 abstract class ScriptBase extends Script implements Context {
 
     //TODO dynamically load at one point
-    Map<String, HasSource> sources = [
-            'dummy'    : new DummySourceContext(),
-            'ccucm'    : new CcucmSourceContext(),
+    Map<String, SourceContext> sourceTypes = [
+            'dummy'    : new DummySourceContextContext(),
+            'ccucm'    : new CcucmSourceContextContext(),
     ]
-    Map<String, HasTarget> targets = [
-            'dummy': new DummyTargetContext(),
-            'git'  : new GitTargetContext(),
+    Map<String, TargetContext> targetTypes = [
+            'dummy': new DummyTargetContextContext(),
+            'git'  : new GitTargetContextContext(),
     ]
 
-    void source(String identifier, @DslContext(Context) Closure closure = null) {
-        if (!sources.containsKey(identifier)) throw new Exception("Source '$identifier' not supported.")
+    void source(String type, @DslContext(Context) Closure closure = null) {
+        if (!sourceTypes.containsKey(type)) throw new Exception("Source '$type' not supported.")
 
         // Set the migrator's source
-        def sourceContext = sources[identifier]
+        def sourceContext = sourceTypes[type]
         executeInContext(closure, sourceContext)
-        MigrationManager.instance.source = sourceContext.source
+        MigrationSource newSource = sourceContext.source
+        MigrationManager.instance.source = newSource
 
         // Apply respective traits to the criteria/extraction contexts
-        MigrationManager.instance.criteriaContext = MigrationManager.instance.source.withCriteria(MigrationManager.instance.criteriaContext)
-        MigrationManager.instance.extractionsContext = MigrationManager.instance.source.withExtractions(MigrationManager.instance.extractionsContext)
+        MigrationManager.instance.criteriaContext = newSource.withCriteria(MigrationManager.instance.criteriaContext)
+        MigrationManager.instance.extractionsContext = newSource.withExtractions(MigrationManager.instance.extractionsContext)
     }
 
-    void target(String identifier, @DslContext(Context) Closure closure = null) {
-        if (!targets.containsKey(identifier)) throw new Exception("Target '$identifier' not supported.")
+    void target(String type, @DslContext(Context) Closure closure = null) {
+        target(type, 'default', closure)
+    }
+
+    void target(String type, String identifier, @DslContext(Context) Closure closure = null) {
+        if (!targetTypes.containsKey(type)) throw new Exception("Target '$type' not supported.")
 
         // Set the migrator's target
-        def targetContext = targets[identifier]
+        def targetContext = targetTypes[type]
         executeInContext(closure, targetContext)
-        MigrationManager.instance.target = targetContext.target
+        MigrationTarget newTarget = targetContext.target
+        MigrationManager.instance.targets[identifier] = targetContext.target
 
         // Apply respective traits to the action context
-        MigrationManager.instance.actionsContext = MigrationManager.instance.target.withActions(MigrationManager.instance.actionsContext)
+        MigrationManager.instance.actionsContext = newTarget.withActions(MigrationManager.instance.actionsContext)
     }
 
     /**
@@ -121,9 +127,19 @@ abstract class ScriptBase extends Script implements Context {
 
     /**
      * Allows referencing the target as 'target' in the DSL front-end
-     * @return the Migrator's MigrationTarget
+     * @return the Migrator's first MigrationTarget
      */
     MigrationTarget getTarget() {
-        return MigrationManager.instance.target
+        // Kept for backwards compatibility's sake and makes it easier for scripts only using a single target
+        return MigrationManager.instance.targets.values()[0]
+    }
+
+    /**
+     * Allows referencing the targets as 'targets' in the DSL front-end
+     * @return the Migrator's MigrationTargets
+     */
+    LinkedHashMap<String, MigrationTarget> getTargets() {
+        // Kept for backwards compatibility's sake and makes it easier for scripts only using a single target
+        return MigrationManager.instance.targets
     }
 }

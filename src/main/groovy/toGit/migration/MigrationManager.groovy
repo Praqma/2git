@@ -4,6 +4,7 @@ import groovy.util.logging.Log
 import toGit.context.ActionsContext
 import toGit.context.CriteriaContext
 import toGit.context.ExtractionsContext
+import toGit.context.base.Context
 import toGit.migration.plan.MigrationPlan
 import toGit.migration.sources.MigrationSource
 import toGit.migration.targets.MigrationTarget
@@ -13,16 +14,16 @@ import toGit.utils.ExceptionHelper
 @Singleton
 class MigrationManager {
     MigrationSource source
-    MigrationTarget target
+    LinkedHashMap<String, MigrationTarget> targets = []
     MigrationPlan plan
 
-    def criteriaContext
-    def extractionsContext
-    def actionsContext
+    Context criteriaContext
+    Context extractionsContext
+    Context actionsContext
 
     void reset() {
         source = null
-        target = null
+        targets = []
         plan = new MigrationPlan()
         criteriaContext = new CriteriaContext()
         extractionsContext = new ExtractionsContext()
@@ -32,7 +33,7 @@ class MigrationManager {
     void migrate(boolean dryRun = false) {
         try {
             source.prepare()
-            target.prepare()
+            targets.values().each {t -> t.prepare()}
             plan.build()
             if (!dryRun)
                 plan.execute()
@@ -44,7 +45,7 @@ class MigrationManager {
         } finally {
             log.info('Cleaning up.')
             source.cleanup()
-            target.cleanup()
+            targets.values().each {t -> t.cleanup()}
         }
     }
 }

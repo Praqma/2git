@@ -1,18 +1,18 @@
 package toGit.migration.targets.git.context
 
 import toGit.context.base.Context
-import toGit.context.traits.HasTarget
+import toGit.context.traits.TargetContext
 import toGit.migration.targets.git.GitOptions
 import toGit.migration.targets.git.GitTarget
 import groovy.util.logging.Log
 
 @Log
-class GitTargetContext implements Context, HasTarget {
+class GitTargetContextContext implements Context, TargetContext {
 
     /**
      * GitOptionsContext constructor
      */
-    public GitTargetContext() {
+    public GitTargetContextContext() {
         target = new GitTarget(options: new GitOptions())
     }
 

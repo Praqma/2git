@@ -5,6 +5,8 @@ import toGit.context.base.DslContext
 import toGit.migration.MigrationManager
 import groovy.util.logging.Log
 
+import static toGit.context.ContextHelper.executeInContext
+
 /**
  * Defines {@link toGit.migration.plan.Action}s to execute before the migration
  * @param closure the closure defining the {@link toGit.migration.plan.Action}s

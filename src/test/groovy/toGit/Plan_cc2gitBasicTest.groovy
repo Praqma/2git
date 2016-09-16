@@ -70,7 +70,7 @@ class Plan_cc2gitBasicTest {
         def manager = MigrationManager.instance
 
         assert manager.source instanceof CcucmSource
-        assert manager.target instanceof GitTarget
+        assert manager.targets.values()[0] instanceof GitTarget
 
         assert manager.plan != null
         assert manager.plan.befores.size() == 1

@@ -7,15 +7,14 @@ import toGit.migration.targets.git.actions.Setup
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-//@Log
 trait GitActionsContext implements Context {
     final static Logger log = LoggerFactory.getLogger(GitActionsContext.class)
 
     /**
      * Deletes all but '.git*' files/dirs in the Git path
      */
-    void clear(String path) {
-        actions.add(new Clear(new File(path)))
+    void clear(File path) {
+        actions.add(new Clear(path))
         log.info("Registered 'clear' action.")
     }
 

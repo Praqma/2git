@@ -16,7 +16,7 @@ class ccucm2gitExamplesTest {
 
         def manager = MigrationManager.instance
         assert manager.source instanceof CcucmSource
-        assert manager.target instanceof GitTarget
+        assert manager.targets.values()['default'] instanceof GitTarget
     }
 
 }

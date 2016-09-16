@@ -1,16 +1,16 @@
 package toGit.migration.sources.ccucm.context
 
 import toGit.context.base.Context
-import toGit.context.traits.HasSource
+import toGit.context.traits.SourceContext
 import toGit.migration.sources.ccucm.CcucmOptions
 import toGit.migration.sources.ccucm.CcucmSource
 import groovy.util.logging.Log
 import net.praqma.clearcase.ucm.view.SnapshotView
 
 @Log
-class CcucmSourceContext implements Context, HasSource {
+class CcucmSourceContextContext implements Context, SourceContext {
 
-    public CcucmSourceContext() {
+    public CcucmSourceContextContext() {
         source = new CcucmSource(options: new CcucmOptions())
     }
 

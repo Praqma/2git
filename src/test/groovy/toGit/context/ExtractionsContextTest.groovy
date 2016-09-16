@@ -34,7 +34,7 @@ public class ExtractionsContextTest {
     private static void assertPlan() {
         def manager = MigrationManager.instance
         assert manager.source instanceof DummySource
-        assert manager.target instanceof DummyTarget
+        assert manager.targets.values()[0] instanceof DummyTarget
 
         assert manager.plan != null
         assert manager.plan.befores.size() == 0
