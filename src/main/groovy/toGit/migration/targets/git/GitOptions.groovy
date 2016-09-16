@@ -1,9 +1,9 @@
 package toGit.migration.targets.git
 
 class GitOptions {
-    List<String> ignore = ['*.updt', 'lost+found', 'view.dat']
+    List<String> ignore = []
     String user = 'migration'
-    String email = 'migration@cctogit.net'
+    String email = '2git@praqma.com'
 
     boolean defaultSetup = true
 }
