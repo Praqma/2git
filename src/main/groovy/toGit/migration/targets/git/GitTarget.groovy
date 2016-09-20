@@ -1,10 +1,9 @@
 package toGit.migration.targets.git
 
-import toGit.context.base.Context
 import toGit.migration.MigrationManager
 import toGit.migration.targets.MigrationTarget
+import toGit.migration.targets.git.actions.Clear
 import toGit.migration.targets.git.actions.Setup
-import toGit.migration.targets.git.context.GitActionsContext
 
 class GitTarget implements MigrationTarget {
     GitOptions options
@@ -20,9 +19,18 @@ class GitTarget implements MigrationTarget {
 
     }
 
-    @Override
-    Context withActions(Context actionsContext) {
-        return actionsContext as GitActionsContext
+    /**
+     * Deletes all but '.git*' files/dirs in the Git path
+     */
+    void clear() {
+        addAction('clear', new Clear(workspace))
     }
 
+    /**
+     * Sets up a default repository using defined {@link GitOptions}
+     * @param options the GitOptions to use
+     */
+    void setup(File path, GitOptions options) {
+        addAction('setup', new Setup(path, options))
+    }
 }

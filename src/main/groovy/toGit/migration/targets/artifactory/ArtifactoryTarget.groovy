@@ -2,7 +2,7 @@ package toGit.migration.targets.artifactory
 
 import toGit.context.base.Context
 import toGit.migration.targets.MigrationTarget
-import toGit.migration.targets.artifactory.context.ArtifactoryActionsContext
+import toGit.migration.targets.artifactory.actions.Publish
 
 class ArtifactoryTarget implements MigrationTarget {
     ArtifactoryOptions options
@@ -17,9 +17,13 @@ class ArtifactoryTarget implements MigrationTarget {
 
     }
 
-    @Override
-    Context withActions(Context actionsContext) {
-        return actionsContext as ArtifactoryActionsContext
+    def publish(String artifactoryPath, File fileToPublish) {
+        def pub = new Publish(options.server,
+                              options.port,
+                              options.user,
+                              options.password,
+                              artifactoryPath,
+                              fileToPublish)
+        addAction('publish', pub)
     }
-
 }

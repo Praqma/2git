@@ -9,25 +9,27 @@ import toGit.migration.targets.artifactory.ArtifactoryTarget
 @Log
 class ArtifactoryTargetContext implements Context, TargetContext {
 
-    /**
-     * GitOptionsContext constructor
-     */
     public ArtifactoryTargetContext() {
         target = new ArtifactoryTarget(options: new ArtifactoryOptions())
     }
 
     void user(String user) {
-        target.options.user = user
-        log.info("Set user to $user.")
+        (target as ArtifactoryTarget).options.user = user
+        log.info("Set user to $user")
     }
 
     void password(String password) {
-        target.options.password = password
-        log.info("Set user to $password.")
+        (target as ArtifactoryTarget).options.password = password
+        log.info("Set password")
     }
 
-    void url(String url) {
-        target.options.user = url
-        log.info("Set user to $url.")
+    void host(String host) {
+        (target as ArtifactoryTarget).options.host = host
+        log.info("Set host to $host")
+    }
+
+    void port(int port) {
+        (target as ArtifactoryTarget).options.port = port
+        log.info("Set port to $port")
     }
 }

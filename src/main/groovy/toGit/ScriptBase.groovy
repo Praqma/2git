@@ -25,24 +25,55 @@ import static toGit.context.ContextHelper.executeInContext
 @Log
 abstract class ScriptBase extends Script implements Context {
 
-    //TODO dynamically load at one point
-    Map<String, SourceContext> sourceTypes = [
-            'dummy': new DummySourceContext(),
-            'ccucm': new CcucmSourceContext(),
-    ]
-    Map<String, TargetContext> targetTypes = [
-            'dummy': new DummyTargetContext(),
-            'git'  : new GitTargetContext(),
-            'artifactory' : new ArtifactoryTargetContext()
+    // Supported sources
+    final Map<String, Class> sourceTypes = [
+            'dummy': DummySourceContext,
+            'ccucm': CcucmSourceContext,
     ]
 
+    // Supported targets
+    final Map<String, Class> targetTypes = [
+            'dummy': DummyTargetContext,
+            'git'  : GitTargetContext,
+            'artifactory' : ArtifactoryTargetContext
+    ]
+
+    // Map for storing properties set at runtime
+    final runtimeProperties = [:]
+
+    /**
+     * If a property that doesn't exist is being set, add it to the runtimeProperties map
+     * @param name Name of the property being set
+     * @param value Value the property is being set to
+     */
+    def propertyMissing(String name, value) {
+        runtimeProperties[name] = value
+    }
+
+    /**
+     * If a property that doesn't exist is being accessed, try retrieving it from the runtimeProperties map
+     * @param name Name of the property being accessed
+     * @return the runtimeProperties entry value
+     */
+    def propertyMissing(String name) {
+        if(!runtimeProperties.containsKey(name)) throw new Exception("Property $name does not exist")
+        return runtimeProperties[name]
+    }
+
+    /**
+     * Set the source of this migration
+     * @param type The source type (e.g. ClearCase UCM)
+     * @param closure The configuration closure
+     */
     void source(String type, @DslContext(Context) Closure closure = null) {
         if (!sourceTypes.containsKey(type)) throw new Exception("Source '$type' not supported.")
 
-        // Set the migrator's source
-        def sourceContext = sourceTypes[type]
+        // Initialize and configure the source
+        def sourceContext = sourceTypes[type].newInstance() as SourceContext
         executeInContext(closure, sourceContext)
         MigrationSource newSource = sourceContext.source
+
+        // Set MigrationManager's source
         MigrationManager.instance.source = newSource
 
         // Apply respective traits to the criteria/extraction contexts
@@ -50,58 +81,43 @@ abstract class ScriptBase extends Script implements Context {
         MigrationManager.instance.extractionsContext = newSource.withExtractions(MigrationManager.instance.extractionsContext)
     }
 
+    /**
+     * Set the target of the migration
+     * @param type The target type (e.g. Git)
+     * @param closure The configuration Closure
+     */
     void target(String type, @DslContext(Context) Closure closure = null) {
-        target(type, 'default', closure)
+        target(type, type, closure)
     }
 
+    /**
+     * Set the target of the migration
+     * @param type The target type (e.g. Git)
+     * @param identifier The target name
+     * @param closure The configuration Closure
+     */
     void target(String type, String identifier, @DslContext(Context) Closure closure = null) {
         if (!targetTypes.containsKey(type)) throw new Exception("Target '$type' not supported.")
 
-        // Set the migrator's target
-        def targetContext = targetTypes[type]
+        // Initialize and configure the target
+        def targetContext = targetTypes[type].newInstance() as TargetContext
         executeInContext(closure, targetContext)
         MigrationTarget newTarget = targetContext.target
-        MigrationManager.instance.targets[identifier] = targetContext.target
 
-        // Apply respective traits to the action context
-        MigrationManager.instance.actionsContext = newTarget.withActions(MigrationManager.instance.actionsContext)
+        // Add to MigrationManager's targets and set runtime property
+        MigrationManager.instance.targets[identifier] = newTarget
+        this."$identifier" = newTarget
     }
 
     /**
      * Closure containing DSL methods used for the migration
      * @param closure The DSL code
      */
-    void migrate(boolean dryRun = false, @DslContext(MigrationContext) Closure closure) {
+    static void migrate(boolean dryRun = false, @DslContext(MigrationContext) Closure closure) {
         def migrationContext = new MigrationContext()
         executeInContext(closure, migrationContext)
         MigrationManager.instance.migrate(dryRun)
         log.info(migrationComplete())
-    }
-
-    /**
-     * Outputs stream loadComponents and dependencies to a given simpleLog file
-     * @param fullyQualifiedStreamName FQ name of the stream to output the dependencies for
-     * @param logFileName the File to output to (contents will be YAML)
-     */
-    static void logDependencies(String fullyQualifiedStreamName, String logFileName) {
-        //TODO move this elsewhere, it's clearcase specific
-        def logFile = new File(logFileName)
-
-        if (!logFile.exists())
-            logFile.delete()
-        if (logFile.parentFile)
-            logFile.parentFile.mkdirs()
-        logFile.createNewFile()
-
-        logFile.append("components:\n")
-        Cool.getModifiableComponentSelectors(fullyQualifiedStreamName).each {
-            logFile.append("  - $it\n")
-        }
-
-        logFile.append("dependencies:\n")
-        Cool.getNonModifiableComponentSelectors(fullyQualifiedStreamName).each {
-            logFile.append("  - $it\n")
-        }
     }
 
     /**
@@ -123,7 +139,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the source as 'source' in the DSL front-end
      * @return the Migrator's MigrationSource
      */
-    MigrationSource getSource() {
+    static MigrationSource getSource() {
         return MigrationManager.instance.source
     }
 
@@ -131,7 +147,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the target as 'target' in the DSL front-end
      * @return the Migrator's first MigrationTarget
      */
-    MigrationTarget getTarget() {
+    static MigrationTarget getTarget() {
         // Kept for backwards compatibility's sake and makes it easier for scripts only using a single target
         return MigrationManager.instance.targets.values()[0]
     }
@@ -140,8 +156,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the targets as 'targets' in the DSL front-end
      * @return the Migrator's MigrationTargets
      */
-    LinkedHashMap<String, MigrationTarget> getTargets() {
-        // Kept for backwards compatibility's sake and makes it easier for scripts only using a single target
+    static LinkedHashMap<String, MigrationTarget> getTargets() {
         return MigrationManager.instance.targets
     }
 }

@@ -1,7 +1,11 @@
 package toGit.migration.targets
 
-import toGit.context.base.Context
+import groovy.util.logging.Log
+import toGit.context.ActionsContext
+import toGit.migration.MigrationManager
+import toGit.migration.plan.Action
 
+@Log
 trait MigrationTarget {
     /**
      * The workspace where target contents will be copied to
@@ -19,9 +23,12 @@ trait MigrationTarget {
     abstract void cleanup()
 
     /**
-     * Adds target-specific contexts to the global ActionsContext
-     * @param actionsContext the global ActionsContext
-     * @return the global ActionsContext enriched with the target   -specific contexts
+     * Registers an action with the MigrationManager
+     * @param name
+     * @param action
      */
-    abstract Context withActions(Context actionsContext)
+    void addAction(String name, Action action){
+        ((ActionsContext)MigrationManager.instance.actionsContext).actions.add(action)
+        log.info("Registered action $name")
+    }
 }

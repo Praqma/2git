@@ -8,8 +8,10 @@ javadoc:           false
 
 ## Defining the target
 
+Define a target with the `'git'` type, followed by your target identifier (in this case, `'g'`).
+
 ```
-target('git') {
+target('git', 'g') {
     /* Configure the target here */
 }
 ```
