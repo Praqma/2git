@@ -17,6 +17,15 @@ You write your migration recipe and feed it into the 2git engine, which will the
 
 If you don't like what you see, you can easily tweak your recipe and run it again, until you get the perfect migration.
 
-### Further information
+## General documentation
 
-[Getting started](getting-started)
+  * [Workflow and concepts](workflow-and-concepts)
+  * [Contact and contributing](contact-and-contributing)
+
+## Technical documentation
+
+  * [Getting started](getting-started)
+  * [Source: ClearCase UCM](source-ccucm)
+  * [Target: Git](target-git)
+  * [Target: artifactory](target-artifactory)
+  * [Other features](other-features)
