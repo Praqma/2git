@@ -8,7 +8,6 @@ import toGit.context.traits.SourceContext
 import toGit.context.traits.TargetContext
 import toGit.migration.MigrationManager
 import toGit.migration.sources.MigrationSource
-import toGit.migration.sources.ccucm.Cool
 import toGit.migration.sources.ccucm.context.CcucmSourceContext
 import toGit.migration.sources.dummy.DummySourceContext
 import toGit.migration.targets.MigrationTarget
@@ -56,7 +55,7 @@ abstract class ScriptBase extends Script implements Context {
      * @return the runtimeProperties entry value
      */
     def propertyMissing(String name) {
-        if(!runtimeProperties.containsKey(name)) throw new Exception("Property $name does not exist")
+        if(!runtimeProperties.containsKey(name)) new MissingPropertyException(name, ScriptBase)
         return runtimeProperties[name]
     }
 
