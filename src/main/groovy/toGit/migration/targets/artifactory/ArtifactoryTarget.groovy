@@ -1,9 +1,10 @@
 package toGit.migration.targets.artifactory
 
-import toGit.context.base.Context
+import groovy.util.logging.Log
 import toGit.migration.targets.MigrationTarget
 import toGit.migration.targets.artifactory.actions.Publish
 
+@Log
 class ArtifactoryTarget implements MigrationTarget {
     ArtifactoryOptions options
 
@@ -18,7 +19,7 @@ class ArtifactoryTarget implements MigrationTarget {
     }
 
     def publish(String artifactoryPath, File fileToPublish) {
-        def pub = new Publish(options.server,
+        def pub = new Publish(options.host,
                               options.port,
                               options.user,
                               options.password,
