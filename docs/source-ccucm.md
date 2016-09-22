@@ -28,6 +28,7 @@ source('ccucm') {
 ##### component
 
 Defines the component to migrate.
+
 ```
 source('ccucm') {
     component 'component:foo@\\myVob'
@@ -43,6 +44,7 @@ source('ccucm') {
     stream 'stream:foo_Int@\\myVob'
 }
 ```
+
 #### Recommended
 
 ##### workspace
@@ -96,6 +98,7 @@ source('ccucm') {
     readOnlyMigrationStream true
 }
 ```
+
 **Note:** May break when combined with `loadComponents 'modifiable'`
 
 ## CCUCM-specific criteria
@@ -186,4 +189,5 @@ extractions {
     baselineProperty([name: 'shortname', level: 'promotionLevel'])
 }
 ```
+
 *Note: Property context of a [COOL Baseline](https://github.com/Praqma/cool/blob/master/src/main/java/net/praqma/clearcase/ucm/entities/Baseline.java).*
