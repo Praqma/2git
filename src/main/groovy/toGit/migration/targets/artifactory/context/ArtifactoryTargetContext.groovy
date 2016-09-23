@@ -23,13 +23,13 @@ class ArtifactoryTargetContext implements Context, TargetContext {
         log.info("Set password")
     }
 
-    void host(String host) {
-        (target as ArtifactoryTarget).options.host = host
-        log.info("Set host to $host")
+    void url(String url) {
+        (target as ArtifactoryTarget).options.url = url
+        log.info("Set url to $url")
     }
 
-    void port(int port) {
-        (target as ArtifactoryTarget).options.port = port
-        log.info("Set port to $port")
+    void repository(String repository) {
+        (target as ArtifactoryTarget).options.repository = repository
+        log.info("Set repository to $repository")
     }
 }

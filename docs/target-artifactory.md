@@ -20,23 +20,23 @@ target('artifactory', 'art') {
 
 #### Required
 
-##### host
+##### url
 
-Defines the Artifactory host url
+Defines the Artifactory url
 
 ```
 target('artifactory') {
-    host 'artifactory.blumanufacturing.com'
+    host 'artifactory.blumanufacturing.com:8081/artifactory'
 }
 ```
 
-##### port
+##### repository
 
-Defines the Artifactory host port
+Defines the Artifactory repository
 
 ```
 target('artifactory') {
-    host 8081
+    repository 'libs-snapshot-local'
 }
 ```
 
@@ -62,6 +62,6 @@ Publishes a file to Artifactory
 ```
 actions {
     def artifact = new File('build/client.zip')
-    art.publish("/artifactory/libs-snapshot-local/com/blu/foober/${version}/client-${version}.zip", artifact)
+    art.publish("com/blu/foober/${version}/client-${version}.zip", artifact)
 }
 ```
