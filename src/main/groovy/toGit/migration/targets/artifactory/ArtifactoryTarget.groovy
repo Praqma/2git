@@ -13,16 +13,20 @@ class ArtifactoryTarget implements MigrationTarget {
 
     @Override
     void prepare() {
-        client = create(options.url, options.user, options.password)
     }
 
     @Override
     void cleanup() {
-
+        client.close()
     }
 
     def publish(String path, File file) {
-        def pub = new Publish(client, options.repository, path, file)
+        def pub = new Publish(getClient(), options.repository, path, file)
         addAction('publish', pub)
+    }
+
+    Artifactory getClient() {
+        if(!client) client = create(options.url, options.user, options.password)
+        return client
     }
 }

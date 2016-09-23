@@ -29,6 +29,6 @@ trait MigrationTarget {
      */
     void addAction(String name, Action action){
         ((ActionsContext)MigrationManager.instance.actionsContext).actions.add(action)
-        log.info("Registered action $name")
+        log.info("Registered action '$name'")
     }
 }

@@ -13,8 +13,8 @@ target('git', 'git') {
 }
 
 target('artifactory', 'art') {
-    host 'artifactory.blumanufacturing.com'
-    port 8081
+    url 'http://artifactory.blumanufacturing.com:8081/artifactory/api'
+    repository 'libs-snapshot-local'
     user 'art-user'
     password 'mYSecrEt2000'
 }
@@ -32,7 +32,7 @@ migrate {
                 cmd 'git add .', git.workspace
                 cmd 'git commit -m "$myBaselineName"', git.workspace
                 def artifact = new File(git.workspace, 'build/client.zip')
-                publish("/artifactory/libs-snapshot-local/com/blu/foober/${version}/client-${version}.zip", artifact)
+                publish("com/blu/foober/${version}/client-${version}-SNAPSHOT.zip", artifact)
             }
         }
     }

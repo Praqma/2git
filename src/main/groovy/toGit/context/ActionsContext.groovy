@@ -37,7 +37,7 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered 'copy' action.")
+        log.info("Registered action 'copy'")
     }
 
     /**
@@ -64,7 +64,7 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered 'move' action.")
+        log.info("Registered action 'copy'")
     }
 
     /**
@@ -79,7 +79,7 @@ class ActionsContext implements Context, HasActions {
                 CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line -> println line }
             }
         })
-        log.info("Registered 'cmd' action.")
+        log.info("Registered action 'copy'")
     }
 
     /**
@@ -95,7 +95,7 @@ class ActionsContext implements Context, HasActions {
                 CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line }
             }
         })
-        log.info("Registered 'cmd' action.")
+        log.info("Registered action 'cmd'")
     }
 
     /**
@@ -111,7 +111,7 @@ class ActionsContext implements Context, HasActions {
                 closure.call(extractionMap)
             }
         })
-        log.info("Registered 'custom' action.")
+        log.info("Registered action 'custom'")
     }
 
     void emptyDir(String dir) {
@@ -121,7 +121,7 @@ class ActionsContext implements Context, HasActions {
                 FileHelper.emptyDirectory(new File(dir))
             }
         })
-        log.info("Registered 'emptyDir' action.")
+        log.info("Registered action 'emptyDir'")
     }
 
     /**
@@ -138,7 +138,7 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered 'flattenDir' action.")
+        log.info("Registered action 'flattenDir'")
     }
 
     /**
