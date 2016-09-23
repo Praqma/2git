@@ -32,7 +32,7 @@ migrate {
                 cmd 'git add .', git.workspace
                 cmd 'git commit -m "$myBaselineName"', git.workspace
                 def artifact = new File(git.workspace, 'build/client.zip')
-                publish("com/blu/foober/${version}/client-${version}-SNAPSHOT.zip", artifact)
+                art.publish("com/blu/foober/${version}/client-${version}-SNAPSHOT.zip", artifact)
             }
         }
     }
