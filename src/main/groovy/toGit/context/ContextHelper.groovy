@@ -17,7 +17,8 @@ class ContextHelper {
      */
     static def executeInContext(Closure closure, Context context) {
         if (closure) {
-            //TODO This is a workaround for the CEA arrays not being cleared/no new instances of our contexts being made
+            //FIXME Workaround for the CEA arrays not being cleared
+            //FIXME This is due to contexts being global and no new instances being made
             if (context instanceof HasCriteria) context.criteria.clear()
             if (context instanceof HasExtractions) context.extractions.clear()
             if (context instanceof HasActions) context.actions.clear()

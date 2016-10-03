@@ -1,30 +1,32 @@
 package toGit.context
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.HasCriteria
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 
-@Log
 class CriteriaContext implements Context, HasCriteria {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     /**
      * Filters {@link Snapshot}s using a custom Groovy closure
      * @param closure Closure to run
      */
     void custom(Closure<Boolean> closure) {
+        log.debug("Registering criteria - custom")
         criteria.add(new Criteria() {
             @Override
             boolean appliesTo(Snapshot snapshot) {
-                println "Testing $snapshot.identifier using custom criteria."
+                log.debug("Testing $snapshot.identifier using custom criteria.")
                 closure.delegate = this
                 closure.resolveStrategy = Closure.DELEGATE_FIRST
                 def result = closure.call(snapshot)
-                println "Result: " + (result ? "SUCCESS" : "FAILURE")
+                log.info("Result: " + (result ? "SUCCESS" : "FAILURE"))
                 return result
             }
         })
-        log.info("Added 'custom' criteria.")
+        log.debug("Registered criteria - custom")
     }
 }

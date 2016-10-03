@@ -1,13 +1,14 @@
 package toGit.migration.targets.git.context
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.TargetContext
 import toGit.migration.targets.git.GitOptions
 import toGit.migration.targets.git.GitTarget
 
-@Log
 class GitTargetContext implements Context, TargetContext {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     /**
      * GitOptionsContext constructor
@@ -22,7 +23,7 @@ class GitTargetContext implements Context, TargetContext {
      */
     void ignore(String... args) {
         target.options.ignore.addAll(args)
-        log.info("Added $args to git ignore.")
+        log.debug("Added $args to git ignore.")
     }
 
     /**
@@ -31,7 +32,7 @@ class GitTargetContext implements Context, TargetContext {
      */
     void lfs(String... args) {
         target.options.lfs.addAll(args)
-        log.info("Added $args to git lfs.")
+        log.debug("Added $args to git lfs.")
     }
 
     /**
@@ -40,7 +41,7 @@ class GitTargetContext implements Context, TargetContext {
      */
     void user(String user) {
         target.options.user = user
-        log.info("Set user to $user.")
+        log.debug("Set user to $user.")
     }
 
     /**
@@ -49,7 +50,7 @@ class GitTargetContext implements Context, TargetContext {
      */
     void email(String email) {
         target.options.email = email
-        log.info("Set email to $email.")
+        log.debug("Set email to $email.")
     }
 
     /**
@@ -57,6 +58,6 @@ class GitTargetContext implements Context, TargetContext {
      */
     void workspace(String path) {
         target.workspace = path
-        log.info("Set workspace to $path.")
+        log.debug("Set workspace to $path.")
     }
 }

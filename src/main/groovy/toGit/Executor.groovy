@@ -1,18 +1,22 @@
 package toGit
 
 import org.codehaus.groovy.control.CompilerConfiguration
+import org.slf4j.LoggerFactory
 import toGit.migration.MigrationManager
 
 public class Executor {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     GroovyShell execute(String[] args) {
         File commandFile = null
         if (!args) {
-            println "ERROR: Missing command file parameter."
+            log.error("Missing command file parameter")
             System.exit(1)
         } else {
             commandFile = new File(args[0])
             if (!commandFile.exists() || commandFile.isDirectory()) {
-                println "ERROR: Cannot find command file '$commandFile'."
+                log.error("Cannot find command file '$commandFile'")
                 System.exit(1)
             }
         }

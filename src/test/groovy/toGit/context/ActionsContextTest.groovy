@@ -79,6 +79,6 @@ public class ActionsContextTest {
 
     @Test
     public void testFlattenDir() throws Exception {
-        testAction("flattenDir 3")
+        testAction("flattenDir '.', 3")
     }
 }

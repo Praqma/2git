@@ -1,6 +1,5 @@
 package toGit.migration.sources.ccucm
 
-import groovy.util.logging.Log
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
 import net.praqma.clearcase.ucm.entities.Project as CoolProject
@@ -8,6 +7,7 @@ import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 import org.apache.commons.io.filefilter.WildcardFileFilter
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
@@ -16,8 +16,10 @@ import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
 import toGit.utils.StringExtensions
 
-@Log
 class CcucmSource implements MigrationSource {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     UUID id = UUID.randomUUID()
     CoolSnapshotView migrationView
     CoolStream migrationStream
@@ -50,10 +52,16 @@ class CcucmSource implements MigrationSource {
     @Override
     void cleanup() {
         if (migrationView) {
+            log.info("Cleaning up migration view")
             migrationView.remove()
             new File(migrationView.path).deleteDir()
+            log.info("Cleaned up migration view")
         }
-        if (migrationStream) migrationStream.remove()
+        if (migrationStream) {
+            log.info("Cleaning up migration stream")
+            migrationStream.remove()
+            log.info("Cleaned up migration stream")
+        }
     }
 
     @Override
@@ -96,10 +104,12 @@ class CcucmSource implements MigrationSource {
      * Deletes files from the View matching the filters specified in the option's 'ignore'
      */
     void removeIgnoredFiles() {
+        log.info("Deleting ignored files")
         def view = new File(migrationView.path)
         def filter = new WildcardFileFilter(options.ignore)
         view.listFiles(filter as FilenameFilter).each {
             it.delete()
         }
+        log.info("Deleted ignored files")
     }
 }

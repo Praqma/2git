@@ -1,10 +1,14 @@
 package toGit.migration.sources.ccucm.criteria
 
+import org.slf4j.LoggerFactory
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.ccucm.Baseline
 
 class BaselineNames extends Criteria {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     List<String> baselines
 
     BaselineNames(String... baselines) {
@@ -20,9 +24,9 @@ class BaselineNames extends Criteria {
         def baseline = ((Baseline) snapshot).source
         // String.equals(GString) fails, hence the extra toString
         def baselineName = "${baseline.shortname}@${baseline.PVob.name}".toString()
-        println "Testing '$baselineName' against baseline list $baselines."
+        log.debug("Testing '$baselineName' against baseline list $baselines")
         def result = baselines.contains(baselineName)
-        println "Result: " + (result ? "MATCH" : "no match")
+        log.debug("Result: " + (result ? "MATCH" : "no match"))
         return result
     }
 }

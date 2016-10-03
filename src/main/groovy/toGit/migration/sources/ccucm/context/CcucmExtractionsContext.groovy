@@ -6,7 +6,7 @@ import toGit.context.base.Context
 import toGit.migration.sources.ccucm.extractions.BaselineProperty
 
 trait CcucmExtractionsContext implements Context {
-    final static Logger log = LoggerFactory.getLogger(CcucmExtractionsContext.class)
+    final static Logger log = LoggerFactory.getLogger(this.class)
 
     /**
      * Extracts a CoolBaseline property
@@ -14,6 +14,6 @@ trait CcucmExtractionsContext implements Context {
      */
     void baselineProperty(Map<String, String> map) {
         extractions.add(new BaselineProperty(map))
-        log.info("Added 'baselineProperty' criteria.")
+        log.debug("Added 'baselineProperty' criteria.")
     }
 }

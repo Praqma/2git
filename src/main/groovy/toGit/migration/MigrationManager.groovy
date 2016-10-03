@@ -1,6 +1,6 @@
 package toGit.migration
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.ActionsContext
 import toGit.context.CriteriaContext
 import toGit.context.ExtractionsContext
@@ -10,9 +10,11 @@ import toGit.migration.sources.MigrationSource
 import toGit.migration.targets.MigrationTarget
 import toGit.utils.ExceptionHelper
 
-@Log
 @Singleton
 class MigrationManager {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     MigrationSource source
     LinkedHashMap<String, MigrationTarget> targets = []
     MigrationPlan plan
@@ -31,21 +33,33 @@ class MigrationManager {
     }
 
     void migrate(boolean dryRun = false) {
-        try {
-            source.prepare()
-            targets.values().each { t -> t.prepare() }
+        if(dryRun) {
             plan.build()
-            if (!dryRun)
-                plan.execute()
+            return
+        }
+        try {
+            log.info("Preparing source")
+            source.prepare()
+            log.info("Prepared source")
+            log.info("Preparing targets")
+            targets.values().each { t -> t.prepare() }
+            log.info("Prepared targets")
+            plan.build()
+            log.info("Executing migration plan")
+            plan.execute()
+            log.info("Executed migration plan")
         } catch (Exception e) {
-            log.severe('An error occurred during the migration.')
+            log.error('An error occurred during the migration')
             ExceptionHelper.simpleLog(e)
-            log.severe('The migration has been stopped.')
+            log.error('The migration has been stopped')
             throw e
         } finally {
-            log.info('Cleaning up.')
+            log.info('Cleaning up source')
             source.cleanup()
+            log.info('Cleaned up source')
+            log.info('Cleaning up targets')
             targets.values().each { t -> t.cleanup() }
+            log.info('Cleaned up targets')
         }
     }
 }

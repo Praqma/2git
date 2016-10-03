@@ -1,10 +1,14 @@
 package toGit.migration.sources.ccucm.criteria
 
+import org.slf4j.LoggerFactory
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.ccucm.Baseline
 
 class AfterDate extends Criteria {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     Date date
 
     AfterDate(Date date) {
@@ -18,9 +22,9 @@ class AfterDate extends Criteria {
     @Override
     boolean appliesTo(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
-        println "Testing '" + baseline.shortname + " (" + baseline.date + ")' against date '" + date + "'."
+        log.debug("Testing '${baseline.shortname} (${baseline.date})' against date '${date}'")
         def result = baseline.date > date
-        println "Result: " + (result ? "MATCH" : "no match")
+        log.debug("Result: " + (result ? "MATCH" : "no match"))
         return result
     }
 }

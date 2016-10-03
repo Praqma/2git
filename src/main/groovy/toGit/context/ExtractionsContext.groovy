@@ -1,19 +1,21 @@
 package toGit.context
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.HasExtractions
 import toGit.migration.plan.Extraction
 import toGit.migration.plan.Snapshot
 
-@Log
 class ExtractionsContext implements Context, HasExtractions {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     /**
      * Runs a custom closure to map values
      * @param closure Closure to run
      */
     void custom(Closure<HashMap<String, Object>> closure) {
+        log.debug("Registering extraction - custom")
         extractions.add(new Extraction() {
             @Override
             HashMap<String, Object> extract(Snapshot snapshot) {
@@ -22,6 +24,6 @@ class ExtractionsContext implements Context, HasExtractions {
                 return closure.call(snapshot)
             }
         })
-        log.info("Added 'custom' extraction.")
+        log.debug("Registered extraction - custom")
     }
 }

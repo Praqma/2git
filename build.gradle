@@ -2,8 +2,8 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 
 repositories {
-    jcenter()
     mavenCentral()
+    jcenter()
     maven {
         url 'http://code.praqma.net/repo/maven/'
     }
@@ -11,11 +11,12 @@ repositories {
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.apache.ivy:ivy:2.4.0'
-    compile 'org.slf4j:slf4j-simple:1.7.13'
+    compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'net.praqma:cool:0.6.48'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-    compile 'org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'
+    compile('org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'){
+        exclude group: 'org.codehaus.groovy'
+    }
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 
@@ -28,11 +29,12 @@ task uberjar(type: Jar) {
     dependsOn('compileGroovy')
     from files(sourceSets.main.output.classesDir)
     from configurations.runtime.asFileTree.files.collect { zipTree(it) }
-
     manifest {
         attributes 'Main-Class': 'toGit.Run'
     }
 }
+
+mainClassName='toGit.Run'
 
 test {
     exclude 'toGit/functional/**'

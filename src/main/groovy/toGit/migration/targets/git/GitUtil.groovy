@@ -1,15 +1,16 @@
 package toGit.migration.targets.git
 
-import groovy.util.logging.Log
 import net.praqma.util.execute.AbnormalProcessTerminationException
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
 
 /**
  * A class that facilitates calling Git commands
  */
-@Log
 class GitUtil {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     /**
      * Calls Git with given arguments in the set path.
@@ -20,7 +21,8 @@ class GitUtil {
         try {
             callOrDie(path, args)
         } catch (AbnormalProcessTerminationException ex) {
-            log.warning("Command exited with status code $ex.exitValue")
+            //TODO Stop migration here?
+            log.warn("Command exited with status code $ex.exitValue")
             return ex.exitValue
         }
         return 0
@@ -33,8 +35,10 @@ class GitUtil {
      */
     static void callOrDie(File path, String... args) {
         String cmd = "git " + args.join(" ")
-        log.info("Executing '$cmd' in $path")
-        CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line -> println line }
+        log.debug("Executing '$cmd' in $path")
+        CommandLine.newInstance().run(cmd, path).stdoutBuffer.eachLine { line ->
+            log.info(line)
+        }
     }
 
     /**
@@ -44,11 +48,11 @@ class GitUtil {
     static void configureRepository(File path, GitOptions options) {
         if (options.user) {
             callOrDie(path, "config", "user.name", options.user)
-            log.fine("Set git user.name to $options.user.")
+            log.debug("Set git user.name to $options.user.")
         }
         if (options.email) {
             callOrDie(path, "config", "user.email", options.email)
-            log.fine("Set git user.email to $options.user.")
+            log.debug("Set git user.email to $options.user.")
         }
         writeGitIgnore(path, options)
         setGitLfs(path, options)

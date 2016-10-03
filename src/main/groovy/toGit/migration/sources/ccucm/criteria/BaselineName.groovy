@@ -1,10 +1,14 @@
 package toGit.migration.sources.ccucm.criteria
 
+import org.slf4j.LoggerFactory
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.ccucm.Baseline
 
 class BaselineName extends Criteria {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     String regex
 
     BaselineName(String regex) {
@@ -14,10 +18,10 @@ class BaselineName extends Criteria {
     @Override
     boolean appliesTo(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
-        println "Testing '" + baseline.shortname + "' against regex '" + regex + "'."
+        log.debug("Testing '${baseline.shortname}' against regex '${regex}'")
         def matcher = baseline.shortname =~ regex
         def result = matcher.matches()
-        println "Result: " + (result ? "MATCH" : "no match")
+        log.debug("Result: " + (result ? "MATCH" : "no match"))
         return result
     }
 }

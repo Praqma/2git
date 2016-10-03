@@ -1,7 +1,6 @@
 package toGit.migration.sources.ccucm
 
 
-import groovy.util.logging.Log
 import net.praqma.clearcase.PVob as CoolPVob
 import net.praqma.clearcase.Rebase as CoolRebase
 import net.praqma.clearcase.api.Describe
@@ -13,12 +12,14 @@ import net.praqma.clearcase.ucm.utils.BaselineList
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 import net.praqma.clearcase.ucm.view.SnapshotView.LoadRules2
 import net.praqma.clearcase.ucm.view.UpdateView
+import org.slf4j.LoggerFactory
 
 /**
  * A Cool wrapper that adds logging.
  */
-@Log
 class Cool {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     /**
      * Creates a child Stream for the given Stream at the given Baseline
@@ -27,9 +28,9 @@ class Cool {
      * @return The new child Cool Stream.
      */
     static CoolStream createStream(CoolStream coolStream, CoolBaseline coolBaseline, String tag, boolean readOnly) {
-        log.info("Creating child stream of $coolStream.fullyQualifiedName at baseline $coolBaseline.fullyQualifiedName.")
+        log.debug("Creating child stream of $coolStream.fullyQualifiedName at baseline $coolBaseline.fullyQualifiedName.")
         def migrationStream = CoolStream.create(coolStream, tag, readOnly, coolBaseline)
-        log.info("Created child stream of $coolStream.fullyQualifiedName at baseline $coolBaseline.fullyQualifiedName.")
+        log.debug("Created child stream of $coolStream.fullyQualifiedName at baseline $coolBaseline.fullyQualifiedName.")
         return migrationStream
     }
 
@@ -40,9 +41,9 @@ class Cool {
      * @return The new Cool View.
      */
     static CoolSnapshotView createView(CoolStream coolStream, File path, String tag) {
-        log.info("Creating view for $coolStream.fullyQualifiedName.")
+        log.debug("Creating view for $coolStream.fullyQualifiedName.")
         def coolView = CoolSnapshotView.create(coolStream, path, tag)
-        log.info("Created view for $coolStream.fullyQualifiedName.")
+        log.debug("Created view for $coolStream.fullyQualifiedName.")
         return coolView
     }
 
@@ -54,10 +55,10 @@ class Cool {
      * @return A BaselineList containing all matching Baselines.
      */
     static BaselineList getBaselines(CoolComponent coolComponent, CoolStream coolStream, BaselineFilter baselineFilter) {
-        log.info("Retrieving Cool baselines for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
+        log.debug("Retrieving Cool baselines for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
         def baselines = new BaselineList(coolStream, coolComponent, null).addFilter(baselineFilter).apply()
         def baselineCount = baselines.size()
-        log.info("Retrieved $baselineCount Cool baseline(s) for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
+        log.debug("Retrieved $baselineCount Cool baseline(s) for $coolComponent.fullyQualifiedName in $coolStream.fullyQualifiedName.")
         return baselines
     }
 
@@ -68,9 +69,9 @@ class Cool {
      * @return The Cool Component.
      */
     static CoolComponent getComponent(String componentName, CoolPVob coolPVob) {
-        log.info("Retrieving Cool component $componentName.")
+        log.debug("Retrieving Cool component $componentName.")
         def coolComponent = CoolComponent.get(componentName, coolPVob)
-        log.info("Retrieved Cool component $coolComponent.fullyQualifiedName.")
+        log.debug("Retrieved Cool component $coolComponent.fullyQualifiedName.")
         return coolComponent
     }
 
@@ -98,10 +99,10 @@ class Cool {
      * @return The Cool PVob.
      */
     static CoolPVob getPVob(String pvobName) {
-        log.info("Retrieving Cool vob $pvobName.")
+        log.debug("Retrieving Cool vob $pvobName.")
         CoolPVob coolPVob = new CoolPVob(pvobName)
         coolPVob.load()
-        log.info("Retrieved Cool vob $coolPVob.fullyQualifiedName.")
+        log.debug("Retrieved Cool vob $coolPVob.fullyQualifiedName.")
         return coolPVob
     }
 
@@ -112,9 +113,9 @@ class Cool {
      * @return The Cool Stream.
      */
     static CoolStream getStream(String streamName, CoolPVob vob) {
-        log.info("Retrieving Cool stream $streamName.")
+        log.debug("Retrieving Cool stream $streamName.")
         def coolStream = CoolStream.get(streamName, vob)
-        log.info("Retrieved Cool stream $coolStream.fullyQualifiedName")
+        log.debug("Retrieved Cool stream $coolStream.fullyQualifiedName")
         return coolStream
     }
 
@@ -124,9 +125,9 @@ class Cool {
      * @param coolView The Cool View to rebase onto.
      */
     static void rebase(CoolBaseline coolBaseline, CoolSnapshotView coolView) {
-        log.info("Rebasing $coolBaseline.fullyQualifiedName onto $coolView.fullyQualifiedName.")
+        log.debug("Rebasing $coolBaseline.fullyQualifiedName onto $coolView.fullyQualifiedName.")
         new CoolRebase(coolView).addBaseline(coolBaseline).rebase(true)
-        log.info("Rebased $coolBaseline.fullyQualifiedName onto $coolView.fullyQualifiedName.")
+        log.debug("Rebased $coolBaseline.fullyQualifiedName onto $coolView.fullyQualifiedName.")
     }
 
     /**
@@ -134,9 +135,9 @@ class Cool {
      * @param coolView The Cool View to update.
      */
     static void updateView(CoolSnapshotView coolView, CoolSnapshotView.Components loadComponents) {
-        log.info("Updating view $coolView.fullyQualifiedName.")
+        log.debug("Updating view $coolView.fullyQualifiedName.")
         def loadRules = new LoadRules2(loadComponents)
         new UpdateView(coolView).swipe().setLoadRules(loadRules).update()
-        log.info("Updated view $coolView.fullyQualifiedName.")
+        log.debug("Updated view $coolView.fullyQualifiedName.")
     }
 }

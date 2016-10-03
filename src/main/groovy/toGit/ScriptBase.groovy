@@ -1,6 +1,6 @@
 package toGit
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.MigrationContext
 import toGit.context.base.Context
 import toGit.context.base.DslContext
@@ -21,8 +21,9 @@ import static toGit.context.ContextHelper.executeInContext
  * Script base for the DSL.
  * The script the user provides is run from this context.
  */
-@Log
 abstract class ScriptBase extends Script implements Context {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     // Supported sources
     final Map<String, Class> sourceTypes = [
@@ -32,9 +33,9 @@ abstract class ScriptBase extends Script implements Context {
 
     // Supported targets
     final Map<String, Class> targetTypes = [
-            'dummy': DummyTargetContext,
-            'git'  : GitTargetContext,
-            'artifactory' : ArtifactoryTargetContext
+            'dummy'      : DummyTargetContext,
+            'git'        : GitTargetContext,
+            'artifactory': ArtifactoryTargetContext
     ]
 
     // Map for storing properties set at runtime
@@ -55,7 +56,7 @@ abstract class ScriptBase extends Script implements Context {
      * @return the runtimeProperties entry value
      */
     def propertyMissing(String name) {
-        if(!runtimeProperties.containsKey(name)) new MissingPropertyException(name, ScriptBase)
+        if (!runtimeProperties.containsKey(name)) new MissingPropertyException(name, ScriptBase)
         return runtimeProperties[name]
     }
 
@@ -124,7 +125,7 @@ abstract class ScriptBase extends Script implements Context {
      * @return The fancy 'Finished' banner to end migration with.
      */
     static String migrationComplete() {
-        def finished = $/
+        def finished = $/        Migration done
          ______ _____ _   _ _____  _____ _    _ ______ _____
         |  ____|_   _| \ | |_   _|/ ____| |  | |  ____|  __ `.
         | |__    | | |  \| | | | | (___ | |__| | |__  | |  | |

@@ -1,13 +1,16 @@
 package toGit.utils
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 
 /**
  * A class containing useful String manipulation methods.
  * TODO: Implement as actual extension methods
  */
-@Log
+
 class StringExtensions {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     /**
      * Takes a ClearCase element name and splits it up into identifier, tag and vobName.
      *
@@ -15,16 +18,13 @@ class StringExtensions {
      * @return a map containing the fqName's identifier, tag and vobName
      */
     static Map<String, String> parseClearCaseName(String name) {
-        log.fine("Entering parseClearCaseName().")
         def regex = ~/^([^:]*?):?([^:\\]+?)?@?(\\\w+)?$/
         def matcher = name =~ regex
         if (matcher.matches()) {
             def result = ['identifier': matcher.group(1), 'tag': matcher.group(2), 'vob': matcher.group(3)]
-            log.fine("Parse result: $result")
-            log.fine("Exiting parseClearCaseName().")
+            log.debug("Parse result: $result")
             return result
         }
-        log.fine("Exiting parseClearCaseName().")
         throw new IllegalArgumentException("Failed to parse name: " + name)
     }
 

@@ -1,20 +1,21 @@
 package toGit.context
 
 import groovy.text.SimpleTemplateEngine
-import groovy.util.logging.Log
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.HasActions
 import toGit.migration.MigrationManager
 import toGit.migration.plan.Action
 import toGit.utils.FileHelper
 
-@Log
 class ActionsContext implements Context, HasActions {
 
+    final static log = LoggerFactory.getLogger(this.class)
+
     /**
-     * Copies the contents of the source directory to the target directory.
+     * Copies the contents of the source directory to the default target directory.
      */
     void copy() {
         copy(MigrationManager.instance.source.workspace, MigrationManager.instance.targets.values()[0].workspace)
@@ -24,6 +25,7 @@ class ActionsContext implements Context, HasActions {
      * Copies the contents of the source directory to the target directory.
      */
     void copy(String source, String target) {
+        log.debug("Registering action - copy")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
@@ -37,7 +39,7 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered action 'copy'")
+        log.debug("Registered action - copy")
     }
 
     /**
@@ -51,6 +53,7 @@ class ActionsContext implements Context, HasActions {
      * Moves the contents of the source directory to the target directory.
      */
     void move(String source, String target) {
+        log.debug("Registering action - move")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
@@ -64,22 +67,26 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered action 'copy'")
+        log.debug("Registered action - copy")
     }
 
     /**
      * Registers a command line action to execute
      * @param command the command to execute
      */
+    // FIXME call cmd(string, string) below
     void cmd(String command) {
+        log.debug("Registering action - cmd")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
-                CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line -> println line }
+                CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line ->
+                    log.info(line)
+                }
             }
         })
-        log.info("Registered action 'copy'")
+        log.debug("Registered action - cmd")
     }
 
     /**
@@ -88,14 +95,17 @@ class ActionsContext implements Context, HasActions {
      * @param path the path to execute the command in
      */
     void cmd(String command, String path) {
+        log.debug("Registering action - cmd")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
-                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line -> println line }
+                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line ->
+                    log.info(line)
+                }
             }
         })
-        log.info("Registered action 'cmd'")
+        log.debug("Registered action - cmd")
     }
 
     /**
@@ -103,6 +113,7 @@ class ActionsContext implements Context, HasActions {
      * @param closure the closure to run
      */
     void custom(Closure closure) {
+        log.debug("Registering action - custom")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
@@ -111,17 +122,18 @@ class ActionsContext implements Context, HasActions {
                 closure.call(extractionMap)
             }
         })
-        log.info("Registered action 'custom'")
+        log.debug("Registered action - custom")
     }
 
     void emptyDir(String dir) {
+        log.debug("Registering action - emptyDir")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 FileHelper.emptyDirectory(new File(dir))
             }
         })
-        log.info("Registered action 'emptyDir'")
+        log.debug("Registered action - emptyDir")
     }
 
     /**
@@ -130,6 +142,7 @@ class ActionsContext implements Context, HasActions {
      * @param amount the amount of times to flatten the directory structure
      */
     void flattenDir(String dir, int amount) {
+        log.debug("Registering action - flattenDir")
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
@@ -138,7 +151,7 @@ class ActionsContext implements Context, HasActions {
                 }
             }
         })
-        log.info("Registered action 'flattenDir'")
+        log.debug("Registered action - flattenDir")
     }
 
     /**
@@ -148,7 +161,7 @@ class ActionsContext implements Context, HasActions {
      * @param args the arguments the method was called with
      */
     void methodMissing(String name, Object args) {
-        log.info("Method '$name' not found. Attempting to register as a 'cmd' action.")
+        log.warn("Could not find action '$name' with arguments '$args', attempting to register as a plain command")
         def arguments = args.join()
         cmd("$name $arguments")
     }

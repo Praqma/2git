@@ -1,10 +1,14 @@
 package toGit.migration.sources.ccucm.criteria
 
+import org.slf4j.LoggerFactory
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.ccucm.Baseline
 
 class PromotionLevels extends Criteria {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     String[] levels
 
     PromotionLevels(String... levels) {
@@ -14,9 +18,9 @@ class PromotionLevels extends Criteria {
     @Override
     boolean appliesTo(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
-        println "Testing '" + baseline.shortname + " (" + baseline.promotionLevel + ")' against promotionLevels '" + levels + "'."
+        log.debug("Testing '${baseline.shortname} (${baseline.promotionLevel})' against promotionLevels '$levels'")
         def result = levels.contains(baseline.promotionLevel.toString())
-        println "Result: " + (result ? "MATCH" : "no match")
+        log.debug("Result: " + (result ? "MATCH" : "no match"))
         return result
     }
 }

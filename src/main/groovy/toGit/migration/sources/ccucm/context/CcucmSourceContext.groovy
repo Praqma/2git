@@ -1,14 +1,15 @@
 package toGit.migration.sources.ccucm.context
 
-import groovy.util.logging.Log
 import net.praqma.clearcase.ucm.view.SnapshotView
+import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.SourceContext
 import toGit.migration.sources.ccucm.CcucmOptions
 import toGit.migration.sources.ccucm.CcucmSource
 
-@Log
 class CcucmSourceContext implements Context, SourceContext {
+
+    final static log = LoggerFactory.getLogger(this.class)
 
     public CcucmSourceContext() {
         source = new CcucmSource(options: new CcucmOptions())
@@ -20,7 +21,7 @@ class CcucmSourceContext implements Context, SourceContext {
      */
     void stream(String streamName) {
         source.options.stream = streamName
-        log.info("Set stream to $streamName.")
+        log.debug("Set stream to $streamName.")
     }
 
     /**
@@ -29,7 +30,7 @@ class CcucmSourceContext implements Context, SourceContext {
      */
     void component(String componentName) {
         source.options.component = componentName
-        log.info("Set component to $componentName.")
+        log.debug("Set component to $componentName.")
     }
 
     /**
@@ -39,12 +40,15 @@ class CcucmSourceContext implements Context, SourceContext {
     void loadComponents(String target) {
         if (target.equalsIgnoreCase('all')) {
             source.options.loadComponents = SnapshotView.Components.ALL
-            log.info("Set loadComponents to $target.")
+            log.debug("Set loadComponents to $target.")
         } else if (target.equalsIgnoreCase('modifiable')) {
             source.options.loadComponents = SnapshotView.Components.MODIFIABLE
-            log.info("Set loadComponents to $target.")
-        } else
-            log.warning("Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'.")
+            log.debug("Set loadComponents to $target.")
+        } else {
+            def message = "Invalid ClearCase component target '$target'. Expected 'all' or 'modifiable'."
+            log.error(message)
+            throw new Exception(message)
+        }
     }
 
     /**
@@ -54,7 +58,7 @@ class CcucmSourceContext implements Context, SourceContext {
      */
     void migrationProject(String projectName) {
         source.options.migrationProject = projectName
-        log.info("Set migrationProject to $projectName.")
+        log.debug("Set migrationProject to $projectName.")
     }
 
     /**
@@ -64,7 +68,7 @@ class CcucmSourceContext implements Context, SourceContext {
      */
     void readOnlyMigrationStream(boolean readOnly = true) {
         source.options.readOnlyMigrationStream = readOnly
-        log.info("Set readOnlyMigrationStream to $readOnly.")
+        log.debug("Set readOnlyMigrationStream to $readOnly.")
     }
 
     /**
@@ -72,6 +76,6 @@ class CcucmSourceContext implements Context, SourceContext {
      */
     void workspace(String path) {
         source.workspace = path
-        log.info("Set workspace to $path.")
+        log.debug("Set workspace to $path.")
     }
 }

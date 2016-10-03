@@ -1,12 +1,14 @@
 package toGit.migration.targets
 
-import groovy.util.logging.Log
+import org.slf4j.LoggerFactory
 import toGit.context.ActionsContext
 import toGit.migration.MigrationManager
 import toGit.migration.plan.Action
 
-@Log
 trait MigrationTarget {
+
+    final static log = LoggerFactory.getLogger(this.class)
+
     /**
      * The workspace where target contents will be copied to
      */
@@ -27,8 +29,8 @@ trait MigrationTarget {
      * @param name
      * @param action
      */
-    void addAction(String name, Action action){
-        ((ActionsContext)MigrationManager.instance.actionsContext).actions.add(action)
-        log.info("Registered action '$name'")
+    void addAction(String name, Action action) {
+        ((ActionsContext) MigrationManager.instance.actionsContext).actions.add(action)
+        log.debug("Registered action '$name'")
     }
 }
