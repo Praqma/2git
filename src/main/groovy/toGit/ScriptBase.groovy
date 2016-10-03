@@ -8,6 +8,8 @@ import toGit.context.traits.SourceContext
 import toGit.context.traits.TargetContext
 import toGit.migration.MigrationManager
 import toGit.migration.sources.MigrationSource
+import toGit.migration.sources.ccbase.ClearcaseSource
+import toGit.migration.sources.ccbase.context.ClearcaseSourceContext
 import toGit.migration.sources.ccucm.context.CcucmSourceContext
 import toGit.migration.sources.dummy.DummySourceContext
 import toGit.migration.targets.MigrationTarget
@@ -29,6 +31,7 @@ abstract class ScriptBase extends Script implements Context {
     final Map<String, Class> sourceTypes = [
             'dummy': DummySourceContext,
             'ccucm': CcucmSourceContext,
+            'clearcase': ClearcaseSourceContext,
     ]
 
     // Supported targets
