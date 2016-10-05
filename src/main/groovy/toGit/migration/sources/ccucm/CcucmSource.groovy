@@ -6,7 +6,6 @@ import net.praqma.clearcase.ucm.entities.Project as CoolProject
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
-import org.apache.commons.io.filefilter.WildcardFileFilter
 import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.migration.plan.Criteria
@@ -97,19 +96,5 @@ class CcucmSource implements MigrationSource {
 
         Cool.rebase(baseline, migrationView)
         Cool.updateView(migrationView, options.loadComponents)
-        removeIgnoredFiles()
-    }
-
-    /**
-     * Deletes files from the View matching the filters specified in the option's 'ignore'
-     */
-    void removeIgnoredFiles() {
-        log.info("Deleting ignored files")
-        def view = new File(migrationView.path)
-        def filter = new WildcardFileFilter(options.ignore)
-        view.listFiles(filter as FilenameFilter).each {
-            it.delete()
-        }
-        log.info("Deleted ignored files")
     }
 }

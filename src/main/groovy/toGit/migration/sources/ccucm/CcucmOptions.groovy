@@ -12,8 +12,6 @@ class CcucmOptions {
     String component
     String migrationProject
 
-    List<String> ignore = ["view.dat", "*.updt"]
-
     CoolSnapshotView.Components loadComponents = CoolSnapshotView.Components.MODIFIABLE
     boolean readOnlyMigrationStream
 
