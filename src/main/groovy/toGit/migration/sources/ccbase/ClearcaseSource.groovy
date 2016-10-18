@@ -16,10 +16,16 @@ class ClearcaseSource implements MigrationSource {
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
-        return [new ClearcaseSnapshot('a_label')];
-        //def txt = "cleartool lslabel ${configSpecPath[0]}".execute().text
-        //def labels = txt.split(";")
-        //return labels.collect{new ClearcaseSnapshot(it)}
+        // FIXME TODO this is bad.
+        def arr = ["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", "ARBITRARY_VOBNAME"]
+        def h = new ProcessBuilder(arr).redirectErrorStream(true).directory(new File(workspace))
+        def p = h.start()
+        def n = []
+        p.in.eachLine {
+            println it
+            n.add(it)
+        }
+        return n.collect{new ClearcaseSnapshot(it)}
     }
 
     @Override
