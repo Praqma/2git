@@ -32,9 +32,15 @@ class ClearcaseSource implements MigrationSource {
     void prepare() {
         log.info("Creating snapshot view...")
         //Fixme get tag from script
-        log.info("cleartool mkview -snapshot -tag whatever -stgloc -auto ${workspace}".execute().text)
+        log.info("cleartool mkview -snapshot -tag whatever0 -stgloc -auto ${workspace}".execute().err.text)
         log.info("Setting config spec...")
-        log.info("cleartool setcs ${configSpecAsFile().absolutePath}".execute([], new File(workspace)).text)
+        def arr = ["cleartool", "setcs", configSpecAsFile().absolutePath]
+        def b = new ProcessBuilder(arr).redirectErrorStream(true).directory(new File(workspace))
+        def p = b.start()
+        p.in.eachLine {
+            println it
+        }
+        println p.waitFor()
     }
 
     File configSpecAsFile() {
