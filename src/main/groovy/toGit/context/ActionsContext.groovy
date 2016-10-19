@@ -74,19 +74,8 @@ class ActionsContext implements Context, HasActions {
      * Registers a command line action to execute
      * @param command the command to execute
      */
-    // FIXME call cmd(string, string) below
     void cmd(String command) {
-        log.debug("Registering action - cmd")
-        actions.add(new Action() {
-            @Override
-            void act(HashMap<String, Object> extractionMap) {
-                def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
-                CommandLine.newInstance().run(expandedCommand).stdoutBuffer.eachLine { line ->
-                    log.info(line)
-                }
-            }
-        })
-        log.debug("Registered action - cmd")
+        cmd(command, null)
     }
 
     /**
@@ -100,7 +89,7 @@ class ActionsContext implements Context, HasActions {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
-                CommandLine.newInstance().run(expandedCommand, new File(path)).stdoutBuffer.eachLine { line ->
+                CommandLine.newInstance().run(expandedCommand, path ? new File(path) : null).stdoutBuffer.eachLine { line ->
                     log.info(line)
                 }
             }
