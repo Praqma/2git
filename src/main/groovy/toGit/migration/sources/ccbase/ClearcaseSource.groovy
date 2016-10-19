@@ -50,14 +50,15 @@ class ClearcaseSource implements MigrationSource {
      * @return The process output as a String
      */
     String runCommand(List<String> command) {
-        def builder = new ProcessBuilder(command).redirectErrorStream(true).directory(new File(workspace))
+        def arguments = command.collect {it.toString()}
+        def builder = new ProcessBuilder(arguments).redirectErrorStream(true).directory(new File(workspace))
         def process = builder.start()
         def output = ""
         process.in.eachLine {
             log.info(it)
             output += "\n$it";
         }
-        log.info(process.waitFor())
+        log.info(process.waitFor().toString())
         return output
     }
 
