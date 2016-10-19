@@ -1,7 +1,6 @@
 package toGit.migration.sources.ccbase.context
 
 import groovy.util.logging.Log
-import org.slf4j.LoggerFactory
 import toGit.context.base.Context
 import toGit.context.traits.SourceContext
 import toGit.migration.sources.ccbase.ClearcaseSource
@@ -14,7 +13,11 @@ class ClearcaseSourceContext implements Context, SourceContext {
     }
 
     void configSpec(String path) {
-        (source as ClearcaseSource).configSpecPath = path
+        (source as ClearcaseSource).configSpec = path
+    }
+
+    void labelVob(String vobName) {
+        (source as ClearcaseSource).labelVob= vobName
     }
 
     void workspace(String path) {

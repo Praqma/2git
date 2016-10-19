@@ -12,50 +12,66 @@ class ClearcaseSource implements MigrationSource {
 
     final static log = LoggerFactory.getLogger(this.class)
 
-    String configSpecPath = "C:\\path\\to\\spec.cs";
+    // Set in DSL
+    String configSpec;
+    String labelVob; // TODO Does this make sense to users? The vob used to get labels from the created view?
+
+    // Set internally
+    String viewTag;
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
-        // FIXME TODO this is bad.
-        def arr = ["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", "ARBITRARY_VOBNAME"]
-        def h = new ProcessBuilder(arr).redirectErrorStream(true).directory(new File(workspace))
-        def p = h.start()
-        def n = []
-        p.in.eachLine {
-            println it
-            n.add(it)
-        }
-        return n.collect{new ClearcaseSnapshot(it)}
+        log.info("Retrieving labels from vob ${labelVob}")
+        def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob])
+        def labels = output.split("\n")
+        return labels.collect{new ClearcaseSnapshot(it)}
     }
 
     @Override
     void checkout(Snapshot snapshot) {
         // Code to prepare a workspace for the given snapshot
-        log.info('Done!')
+        log.info('Done (?)')
     }
 
     @Override
     void prepare() {
-        log.info("Creating snapshot view...")
-        //Fixme get tag from script
-        log.info("cleartool mkview -snapshot -tag whatever0 -stgloc -auto ${workspace}".execute().err.text)
-        log.info("Setting config spec...")
-        def arr = ["cleartool", "setcs", configSpecAsFile().absolutePath]
-        def b = new ProcessBuilder(arr).redirectErrorStream(true).directory(new File(workspace))
-        def p = b.start()
-        p.in.eachLine {
-            println it
-        }
-        println p.waitFor()
+        viewTag = "2git-${UUID.randomUUID()}"
+
+        log.info("Creating snapshot view '${viewTag}'")
+        runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"])
+
+        log.info("Setting config spec to $configSpec")
+        runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath])
     }
 
+    /**
+     * Runs given String list as a command, logging and returning the output
+     * @param command String list representing the command to execute
+     * @return The process output as a String
+     */
+    String runCommand(List<String> command) {
+        def builder = new ProcessBuilder(command).redirectErrorStream(true).directory(new File(workspace))
+        def process = builder.start()
+        def output = ""
+        process.in.eachLine {
+            log.info(it)
+            output += "\n$it";
+        }
+        log.info(process.waitFor())
+        return output
+    }
+
+    /**
+     * Checks if the given config spec exists
+     * @return The given config spec as a Java.io.File
+     */
     File configSpecAsFile() {
-        def configSpec = new File(configSpecPath);
-        if(!configSpec.exists() || configSpec.isDirectory()) {
-            log.error("Could not find config spec at $configSpecPath")
+        def configSpecFile = new File(configSpec);
+        if(!configSpecFile.exists() || configSpecFile.isDirectory()) {
+            log.error("Could not find config spec at ${configSpecFile.absolutePath}")
             System.exit(1)
         }
-        return configSpec;
+        return configSpecFile;
     }
 
     @Override

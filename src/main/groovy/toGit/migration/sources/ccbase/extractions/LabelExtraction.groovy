@@ -4,14 +4,13 @@ import toGit.migration.plan.Snapshot
 
 class LabelExtraction extends Extraction {
 
-    String labelKey
+    String key
 
-    LabelExtraction(String labelKey) {
-        this.labelKey = labelKey;
+    LabelExtraction(String key) {
+        this.key = key;
     }
 
     @Override HashMap<String, Object> extract(Snapshot snapshot) {
-        def l = "cleartool getlabel".execute().text
-        return [labelKey: l]
+        return ["$key": snapshot.identifier]
     }
 }
