@@ -1,5 +1,17 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.palantir.gradle.gitversion:gradle-git-version:0.5.2"
+  }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'application'
+apply plugin: 'com.palantir.git-version'
 
 repositories {
     mavenCentral()
@@ -19,6 +31,8 @@ dependencies {
     }
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
+
+def versionString = gitVersion()
 
 task functionalTest(type: Test) {
     dependsOn('testClasses')
