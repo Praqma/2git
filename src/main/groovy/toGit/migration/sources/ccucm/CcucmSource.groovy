@@ -13,7 +13,6 @@ import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccucm.context.CcucmCriteriaContext
 import toGit.migration.sources.ccucm.context.CcucmExtractionsContext
-import toGit.utils.StringExtensions
 
 class CcucmSource implements MigrationSource {
 
@@ -32,9 +31,9 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void prepare() {
-        def vobName = StringExtensions.parseClearCaseName(options.stream).vob
-        def componentName = StringExtensions.parseClearCaseName(options.component).tag
-        def streamName = StringExtensions.parseClearCaseName(options.stream).tag
+        def vobName = CcucmStringHelper.parseName(options.stream).vob
+        def componentName = CcucmStringHelper.parseName(options.component).tag
+        def streamName = CcucmStringHelper.parseName(options.stream).tag
 
         vob = Cool.getPVob(vobName)
         component = Cool.getComponent(componentName, vob)

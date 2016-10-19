@@ -1,9 +1,9 @@
-package toGit.utils
+package toGit.migration.sources.ccucm
 
 import org.junit.Test
 import spock.lang.Specification
 
-class StringExtensionsTest extends Specification {
+class CcucmStringHelperTest extends Specification {
 
     @Test
     def 'fully qualified name parses'() {
@@ -11,7 +11,7 @@ class StringExtensionsTest extends Specification {
         def selector = 'component:Model@\\2Cool_PVOB'
 
         then: 'all values should be put under their respective key'
-        def parseResult = StringExtensions.parseClearCaseName(selector)
+        def parseResult = CcucmStringHelper.parseName(selector)
         parseResult.identifier == 'component'
         parseResult.tag == 'Model'
         parseResult.vob == '\\2Cool_PVOB'
@@ -23,7 +23,7 @@ class StringExtensionsTest extends Specification {
         def selector = 'Server_int'
 
         then: "the name should end up under the 'tag'"
-        def parseResult = StringExtensions.parseClearCaseName(selector)
+        def parseResult = CcucmStringHelper.parseName(selector)
         !parseResult.identifier
         parseResult.tag == 'Server_int'
         !parseResult.vob
@@ -35,7 +35,7 @@ class StringExtensionsTest extends Specification {
         def selector = 'myStream@\\2Cool'
 
         then: "It should be recognized as a FQName"
-        StringExtensions.isFullyQualifiedName(selector)
+        CcucmStringHelper.isSelector(selector)
     }
 
     @Test
@@ -44,7 +44,7 @@ class StringExtensionsTest extends Specification {
         def selector = 'stream:myStream@\\2Cool'
 
         then: "It should be recognized as a FQName"
-        StringExtensions.isFullyQualifiedName(selector)
+        CcucmStringHelper.isSelector(selector)
     }
 
     @Test
@@ -53,7 +53,7 @@ class StringExtensionsTest extends Specification {
         def selector = 'myComponent@\\2Cool'
 
         then: "It should be recognized as a FQName"
-        StringExtensions.isFullyQualifiedName(selector)
+        CcucmStringHelper.isSelector(selector)
     }
 
     @Test
@@ -62,6 +62,6 @@ class StringExtensionsTest extends Specification {
         def selector = 'component:myComponent@\\2Cool'
 
         then: "It should be recognized as a FQName"
-        StringExtensions.isFullyQualifiedName(selector)
+        CcucmStringHelper.isSelector(selector)
     }
 }

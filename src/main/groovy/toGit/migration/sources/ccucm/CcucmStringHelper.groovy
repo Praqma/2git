@@ -1,4 +1,4 @@
-package toGit.utils
+package toGit.migration.sources.ccucm
 
 import org.slf4j.LoggerFactory
 
@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
  * A class containing useful String manipulation methods.
  */
 
-class StringExtensions {
+class CcucmStringHelper {
 
     final static log = LoggerFactory.getLogger(this.class)
 
@@ -16,7 +16,7 @@ class StringExtensions {
      * @param name the ClearCase name (e.g. component:Model@\myVob, stream@\myVob, \myVob, stream)
      * @return a map containing the fqName's identifier, tag and vobName
      */
-    static Map<String, String> parseClearCaseName(String name) {
+    static Map<String, String> parseName(String name) {
         def regex = ~/^([^:]*?):?([^:\\]+?)?@?(\\\w+)?$/
         def matcher = name =~ regex
         if (matcher.matches()) {
@@ -32,7 +32,7 @@ class StringExtensions {
      * @param name the String to check
      * @return true if the String is a FQName, otherwise false
      */
-    static boolean isFullyQualifiedName(String name) {
+    static boolean isSelector(String name) {
         return name.matches(/^([\S]*(?=:))?:?([\S]*(?=@))@(\\[\S]*)$/)
     }
 }
