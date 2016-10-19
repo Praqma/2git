@@ -88,7 +88,6 @@ class CcucmSource implements MigrationSource {
     void checkout(Snapshot snapshot) {
         def baseline = ((Baseline) snapshot).source
 
-        //TODO Move this to setup? Too intense for setup?
         if (!migrationStream)
             migrationStream = Cool.createStream(parentStream, baseline, "$component.shortname-2git-$id", options.readOnlyMigrationStream)
         if (!migrationView)

@@ -21,7 +21,6 @@ class GitUtil {
         try {
             callOrDie(path, args)
         } catch (AbnormalProcessTerminationException ex) {
-            //TODO Stop migration here?
             log.warn("Command exited with status code $ex.exitValue")
             return ex.exitValue
         }

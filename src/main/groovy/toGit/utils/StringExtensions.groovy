@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * A class containing useful String manipulation methods.
- * TODO: Implement as actual extension methods
  */
 
 class StringExtensions {
