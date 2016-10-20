@@ -22,7 +22,7 @@ class ClearcaseSource implements MigrationSource {
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
         log.info("Retrieving labels from vob ${labelVob}")
-        def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob])
+        def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false)
         def labels = output.split("\n")
         return labels.collect{new ClearcaseSnapshot(it)}
     }
@@ -35,13 +35,18 @@ class ClearcaseSource implements MigrationSource {
 
     @Override
     void prepare() {
-        viewTag = "2git-${UUID.randomUUID()}"
+        //viewTag = "2git-${UUID.randomUUID()}"
+        viewTag = "2git-tmp"
 
         log.info("Creating snapshot view '${viewTag}'")
-        runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"])
+        runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"], false, true)
 
-        log.info("Setting config spec to $configSpec")
-        runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath])
+        //log.info("Setting config spec to $configSpec")
+        //runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath])
+    }
+
+    String runCommand(List<String> command) {
+        return runCommand(command, true, true)
     }
 
     /**
@@ -49,16 +54,17 @@ class ClearcaseSource implements MigrationSource {
      * @param command String list representing the command to execute
      * @return The process output as a String
      */
-    String runCommand(List<String> command) {
+    String runCommand(List<String> command, boolean runInWorkspace, boolean printOutput) {
         def arguments = command.collect {it.toString()}
-        def builder = new ProcessBuilder(arguments).redirectErrorStream(true).directory(new File(workspace))
+        def builder = new ProcessBuilder(arguments).redirectErrorStream(true)
+        builder = runInWorkspace ? builder.directory(new File(workspace)) : builder
         def process = builder.start()
         def output = ""
         process.in.eachLine {
-            log.info(it)
+            if(printOutput) log.info(it)
             output += "\n$it";
         }
-        log.info(process.waitFor().toString())
+        log.info("runCommand return: " + process.waitFor().toString())
         return output
     }
 
