@@ -1,5 +1,20 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.palantir.gradle.gitversion:gradle-git-version:0.5.2"
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.7"
+  }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'application'
+apply plugin: 'com.palantir.git-version'
+apply plugin: 'maven-publish'
+apply plugin: "com.jfrog.artifactory"
 
 repositories {
     mavenCentral()
@@ -20,6 +35,10 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 
+def versionString = gitVersion()
+// makes gradle wo any argument publish the build to artifactory.
+defaultTasks 'artifactoryPublish'
+
 task functionalTest(type: Test) {
     dependsOn('testClasses')
     include 'toGit/functional/**'
@@ -38,4 +57,42 @@ mainClassName='toGit.Run'
 
 test {
     exclude 'toGit/functional/**'
+}
+
+publishing {
+  publications {
+    binaryPublication(MavenPublication) {
+      artifact 'build/libs/2git.jar'
+      groupId = 'com.volvo.esw.obt.tool'
+      artifactId = '2git'
+      version = versionString
+    }
+  }
+}
+
+artifactoryPublish.dependsOn uberjar
+
+artifactory {
+  contextUrl = artifactoryContextUrl
+  publish {
+    repository {
+    //keys and user pars
+      repoKey = "${artifactoryRepoPublish}"
+      username = "${artifactoryUser}"
+      password = "${artifactoryPassword}"
+      maven = true
+    }
+    defaults {
+    //pubs and props
+      publications('binaryPublication')
+    }
+  }
+  resolve {
+    repository {
+      repoKey = artifactoryRepoKey
+      username = artifactoryUser
+      password = artifactoryPassword
+      maven = 'true'
+    }
+  }
 }
