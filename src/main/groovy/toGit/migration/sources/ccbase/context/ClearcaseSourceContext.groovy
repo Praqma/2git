@@ -23,4 +23,8 @@ class ClearcaseSourceContext implements Context, SourceContext {
     void workspace(String path) {
         source.workspace = path
     }
+
+    void vobPaths(String[] vobPaths) {
+        (source as ClearcaseSource).vobPaths = vobPaths
+    }
 }

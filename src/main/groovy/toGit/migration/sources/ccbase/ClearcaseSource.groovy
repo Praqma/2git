@@ -15,6 +15,7 @@ class ClearcaseSource implements MigrationSource {
     // Set in DSL
     String configSpec;
     String labelVob; // TODO Does this make sense to users? The vob used to get labels from the created view?
+    String[] vobPaths;
 
     // Set internally
     String viewTag;
@@ -23,6 +24,7 @@ class ClearcaseSource implements MigrationSource {
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
         log.info("Retrieving labels from vob ${labelVob}")
         def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false)
+        //        def output = runCommand(["echo", "apa"])
         def labels = output.split("\n")
         return labels.collect{new ClearcaseSnapshot(it)}
     }
@@ -41,8 +43,45 @@ class ClearcaseSource implements MigrationSource {
         log.info("Creating snapshot view '${viewTag}'")
         runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"], false, true)
 
-        //log.info("Setting config spec to $configSpec")
-        //runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath])
+        log.info("Creating new basic config spec")
+        writeNewConfigSpec("")
+
+        log.info("Setting config spec to $configSpec")
+        setConfigSpec();
+    }
+
+    void writeNewConfigSpec() {
+        writeNewConfigSpec("")
+    }
+
+    void writeNewConfigSpec(String label) {
+        def csData = null
+        if (label == null || label.isEmpty()) {
+            csData =
+                [ "element * CHECKEDOUT",
+                  "element * /main/LATEST",
+                  "" ]
+        }
+        else {
+            csData =
+                [ "element * CHECKEDOUT",
+                  "element * $label",
+                  "element * /main/LATEST",
+                  "" ]
+        }
+        vobPaths.each {
+            csData.add("load $it")
+        }
+
+        configSpecAsFile().withWriter { out ->
+            csData.each {
+                out.println it
+            }
+        }
+    }
+
+    void setConfigSpec() {
+        runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath], true, true)
     }
 
     String runCommand(List<String> command) {
