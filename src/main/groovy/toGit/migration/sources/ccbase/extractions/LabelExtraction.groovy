@@ -11,6 +11,8 @@ class LabelExtraction extends Extraction {
     }
 
     @Override HashMap<String, Object> extract(Snapshot snapshot) {
-        return ["$key": snapshot.identifier]
+        def map = [:]
+        map.put(key, snapshot.identifier)
+        return map
     }
 }

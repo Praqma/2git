@@ -14,17 +14,14 @@ class ClearcaseSource implements MigrationSource {
 
     // Set in DSL
     String configSpec;
-    String labelVob; // TODO Does this make sense to users? The vob used to get labels from the created view?
-    String[] vobPaths;
-
-    // Set internally
+    String labelVob;
     String viewTag;
+    List<String> vobPaths;
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
         log.info("Retrieving labels from vob ${labelVob}")
         def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false)
-        //        def output = runCommand(["echo", "apa"])
         def labels = output.split("\n")
         return labels.collect{new ClearcaseSnapshot(it)}
     }
@@ -32,26 +29,21 @@ class ClearcaseSource implements MigrationSource {
     @Override
     void checkout(Snapshot snapshot) {
         // Code to prepare a workspace for the given snapshot
-        log.info('Done (?)')
+        writeNewConfigSpec(snapshot.identifier)
+        setConfigSpec()
+        log.info('Done preparing snapshot ' + snapshot.identifier)
     }
 
     @Override
     void prepare() {
-        //viewTag = "2git-${UUID.randomUUID()}"
-        viewTag = "2git-tmp"
-
         log.info("Creating snapshot view '${viewTag}'")
         runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"], false, true)
 
         log.info("Creating new basic config spec")
-        writeNewConfigSpec("")
+        writeNewConfigSpec(null)
 
         log.info("Setting config spec to $configSpec")
-        setConfigSpec();
-    }
-
-    void writeNewConfigSpec() {
-        writeNewConfigSpec("")
+        setConfigSpec()
     }
 
     void writeNewConfigSpec(String label) {
@@ -70,7 +62,7 @@ class ClearcaseSource implements MigrationSource {
                   "" ]
         }
         vobPaths.each {
-            csData.add("load $it")
+            csData.add("load /$it")
         }
 
         configSpecAsFile().withWriter { out ->
@@ -81,7 +73,7 @@ class ClearcaseSource implements MigrationSource {
     }
 
     void setConfigSpec() {
-        runCommand(["cleartool", "setcs", configSpecAsFile().absolutePath], true, true)
+        runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
     }
 
     String runCommand(List<String> command) {
@@ -122,6 +114,7 @@ class ClearcaseSource implements MigrationSource {
 
     @Override
     void cleanup() {
+        //runCommand(['cleartool', 'rmview', workspace], false, true)
     }
 
     @Override

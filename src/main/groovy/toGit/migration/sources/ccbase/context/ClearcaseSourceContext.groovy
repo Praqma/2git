@@ -17,14 +17,18 @@ class ClearcaseSourceContext implements Context, SourceContext {
     }
 
     void labelVob(String vobName) {
-        (source as ClearcaseSource).labelVob= vobName
+        (source as ClearcaseSource).labelVob = vobName
     }
 
     void workspace(String path) {
         source.workspace = path
     }
 
-    void vobPaths(String[] vobPaths) {
+    void viewTag(String name) {
+        (source as ClearcaseSource).viewTag = name
+    }
+
+    void vobPaths(List<String> vobPaths) {
         (source as ClearcaseSource).vobPaths = vobPaths
     }
 }
