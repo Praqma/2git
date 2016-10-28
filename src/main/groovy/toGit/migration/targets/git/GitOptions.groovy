@@ -7,4 +7,5 @@ class GitOptions {
     String email = '2git@praqma.com'
 
     boolean defaultSetup = true
+    boolean longPaths = false
 }

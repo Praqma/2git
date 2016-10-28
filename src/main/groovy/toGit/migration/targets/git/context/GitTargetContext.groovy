@@ -60,4 +60,12 @@ class GitTargetContext implements Context, TargetContext {
         target.workspace = path
         log.debug("Set workspace to $path.")
     }
+
+    /**
+     * Allow long (>255 characters ) path names
+     * to be handled by Git
+     */
+    void longPaths() {
+        target.longPaths = true
+    }
 }

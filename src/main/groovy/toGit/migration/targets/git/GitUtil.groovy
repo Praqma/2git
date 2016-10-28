@@ -54,6 +54,9 @@ class GitUtil {
             callOrDie(path, "config", "user.email", options.email)
             log.debug("Set git user.email to $options.user.")
         }
+        if (options.longPaths) {
+            callOrDie(path, "config", "core.longpaths", "true")
+        }
         writeGitIgnore(path, options)
         setGitLfs(path, options)
     }
