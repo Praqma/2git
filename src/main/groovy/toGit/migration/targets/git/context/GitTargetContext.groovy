@@ -68,4 +68,11 @@ class GitTargetContext implements Context, TargetContext {
     void longPaths() {
         target.longPaths = true
     }
+
+    /**
+     * Sets the URL of the origin remote
+     */
+    void remote(String remoteUrl) {
+        target.remote = remoteUrl
+    }
 }
