@@ -114,7 +114,7 @@ class ClearcaseSource implements MigrationSource {
 
     @Override
     void cleanup() {
-        //runCommand(['cleartool', 'rmview', workspace], false, true)
+        runCommand(['cleartool', 'rmview', workspace], false, true)
     }
 
     @Override

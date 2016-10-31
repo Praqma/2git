@@ -73,6 +73,6 @@ class GitTargetContext implements Context, TargetContext {
      * Sets the URL of the origin remote
      */
     void remote(String remoteUrl) {
-        target.remote = remoteUrl
+        target.options.remote = remoteUrl
     }
 }
