@@ -17,7 +17,7 @@ class GitTarget implements MigrationTarget {
 
     @Override
     void cleanup() {
-        addAction('remove', new Remove(workspace))
+
     }
 
     /**
