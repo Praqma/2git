@@ -58,7 +58,7 @@ class GitUtil {
             callOrDie(path, "config", "core.longpaths", "true")
         }
         if (!(("").equals(options.remote))) {
-            callOrDie(path, "remote", "add", "origin", options.remote)
+            call(path, "remote", "add", "origin", options.remote)
         }
         writeGitIgnore(path, options)
         setGitLfs(path, options)

@@ -66,7 +66,8 @@ class GitTargetContext implements Context, TargetContext {
      * to be handled by Git
      */
     void longPaths() {
-        target.longPaths = true
+        target.options.longPaths = true
+        log.debug("Set longpaths for repo.")
     }
 
     /**
@@ -74,5 +75,6 @@ class GitTargetContext implements Context, TargetContext {
      */
     void remote(String remoteUrl) {
         target.options.remote = remoteUrl
+        log.debug("Set remote url to $remoteUrl.")
     }
 }

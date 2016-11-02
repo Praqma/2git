@@ -22,3 +22,5 @@ customers/*
 
 # 2git log files
 2git-[-_0-9]*.log
+logs
+cc2git
