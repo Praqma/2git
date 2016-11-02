@@ -3,7 +3,6 @@ package toGit.migration.targets.git
 import toGit.migration.MigrationManager
 import toGit.migration.targets.MigrationTarget
 import toGit.migration.targets.git.actions.Clear
-import toGit.migration.targets.git.actions.Remove
 import toGit.migration.targets.git.actions.Setup
 
 class GitTarget implements MigrationTarget {
