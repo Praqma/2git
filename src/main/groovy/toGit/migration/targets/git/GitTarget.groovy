@@ -3,6 +3,7 @@ package toGit.migration.targets.git
 import toGit.migration.MigrationManager
 import toGit.migration.targets.MigrationTarget
 import toGit.migration.targets.git.actions.Clear
+import toGit.migration.targets.git.actions.FillEmptyDirs
 import toGit.migration.targets.git.actions.Setup
 
 class GitTarget implements MigrationTarget {
@@ -32,5 +33,13 @@ class GitTarget implements MigrationTarget {
      */
     void setup(File path, GitOptions options) {
         addAction('setup', new Setup(path, options))
+    }
+
+    /**
+     * Puts a dummy file in all the empty directories in the workspace.
+     * This allows you to add 'empty' directories to the git repository.
+     */
+    void fillEmptyDirs() {
+        addAction('fillEmptyDirs', new FillEmptyDirs(workspace))
     }
 }

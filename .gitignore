@@ -16,5 +16,8 @@ out/
 _site
 .sass-cache
 
+# Logs
+2git*.log
+
 # Specific command files
 customers/*
