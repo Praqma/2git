@@ -13,7 +13,6 @@ class AfterLabel extends Criteria{
 
     @Override
     boolean appliesTo(Snapshot snapshot) {
-        // Assumes alphabetical sorting == date sorting
         return label.compareTo(snapshot.identifier) < 0
     }
 }

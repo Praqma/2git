@@ -5,10 +5,10 @@ import toGit.context.base.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
-import toGit.migration.sources.ccbase.context.ClearcaseCriteriaContext
-import toGit.migration.sources.ccbase.context.ClearcaseExtractionsContext
+import toGit.migration.sources.ccbase.context.ClearCaseCriteriaContext
+import toGit.migration.sources.ccbase.context.ClearCaseExtractionsContext
 
-class ClearcaseSource implements MigrationSource {
+class ClearCaseSource implements MigrationSource {
 
     final static log = LoggerFactory.getLogger(this.class)
 
@@ -23,12 +23,11 @@ class ClearcaseSource implements MigrationSource {
         log.info("Retrieving labels from vob ${labelVob}")
         def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false)
         def labels = output.split("\n")
-        return labels.collect{new ClearcaseSnapshot(it)}
+        return labels.collect{new ClearCaseSnapshot(it)}
     }
 
     @Override
     void checkout(Snapshot snapshot) {
-        // Code to prepare a workspace for the given snapshot
         writeNewConfigSpec(snapshot.identifier)
         setConfigSpec()
         log.info('Done preparing snapshot ' + snapshot.identifier)
@@ -95,7 +94,7 @@ class ClearcaseSource implements MigrationSource {
             if(printOutput) log.info(it)
             output += "\n$it";
         }
-        log.info("runCommand return: " + process.waitFor().toString())
+        log.info("runCommand return: ${process.waitFor()}")
         return output
     }
 
@@ -119,11 +118,11 @@ class ClearcaseSource implements MigrationSource {
 
     @Override
     Context withCriteria(Context criteriaContext) {
-        return criteriaContext as ClearcaseCriteriaContext
+        return criteriaContext as ClearCaseCriteriaContext
     }
 
     @Override
     Context withExtractions(Context extractionsContext) {
-        return extractionsContext as ClearcaseExtractionsContext
+        return extractionsContext as ClearCaseExtractionsContext
     }
 }

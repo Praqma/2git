@@ -2,9 +2,9 @@ package toGit.migration.sources.ccbase
 
 import toGit.migration.plan.Snapshot
 
-class ClearcaseSnapshot extends Snapshot {
+class ClearCaseSnapshot extends Snapshot {
 
-    ClearcaseSnapshot(String identifier) {
+    ClearCaseSnapshot(String identifier) {
         super(identifier)
     }
 }
