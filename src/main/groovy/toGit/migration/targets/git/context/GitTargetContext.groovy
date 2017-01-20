@@ -62,11 +62,10 @@ class GitTargetContext implements Context, TargetContext {
     }
 
     /**
-     * Allow long (>255 characters ) path names
-     * to be handled by Git
+     * Allow long (>255 characters ) path names to be handled by Git
      */
-    void longPaths() {
-        target.options.longPaths = true
+    void longPaths(boolean longPaths = true) {
+        target.options.longPaths = longPaths
         log.debug("Set longpaths for repo.")
     }
 
