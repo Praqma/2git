@@ -64,3 +64,13 @@ target('git') {
     lfs '*.pdf', '*.iso'
 }
 ```
+
+##### longPaths
+
+Sets `core.longpaths` before the migration.
+
+```
+target('git') {
+    longPaths true
+}
+```

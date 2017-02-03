@@ -75,10 +75,6 @@ class ClearCaseSource implements MigrationSource {
         runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
     }
 
-    String runCommand(List<String> command) {
-        return runCommand(command, true, true)
-    }
-
     /**
      * Runs given String list as a command, logging and returning the output
      * @param command String list representing the command to execute

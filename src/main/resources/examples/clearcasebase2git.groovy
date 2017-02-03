@@ -42,7 +42,7 @@ migrate {
     filters {
         filter {
             criteria {
-                regexMatchLabel("(\\d{6})-(.+)")
+                labelName("(\\d{6})-(.+)")
                 afterLabel("010116-v2.1.3")
             }
             extractions {
