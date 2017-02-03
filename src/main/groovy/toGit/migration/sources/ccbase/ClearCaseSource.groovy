@@ -27,7 +27,7 @@ class ClearCaseSource implements MigrationSource {
     @Override
     void checkout(Snapshot snapshot) {
         updateConfigSpec(snapshot.identifier)
-        setConfigSpec()
+        updateViewConfigSpec()
         log.info('Done preparing snapshot ' + snapshot.identifier)
     }
 
@@ -72,7 +72,7 @@ class ClearCaseSource implements MigrationSource {
     /**
      * Sets the view's config spec to
      */
-    private void setConfigSpec() {
+    private void updateViewConfigSpec() {
         runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
     }
 
