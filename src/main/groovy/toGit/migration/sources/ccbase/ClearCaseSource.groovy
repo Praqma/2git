@@ -12,23 +12,21 @@ class ClearCaseSource implements MigrationSource {
 
     final static log = LoggerFactory.getLogger(this.class)
 
-    // Set in DSL
     String configSpec;
     String labelVob;
     String viewTag;
-    List<String> vobPaths;
+    List<String> vobPaths = [];
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
         log.info("Retrieving labels from vob ${labelVob}")
-        def output = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false)
-        def labels = output.split("\n")
-        return labels.collect{new ClearCaseSnapshot(it)}
+        def labels = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false).split("\n")
+        return labels.collect { new ClearCaseSnapshot(it) }
     }
 
     @Override
     void checkout(Snapshot snapshot) {
-        writeNewConfigSpec(snapshot.identifier)
+        updateConfigSpec(snapshot.identifier)
         setConfigSpec()
         log.info('Done preparing snapshot ' + snapshot.identifier)
     }
@@ -37,74 +35,6 @@ class ClearCaseSource implements MigrationSource {
     void prepare() {
         log.info("Creating snapshot view '${viewTag}'")
         runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"], false, true)
-
-        log.info("Creating new basic config spec")
-        writeNewConfigSpec(null)
-
-        log.info("Setting config spec to $configSpec")
-        setConfigSpec()
-    }
-
-    void writeNewConfigSpec(String label) {
-        def csData = null
-        if (label == null || label.isEmpty()) {
-            csData =
-                [ "element * CHECKEDOUT",
-                  "element * /main/LATEST",
-                  "" ]
-        }
-        else {
-            csData =
-                [ "element * CHECKEDOUT",
-                  "element * $label",
-                  "element * /main/LATEST",
-                  "" ]
-        }
-        vobPaths.each {
-            csData.add("load /$it")
-        }
-
-        configSpecAsFile().withWriter { out ->
-            csData.each {
-                out.println it
-            }
-        }
-    }
-
-    void setConfigSpec() {
-        runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
-    }
-
-    /**
-     * Runs given String list as a command, logging and returning the output
-     * @param command String list representing the command to execute
-     * @return The process output as a String
-     */
-    String runCommand(List<String> command, boolean runInWorkspace, boolean printOutput) {
-        def arguments = command.collect {it.toString()}
-        def builder = new ProcessBuilder(arguments).redirectErrorStream(true)
-        builder = runInWorkspace ? builder.directory(new File(workspace)) : builder
-        def process = builder.start()
-        def output = ""
-        process.in.eachLine {
-            if(printOutput) log.info(it)
-            output += "\n$it";
-        }
-        log.info("runCommand return: ${process.waitFor()}")
-        return output
-    }
-
-    /**
-     * Checks if the given config spec exists
-     * @return The given config spec as a Java.io.File
-     */
-    File configSpecAsFile() {
-        def configSpecFile = new File(configSpec);
-        if(!configSpecFile.exists() || configSpecFile.isDirectory()) {
-            log.error("Could not find config spec at ${configSpecFile.absolutePath}")
-            System.exit(1)
-        }
-        return configSpecFile;
     }
 
     @Override
@@ -120,5 +50,56 @@ class ClearCaseSource implements MigrationSource {
     @Override
     Context withExtractions(Context extractionsContext) {
         return extractionsContext as ClearCaseExtractionsContext
+    }
+
+    /**
+     * Updates the config spec to load the given label
+     * @param label The label to update the spec with
+     */
+    private void updateConfigSpec(String label) {
+        def spec = configSpecAsFile()
+        if (label == null || label.isEmpty())
+            spec.text = "element * CHECKEDOUT\nelement * /main/LATEST\n"
+        else
+            spec.text = "element * $label\n"
+
+        vobPaths.each {
+            spec.text += ("load /$it\n")
+        }
+        println(spec.text)
+    }
+
+    /**
+     * Sets the view's config spec to
+     */
+    private void setConfigSpec() {
+        runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
+    }
+
+    /**
+     * Runs given String list as a command, logging and returning the output
+     * @param command String list representing the command to execute
+     * @return The process output as a String
+     */
+    private String runCommand(List<String> command, boolean runInWorkspace, boolean printOutput) {
+        def builder = new ProcessBuilder(command).redirectErrorStream(true)
+        builder = runInWorkspace ? builder.directory(new File(workspace)) : builder
+        def process = builder.start()
+        if (printOutput) { process.in.eachLine { log.info(it) } }
+        log.info("runCommand return: ${process.waitFor()}")
+        return process.text
+    }
+
+    /**
+     * Checks if the given config spec exists
+     * @return The given config spec as a Java.io.File
+     */
+    private File configSpecAsFile() {
+        def configSpecFile = new File(configSpec);
+        if (!configSpecFile.exists() || configSpecFile.isDirectory()) {
+            log.error("Could not find config spec at ${configSpecFile.absolutePath}")
+            System.exit(1)
+        }
+        return configSpecFile;
     }
 }
