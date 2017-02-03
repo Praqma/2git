@@ -50,8 +50,10 @@ migrate {
             }
             actions {
                 // Scrub Git repository, so file deletions will also be committed
-                new File(target.workspace).eachFile { file ->
-                    if(!file.name.startsWith(".git")) file.delete()
+                custom {
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) file.delete()
+                    }
                 }
 
                 // Copy ClearCase view into Git repository

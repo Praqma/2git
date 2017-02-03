@@ -1,7 +1,5 @@
 package examples
 
-def tempDir = "d:/2git"
-
 source('ccucm') {
     component "_Client@\\2Cool_PVOB"
     stream "Client_int\\2Cool_PVOB"
@@ -23,8 +21,10 @@ migrate {
             }
             actions {
                 // Scrub Git repository, so file deletions will also be committed
-                new File(target.workspace).eachFile { file ->
-                    if(!file.name.startsWith(".git")) file.delete()
+                custom {
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) file.delete()
+                    }
                 }
 
                 // Copy ClearCase view into Git repository
