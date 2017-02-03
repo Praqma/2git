@@ -60,4 +60,20 @@ class GitTargetContext implements Context, TargetContext {
         target.workspace = path
         log.debug("Set workspace to $path.")
     }
+
+    /**
+     * Allow long (>255 characters) path names to be handled by Git
+     */
+    void longPaths(boolean longPaths = true) {
+        target.options.longPaths = longPaths
+        log.debug("Set longPaths for repo.")
+    }
+
+    /**
+     * Sets the URL of the origin remote
+     */
+    void remote(String remoteUrl) {
+        target.options.remote = remoteUrl
+        log.debug("Set remote url to $remoteUrl.")
+    }
 }

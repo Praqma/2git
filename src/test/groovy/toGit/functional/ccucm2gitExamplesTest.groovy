@@ -18,5 +18,4 @@ class ccucm2gitExamplesTest {
         assert manager.source instanceof CcucmSource
         assert manager.targets.values()['git'] instanceof GitTarget
     }
-
 }

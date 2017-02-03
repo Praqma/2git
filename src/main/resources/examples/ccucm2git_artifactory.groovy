@@ -1,7 +1,5 @@
 package examples
 
-def tempDir = "d:/2git"
-
 source('ccucm') {
     component "_Client@\\2Cool_PVOB"
     stream "Client_int\\2Cool_PVOB"
@@ -29,10 +27,23 @@ migrate {
                 baselineProperty([myBaselineName: 'shortname'])
             }
             actions {
+                // Scrub Git repository, so file deletions will also be committed
+                custom {
+                    new File(git.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) file.delete()
+                    }
+                }
+
+                // Copy ClearCase view into Git repository
+                copy(source.workspace, target.workspace)
+
+                // Commit everything
                 cmd 'git add .', git.workspace
                 cmd 'git commit -m "$myBaselineName"', git.workspace
-                def artifact = new File(git.workspace, 'build/client.zip')
-                art.publish("com/blu/foober/${version}/client-${version}-SNAPSHOT.zip", artifact)
+
+
+                def artifact = new File(git.workspace, 'artifacts/xyz.zip')
+                art.publish("com/blu/xyz/${myBaselineName}/xyz-${myBaselineName}.zip", artifact)
             }
         }
     }

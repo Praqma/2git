@@ -1,4 +1,4 @@
-package toGit.context
+package toGit.context.dummy
 
 import org.junit.Test
 import toGit.Executor

@@ -3,7 +3,6 @@ package examples
 @Grab(group = 'org.codehaus.groovy.modules.http-builder', module = 'http-builder', version = '0.7.1')
 import groovyx.net.http.*
 
-def tempDir = "c:/tmp"
 def repo = new BitbucketRepo("http://localhost:7990", "PROJ/funky-repo", "admin:password")
 
 source('ccucm') {
@@ -26,11 +25,17 @@ migrate {
                 baselineProperty([myBaselineName: 'shortname'])
             }
             actions {
-                copy(source.workspace, tempDir)
-                flattenDir(tempDir, 3)
-                copy(tempDir, target.workspace)
-                emptyDir(tempDir)
+                // Scrub Git repository, so file deletions will also be committed
+                custom {
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) file.delete()
+                    }
+                }
 
+                // Copy ClearCase view into Git repository
+                copy(source.workspace, target.workspace)
+
+                // Commit everything
                 cmd 'git add .', target.workspace
                 cmd 'git commit -m "$myBaselineName"', target.workspace
             }
