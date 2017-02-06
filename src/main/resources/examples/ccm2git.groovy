@@ -4,11 +4,9 @@ package examples
 
 def my_workspace = "ccm2git-main"
 def my_workspace_file = new File(my_workspace)
-if(!my_workspace_file.exists()) my_workspace.mkdirs()
+if(!my_workspace_file.exists()) my_workspace_file.mkdirs()
 
 def git_server = "http://dtdkcphlx0231.md-man.biz:7991/"
-def rootproject = 'ems'
-def subproject = [] // will be generated
 
 def this_project = "ems_bus~1_20131002"
 
