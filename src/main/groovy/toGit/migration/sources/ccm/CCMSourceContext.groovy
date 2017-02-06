@@ -8,7 +8,19 @@ class CCMSourceContext implements Context, SourceContext {
         source = new CCMSource()
     }
 
+    /**
+     * Sets the source workspace
+     */
+    void workspace(String path) {
+        source.workspace = path
+        //log.debug("Set workspace to $path.")
+    }
+
     void revision (String revision){
         source.revision = revision
+    }
+
+    void ccm_addr (String ccm_addr){
+        source.ccm_addr = ccm_addr
     }
 }
