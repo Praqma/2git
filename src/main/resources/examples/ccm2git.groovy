@@ -46,16 +46,15 @@ migrate {
                 custom { project ->
                     println project.baseline
                     println project.version
-
-
-                    // Copy ClearCase view into Git repository
-                    copy(source.workspace + "/code/" + this_project + "/ems_bus", target.workspace)
-
-                    // Commit everything
-                    cmd 'git add .', target.workspace
-                    cmd 'git commit -m "${project.version}"', target.workspace
-                    cmd 'git tag -m "${project.version}" ${project.version}', target.workspace
                 }
+
+                // Copy ClearCase view into Git repository
+                copy(source.workspace + "/code/" + this_project + "/ems_bus", target.workspace)
+
+                // Commit everything
+                cmd 'git add .', target.workspace
+                cmd 'git commit -m "$version"', target.workspace
+                cmd 'git tag -m "$version" $version', target.workspace
             }
         }
     }
