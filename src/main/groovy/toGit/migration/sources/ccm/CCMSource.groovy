@@ -4,11 +4,13 @@ import toGit.context.base.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
+import toGit.migration.sources.ccm.context.CcmExtractionsContext
 
 class CCMSource implements MigrationSource {
 
     String revision
     String ccm_addr
+
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
@@ -68,6 +70,6 @@ class CCMSource implements MigrationSource {
 
     @Override
     Context withExtractions(Context extractionsContext) {
-        return extractionsContext
+        return extractionsContext as CcmExtractionsContext
     }
 }
