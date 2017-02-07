@@ -34,7 +34,7 @@ migrate {
 //
 //            }
             extractions {
-                // some here ?
+                baselineProperties()
             }
             actions {
                 // Scrub Git repository, so file deletions will also be committed

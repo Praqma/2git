@@ -2,10 +2,16 @@ package toGit.migration.sources.ccm
 
 import toGit.context.base.Context
 import toGit.context.traits.SourceContext
+import toGit.migration.sources.ccm.context.CcmExtractionsContext
 
 class CCMSourceContext implements Context, SourceContext {
     public CCMSourceContext() {
         source = new CCMSource()
+    }
+
+    @Override
+    Context withExtractions(Context extractionsContext) {
+        return extractionsContext as CcmExtractionsContext
     }
 
     /**
