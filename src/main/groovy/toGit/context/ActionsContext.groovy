@@ -29,8 +29,12 @@ class ActionsContext implements Context, HasActions {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                def sourceDir = new File(source)
-                def targetDir = new File(target)
+                def expandedSource = new SimpleTemplateEngine().createTemplate(source).make(extractionMap).toString()
+                def expandedTarget = new SimpleTemplateEngine().createTemplate(target).make(extractionMap).toString()
+                def sourceDir = new File(expandedSource)
+                def targetDir = new File(expandedTarget)
+                log.info ("Copy from: $expandedSource")
+                log.info ("To: $expandedTarget")
                 sourceDir.listFiles().each { file ->
                     if (file.isDirectory())
                         FileUtils.copyDirectoryToDirectory(file, targetDir)

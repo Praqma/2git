@@ -98,6 +98,7 @@ class GitUtil {
             log.info("Git dir $path does not exist, performing first time setup.")
             FileUtils.forceMkdir(path)
             callOrDie(path, "init")
+            callOrDie(path, "commit", "--allow-empty", "-m init")
             callOrDie(path, "tag", "-m init", "init")
         }
     }

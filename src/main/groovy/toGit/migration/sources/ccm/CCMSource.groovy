@@ -15,23 +15,39 @@ class CCMSource implements MigrationSource {
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
 
+        List<Snapshot> projects
+
         // Build the CCM project conversion list
         def sout = new StringBuilder(), serr = new StringBuilder()
-        def cmd = "bash /c/Users/cssr/git_conversion/utilities_for_jira_git_conversion/baseline_history.sh $revision".execute()
-        cmd.consumeProcessOutput(sout, serr)
-        cmd.waitForProcessOutput()
+        def cmd_line = "bash /c/Users/cssr/git_conversion/utilities_for_jira_git_conversion/baseline_history.sh $revision"
+        println cmd_line
 
-        // ems_bus~1_20131002
+        def envVars = ["CCM_ADDR=" + ccm_addr ];
+        def cmd = cmd_line.execute(envVars,new File(workspace))
+        //cmd.consumeProcessOutput(sout, serr)
+        cmd.waitForProcessOutput(sout, serr)
+//        cmd.waitFor()
 
-        List<Snapshot> projects
-        projects = sout.collect{new Snapshot(it){}}
+
+//        projects = cmd.text.readLines().collect{new Snapshot(it){}}
+
+        println sout
+        println serr
+
+        projects = sout.readLines().collect{new Snapshot(it){}}
+
+        projects.each {
+            println it
+        }
+
+        println projects.size()
 
         return projects
     }
 
     @Override
     void checkout(Snapshot snapshot) {
-        copy2Filesystem(snapshot.identifier.split(" ")[0])
+        copy2Filesystem(snapshot.identifier.split("@@@")[0])
     }
 
     private void copy2Filesystem(String project) {
@@ -42,14 +58,18 @@ class CCMSource implements MigrationSource {
         }
         codeFile.mkdir()
 
-        def sout = new StringBuilder(), serr = new StringBuilder()
-        def envVars = ["CCM_ADDR=" + ccm_addr ];
-        def cmd = "ccm copy_to_file_system -p $project -r \"$project:project:1\" ".execute(envVars,codeFile)
-        cmd.consumeProcessOutput(sout, serr)
-        cmd.waitForProcessOutput()
-        println sout
-        println serr
-        //println ("ccm copy_to_file_system -p $project -r \"$project:project:1\" > /dev/null".execute([],codeFile.parentFile).text)
+        if ( new File(workspace + "/code/" + project).exists()){
+            println "Skipping project revision: ${project} - already exists"
+        } else {
+            def sout = new StringBuilder(), serr = new StringBuilder()
+            def envVars = ["CCM_ADDR=" + ccm_addr ];
+            def cmd = "ccm copy_to_file_system -p $project -r \"$project:project:1\" ".execute(envVars,codeFile)
+            cmd.waitForProcessOutput(sout, serr)
+            println sout
+            println serr
+            //println ("ccm copy_to_file_system -p $project -r \"$project:project:1\" > /dev/null".execute([],codeFile.parentFile).text)
+        }
+
 
     }
 

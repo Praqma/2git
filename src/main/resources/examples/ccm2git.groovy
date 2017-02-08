@@ -8,7 +8,7 @@ if(!my_workspace_file.exists()) my_workspace_file.mkdirs()
 
 def git_server = "http://dtdkcphlx0231.md-man.biz:7991/"
 
-def ccm_addr_cli = "DTDKCPHNB124554:56761:100.64.0.2"
+def ccm_addr_cli = "DTDKCPHNB124554:51501:100.64.0.2"
 
 def this_project = "ems_bus~1_20131002"
 
@@ -37,24 +37,41 @@ migrate {
                 baselineProperties()
             }
             actions {
+                custom { project ->
+                    println project.snapshot
+                    println project.snapshotName
+                    println project.snapshotRevision
+                    println project.baselineRevision
+                }
+
                 // Scrub Git repository, so file deletions will also be committed
+                cmd 'git reset --hard $baselineRevision', target.workspace
+
                 custom {
+                    println "Removing files except .git folder in: $target.workspace"
                     new File(target.workspace).eachFile { file ->
                         if(!file.name.startsWith(".git")) file.delete()
                     }
-                }
-                custom { project ->
-                    println project.baseline
-                    println project.version
-                }
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) println file.getName()
+                    }                }
 
-                // Copy ClearCase view into Git repository
-                copy(source.workspace + "/code/" + this_project + "/ems_bus", target.workspace)
+                // Copy checkout into Git repository
+                copy(source.workspace + "/code/" + snapshot + "/$snapshotName", target.workspace)
+
+                custom {
+                    println "Files in: $target.workspace"
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) println file.getName()
+                    }
+                }
 
                 // Commit everything
-                cmd 'git add .', target.workspace
-                cmd 'git commit -m "$version"', target.workspace
-                cmd 'git tag -m "$version" $version', target.workspace
+                cmd 'git add -A .', target.workspace
+
+                cmd 'git commit --allow-empty -m "$snapshotRevision"', target.workspace
+
+                cmd 'git tag -f -m "$snapshotRevision" $snapshotRevision', target.workspace
             }
         }
     }

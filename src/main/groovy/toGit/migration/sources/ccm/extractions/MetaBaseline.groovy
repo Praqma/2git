@@ -19,8 +19,11 @@ class MetaBaseline extends Extraction {
     HashMap<String, Object> extract(Snapshot snapshot) {
         def result = [:]
 
-        result['baseline'] = snapshot.identifier.split(" ")[1]
-        result['version'] = snapshot.identifier.split(" ")[0].split("~")[1]
+        result['snapshot'] = snapshot.identifier.split("@@@")[0]
+        result['snapshotName'] = snapshot.identifier.split("@@@")[0].split("~")[0]
+        result['snapshotRevision'] = snapshot.identifier.split("@@@")[0].split("~")[1]
+
+        result['baselineRevision'] = snapshot.identifier.split("@@@")[1].split("~")[1]
 
         // extract ccm data (baseline, tasks bla bla)
 
