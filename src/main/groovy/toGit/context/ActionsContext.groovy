@@ -93,6 +93,7 @@ class ActionsContext implements Context, HasActions {
             @Override
             void act(HashMap<String, Object> extractionMap) {
                 def expandedCommand = new SimpleTemplateEngine().createTemplate(command).make(extractionMap).toString()
+                log.info(expandedCommand)
                 CommandLine.newInstance().run(expandedCommand, path ? new File(path) : null).stdoutBuffer.eachLine { line ->
                     log.info(line)
                 }
