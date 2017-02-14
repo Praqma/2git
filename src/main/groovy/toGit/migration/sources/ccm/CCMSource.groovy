@@ -6,6 +6,7 @@ import toGit.context.base.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource
+import toGit.migration.sources.ccm.context.CcmCriteriaContext
 import toGit.migration.sources.ccm.context.CcmExtractionsContext
 
 class CCMSource implements MigrationSource {
@@ -92,7 +93,7 @@ class CCMSource implements MigrationSource {
 
     @Override
     Context withCriteria(Context criteriaContext) {
-        return criteriaContext
+        return criteriaContext as CcmCriteriaContext
     }
 
     @Override
