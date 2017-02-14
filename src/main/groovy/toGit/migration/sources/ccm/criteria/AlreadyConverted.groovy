@@ -11,10 +11,6 @@ class AlreadyConverted extends Criteria {
 
 
 
-    AlreadyConverted( ){
-
-    }
-
     @Override
     boolean appliesTo(Snapshot snapshot) {
 
