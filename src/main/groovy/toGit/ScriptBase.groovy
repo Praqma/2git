@@ -120,6 +120,7 @@ abstract class ScriptBase extends Script implements Context {
         executeInContext(closure, migrationContext)
         MigrationManager.instance.migrate(dryRun)
         log.info(migrationComplete())
+        if(!dryRun) MigrationManager.instance.resetMigrationPlan()
     }
 
     /**

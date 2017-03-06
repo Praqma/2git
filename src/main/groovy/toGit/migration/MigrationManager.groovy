@@ -32,6 +32,10 @@ class MigrationManager {
         actionsContext = new ActionsContext()
     }
 
+    void resetMigrationPlan() {
+        plan = new MigrationPlan()
+    }
+
     void migrate(boolean dryRun = false) {
         if(dryRun) {
             plan.build()
