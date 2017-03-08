@@ -14,8 +14,8 @@ trait CcmCriteriaContext implements Context {
      * Filters out baselines that don't have given promotion levels
      * @param levels the promotion levels to test baselines against
      */
-    void AlreadyConverted() {
-        criteria.add(new AlreadyConverted())
+    void AlreadyConverted(String repo_path) {
+        criteria.add(new AlreadyConverted(repo_path))
         log.debug("Added 'AlreadyConverted' criteria.")
     }
 }

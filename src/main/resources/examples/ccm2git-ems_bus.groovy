@@ -2,37 +2,76 @@ package examples
 
 /* vim: set syntax=groovy:set et:set tabstop=4: */
 
-def my_workspace = "c:/Users/cssr/git_conversion/ccm2git-main"
+//def ccm_project = "make2"
+//def start_project = ccm_project + "~makedev2_migr"
+def ccm_delimiter='~'
+
+def ccm_project
+if ( !start_project?.trim()) {
+    println "start_project not set"
+    System.exit(1)
+} else {
+    if ( !start_project.contains(ccm_delimiter) ){
+        println "start_project does not contain a ${ccm_delimiter}\n" +
+                "Provide the start_project=<projectname>~<revision>"
+        System.exit(1)
+    } else {
+        ccm_project = start_project.split(ccm_delimiter)[0]
+        ccm_revision = start_project.split(ccm_delimiter)[1]
+
+        if ( !ccm_revision || start_project.contains(':') ) {
+            println "start_project does contains ':' \n" +
+                    "Provide the start_project=<projectname>~<revision>"
+            System.exit(1)
+        }
+    }
+    if ( ! ccm_project ) {
+        println "Could not extract ccm_project name from start_project"
+        System.exit(1)
+    }
+}
+
+def ccm_addr_cli
+if ( !System.getenv("CCM_ADDR") ){
+    println "CCM_ADDR system variable not set. Please start session prior to calling the ccm2git \n \
+( ex: ccm start -m -d /data/ccmdb/<db> -s http://<server>:<port> -q ) "
+    System.exit(1)
+} else {
+    ccm_addr_cli = System.getenv("CCM_ADDR")
+}
+// "DTDKCPHPW111426:61516:10.100.104.126"
+
+//def my_workspace = "c:/Users/cssr/git_conversion/ccm2git-main/" + ccm_project
+def my_workspace = "d:/Synergy/ccm2git-main/" + ccm_project
+
+def git_server = "http://dtdkcphlx0231.md-man.biz:7991/scarp"
+
+
 def my_workspace_file = new File(my_workspace)
 if(!my_workspace_file.exists()) my_workspace_file.mkdirs()
-
-def git_server = "http://dtdkcphlx0231.md-man.biz:7991/"
-
-def ccm_addr_cli = "DTDKCPHNB124554:51501:100.64.0.2"
-
-def this_project = "ems_bus~1_20131002"
-
+my_workspace_file = new File(my_workspace + "/ccm_wa")
+if(!my_workspace_file.exists()) my_workspace_file.mkdirs()
 
 source('ccm') {
     workspace "${my_workspace}/ccm_wa"
-    revision this_project
+    revision start_project
     ccm_addr ccm_addr_cli
 }
 
 target('git', repository_name) {
-    workspace "${my_workspace}/repos/ems_bus"
+    workspace "${my_workspace}/repo/" + ccm_project
     user 'cssr'
     email 'claus.schneider-ext@man-eu.com'
-    remote "ssh://git@$git_server/ems_bus.git"
+    remote "ssh://git@$git_server/${ccm_project}.git"
     longPaths true
 }
 
 migrate {
     filters {
         filter {
-//            criteria {
-//
-//            }
+            criteria {
+                AlreadyConverted(target.workspace)
+            }
             extractions {
                 baselineProperties()
             }
@@ -50,12 +89,21 @@ migrate {
                 custom {
                     println "Removing files except .git folder in: $target.workspace"
                     new File(target.workspace).eachFile { file ->
-                        if(!file.name.startsWith(".git")) file.delete()
+                        if(!file.name.startsWith(".git")) {
+                            if (!file.isDirectory()) {
+                                println file.getName()
+                                file.delete()
+                            } else {
+                                println file.getName()
+                                file.deleteDir()
+                            }
+                        }
                     }
                     println "Remaining files except .git folder in: $target.workspace"
                     new File(target.workspace).eachFile { file ->
                         if(!file.name.startsWith(".git")) println file.getName()
-                    }                }
+                    }
+                }
 
                 // Copy checked out into Git repository
                 copy("$source.workspace/code/\$snapshot/\$snapshotName", target.workspace)
@@ -74,7 +122,10 @@ migrate {
 
 //                cmd 'git commit --allow-empty -m "$snapshotRevision"', target.workspace
 
-                cmd 'git tag -f -m "$snapshotRevision" $snapshotRevision', target.workspace
+                cmd 'git tag -f -m "$snapshotRevision" "$snapshotRevision"', target.workspace
+
+                cmd 'du -sh .git >> ../git_sizes.txt', target.workspace
+                cmd 'du -sh .git', target.workspace
             }
         }
     }

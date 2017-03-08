@@ -1,13 +1,13 @@
 #!/bin/bash
-#set -x # får shell til at displaye kommandoer
+#set -x # fï¿½r shell til at displaye kommandoer
 
 export PATH="/c/Program Files (x86)/IBM/Rational/Synergy/7.2.1/bin:${PATH}"
 
 BASELINE_PROJECT=$1
 UNTIL_PROJECT=$2
 
-UNTIL_SUBPROJECT=$3
-BASELINE_SUBPROJECT=$4 #"ems_bus~1_20131002"
+#UNTIL_SUBPROJECT=$3
+#BASELINE_SUBPROJECT=$4 #"ems_bus~1_20131002"
 
 if [ "${BASELINE_SUBPROJECT}X" != "X" ]; then
 	SUBPROJECT_NAME=`echo ${BASELINE_SUBPROJECT} | awk -F"~" '{print $1}'`
@@ -44,19 +44,24 @@ handle_baseline2(){
 	local SUCCESSOR_PROJECTS=`ccm query "${query}" -u -f "%name~%version" | sed -e 's/ /xxx/g'` 
   for SUCCESSOR_PROJECT in ${SUCCESSOR_PROJECTS} ; do
 		local inherited_string="${inherited_string_local} -> \"${BASELINE_PROJECT}\""
-    printf "$SUCCESSOR_PROJECT@@@$CURRENT_PROJECT\n" >> projects.txt
+    printf "$SUCCESSOR_PROJECT@@@$CURRENT_PROJECT\n" >> ${projects_file}
 		handle_baseline2 ${SUCCESSOR_PROJECT} "${inherited_string}"
 	done
 }
 
-#set -x 
-cat /c/Users/cssr/git_conversion/utilities_for_jira_git_conversion/projects_bes2_all_projs.txt
-exit 0
-rm -rf projects.txt
+#   set -x
 init_project_name=`printf "${BASELINE_PROJECT}" | awk -F"~" '{print $1}'`
 bl_version=`printf "${BASELINE_PROJECT}" | awk -F"~" '{print $2}'`
-printf "$BASELINE_PROJECT@@@${init_project_name}~init\n" >> projects.txt
+
+export projects_file="/d/Synergy/ccm2git-main/${init_project_name}/ccm_wa/projects.txt"
+
+if [ -e ${projects_file} ] ; then
+  cat ${projects_file}
+  exit 0
+fi
+
+printf "$BASELINE_PROJECT@@@${init_project_name}~init\n" > ${projects_file}
 inherited_string="  \"${BASELINE_PROJECT}\""
 handle_baseline2 ${BASELINE_PROJECT} ${inherited_string}
-cat projects.txt
-#rm -f projects.txt
+cat ${projects_file}
+#rm -f ${projects_file}
