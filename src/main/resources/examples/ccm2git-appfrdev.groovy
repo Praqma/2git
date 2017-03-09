@@ -42,7 +42,7 @@ if ( !System.getenv("CCM_ADDR") ){
 // "DTDKCPHPW111426:61516:10.100.104.126"
 
 //def my_workspace = "c:/Users/cssr/git_conversion/ccm2git-main/" + ccm_project
-def my_workspace = "d:/Synergy/ccm2git-main/" + ccm_project
+def my_workspace = "/data/Synergy/ccm2git-main/" + ccm_project
 
 def git_server = "http://dtdkcphlx0231.md-man.biz:7991/scarp"
 

@@ -16,7 +16,7 @@ class MetaBaseline extends Extraction {
     }
 
     @Override
-    HashMap<String, Object> extract(Snapshot snapshot, Sting[] submodule_paths) {
+    HashMap<String, Object> extract(Snapshot snapshot ) {
         def result = [:]
 
         result['snapshot'] = snapshot.identifier.split("@@@")[0]
@@ -25,6 +25,7 @@ class MetaBaseline extends Extraction {
 
         result['baselineRevision'] = snapshot.identifier.split("@@@")[1].split("~")[1]
 
+/**
         def submodules = [:]
 
         submodule_paths.each { path ->
@@ -47,7 +48,7 @@ class MetaBaseline extends Extraction {
         }
 
         result['submodules'] = submodules
-
+*/
         // extract ccm data (baseline, tasks bla bla)
 
         return result
