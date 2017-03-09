@@ -25,4 +25,8 @@ class CCMSourceContext implements Context, SourceContext {
     void ccm_addr (String ccm_addr){
         source.ccm_addr = ccm_addr
     }
+
+    void submodule_paths (String[] submodule_paths){
+        source.submodule_paths = submodule_paths
+    }
 }

@@ -9,4 +9,6 @@ class GitOptions {
 
     boolean defaultSetup = true
     boolean longPaths = false
+    boolean status_submoduleSummary = true
+
 }

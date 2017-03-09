@@ -37,7 +37,12 @@ class ActionsContext implements Context, HasActions {
                 log.info ("To: $expandedTarget")
                 sourceDir.listFiles().each { file ->
                     if (file.isDirectory())
-                        FileUtils.copyDirectoryToDirectory(file, targetDir)
+                        if ( ! target.submodule_paths.contains(file.name) ){
+                            FileUtils.copyDirectoryToDirectory(file, targetDir)
+                        } else {
+                            println "Skipping - submodule: ${file.name}"
+                        }
+
                     else
                         FileUtils.copyFileToDirectory(file, targetDir)
                 }

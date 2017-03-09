@@ -13,6 +13,7 @@ class CCMSource implements MigrationSource {
 
     String revision
     String ccm_addr
+    String[] submodule_paths
 
 
     @Override
