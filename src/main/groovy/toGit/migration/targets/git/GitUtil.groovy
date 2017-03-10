@@ -98,6 +98,13 @@ class GitUtil {
             log.info("Git dir $path does not exist, performing first time setup.")
             FileUtils.forceMkdir(path)
             callOrDie(path, "init")
+        }
+    }
+
+    static void initCommit(File path) {
+        if (!path.exists()) {
+            log.error("Git dir $path does not exist: FAIL")
+        } else {
             callOrDie(path, "commit", "--allow-empty", "-m init")
             callOrDie(path, "tag", "-m init", "init")
         }

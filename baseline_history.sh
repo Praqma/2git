@@ -1,7 +1,9 @@
 #!/bin/bash
 #set -x # f�r shell til at displaye kommandoer
 
-export PATH="/c/Program Files (x86)/IBM/Rational/Synergy/7.2.1/bin:${PATH}"
+
+#export PATH="/c/Program Files (x86)/IBM/Rational/Synergy/7.2.1/bin:${PATH}"
+#export PATH="/mnt/synergy/ccm721/bin/ccm:${PATH}"
 
 BASELINE_PROJECT=$1
 UNTIL_PROJECT=$2
@@ -53,15 +55,15 @@ handle_baseline2(){
 init_project_name=`printf "${BASELINE_PROJECT}" | awk -F"~" '{print $1}'`
 bl_version=`printf "${BASELINE_PROJECT}" | awk -F"~" '{print $2}'`
 
-export projects_file="/d/Synergy/ccm2git-main/${init_project_name}/ccm_wa/projects.txt"
-
+export projects_file="./projects.txt"
+#rm -f ${projects_file}
 if [ -e ${projects_file} ] ; then
   cat ${projects_file}
   exit 0
 fi
 
-printf "$BASELINE_PROJECT@@@${init_project_name}~init\n" > ${projects_file}
-inherited_string="  \"${BASELINE_PROJECT}\""
+echo "$BASELINE_PROJECT@@@${init_project_name}~init" > ${projects_file}
+inherited_string="\"${BASELINE_PROJECT}\""
 handle_baseline2 ${BASELINE_PROJECT} ${inherited_string}
 cat ${projects_file}
 #rm -f ${projects_file}

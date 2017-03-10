@@ -13,6 +13,8 @@ class CCMSource implements MigrationSource {
 
     String revision
     String ccm_addr
+    String ccm_home
+    String system_path
 
 
     @Override
@@ -22,10 +24,11 @@ class CCMSource implements MigrationSource {
 
         // Build the CCM project conversion list
         def sout = new StringBuilder(), serr = new StringBuilder()
-        def cmd_line = "bash /c/Users/cssr/Downloads/danfoss-devops-master/danfoss-devops-master/cc2git/2git/baseline_history.sh $revision"
+        def cmd_line = "bash --login " + System.getProperty("user.dir") + File.separator + "baseline_history.sh $revision"
         println cmd_line
 
-        def envVars = ["CCM_ADDR=" + ccm_addr ];
+        def envVars = System.getenv().collect { k, v -> "$k=$v" }
+//        def envVars = ["CCM_ADDR=" + ccm_addr, "CCM_HOME=" + ccm_home, "PATH=" + system_path]
         def cmd = cmd_line.execute(envVars,new File(workspace))
         //cmd.consumeProcessOutput(sout, serr)
         cmd.waitForProcessOutput(sout, serr)
@@ -68,8 +71,11 @@ class CCMSource implements MigrationSource {
                 new File(workspace + "/code/" + project + "_tmp").delete()
             }
 
-            def envVars = ["CCM_ADDR=" + ccm_addr ];
-            def cmd = "ccm copy_to_file_system -p ${project}_tmp -r \"$project_revision_with_spaces:project:1\" ".execute(envVars,codeFile)
+            def envVars = System.getenv().collect { k, v -> "$k=$v" }
+            //def envVars = ["CCM_ADDR=" + ccm_addr, "CCM_HOME=" + ccm_home, "PATH=" + system_path]
+            def cmd_line = ["ccm", "copy_to_file_system", "-p", "${project}_tmp", "-r", "${project_revision_with_spaces}:project:1"]
+            println "'" + cmd_line + "'"
+            def cmd = cmd_line.execute(envVars,codeFile)
             cmd.waitForProcessOutput(sout, serr)
             println sout
             println serr
