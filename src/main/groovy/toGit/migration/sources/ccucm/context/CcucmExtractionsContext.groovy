@@ -14,6 +14,6 @@ trait CcucmExtractionsContext implements Context {
      */
     void baselineProperty(Map<String, String> map) {
         extractions.add(new BaselineProperty(map))
-        log.debug("Added 'baselineProperty' criteria.")
+        log.debug("Added 'baselineProperty' extraction.")
     }
 }
