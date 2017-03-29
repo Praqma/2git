@@ -50,14 +50,16 @@ if ( !System.getenv("CCM_HOME") ){
 }
 def system_path2 = System.getenv("PATH")
 
-// "DTDKCPHPW111426:61516:10.100.104.126"
-
 //def my_workspace = "c:/Users/cssr/git_conversion/ccm2git-main/" + ccm_project
-def my_workspace = "/data/Synergy/ccm2git-main/" + ccm_project
+def my_workspace
 
-if ( !my_workspace ) {
-  my_workspace = "/data/Synergy/ccm2git-main/" + ccm_project + "/"
+if ( !my_workspace_root ) {
+    my_workspace_root = "/data/Synergy/ccm2git-main/" 
+    my_workspace = my_workspace_root + ccm_project + "/"
+} else {
+    my_workspace = my_workspace_root + ccm_project + "/"
 }
+
 def git_server = "http://dtdkcphlx0231.md-man.biz:7991/scarp"
 
 
