@@ -55,7 +55,7 @@ class CCMSource implements MigrationSource {
     private void copy2Filesystem(String project) {
         def codeFile = new File(workspace, "code")
         codeFile.parentFile.mkdirs()
-        if (codeFile.exists()) {
+        if ( ! codeFile.exists()) {
             codeFile.delete()
         }
         codeFile.mkdir()
@@ -67,8 +67,10 @@ class CCMSource implements MigrationSource {
 
             def project_revision_with_spaces = project.replaceAll("xxx"," ")
 
-            if ( new File( workspace + "/code/" + project + "_tmp" ).exists() ){
-                new File(workspace + "/code/" + project + "_tmp").delete()
+            def file_tmp = new File(workspace + "/code/" + project + "_tmp")
+            if ( file_tmp.exists() ){
+                println workspace + "/code/" + project + "_tmp exist - Delete it "
+                file_tmp.deleteDir()
             }
 
             def envVars = System.getenv().collect { k, v -> "$k=$v" }
@@ -77,8 +79,19 @@ class CCMSource implements MigrationSource {
             println "'" + cmd_line + "'"
             def cmd = cmd_line.execute(envVars,codeFile)
             cmd.waitForProcessOutput(sout, serr)
-            println sout
-            println serr
+            def exitValue = cmd.exitValue()
+            println "Standard out:"
+            println "'" + sout + "'"
+            println "Standard error:"
+            println "'" + serr + "'"
+            println "Exit code: " + exitValue
+            if ( exitValue ){
+                throw new Exception("ccm copy_to_file_system gave an non-0 exit code" )
+            }
+            if ( serr.toString().readLines().size() > 0 ){
+                throw new Exception("ccm copy_to_file_system standard error contains text lines: " + serr.toString().readLines().size() )
+            }
+
             FileUtils.moveDirectory(new File(workspace + "/code/" + project + "_tmp"), new File(workspace + "/code/" + project))
 
             //println ("ccm copy_to_file_system -p $project -r \"$project:project:1\" > /dev/null".execute([],codeFile.parentFile).text)
