@@ -60,7 +60,7 @@ if ( !my_workspace_root ) {
     my_workspace = my_workspace_root + ccm_project + "/"
 }
 
-def git_server = "http://dtdkcphlx0231.md-man.biz:7991/scarp"
+def git_server = "dtdkcphlx0231.md-man.biz:7991/scarp"
 
 
 def my_workspace_file = new File(my_workspace)
@@ -81,7 +81,7 @@ target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user 'cssr'
     email 'claus.schneider-ext@man-eu.com'
-    remote "ssh://git@$git_server/${ccm_project}.git"
+    remote "ssh://git@${git_server}/${ccm_project}.git"
     longPaths true
 }
 
