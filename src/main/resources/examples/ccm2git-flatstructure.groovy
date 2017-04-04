@@ -79,8 +79,8 @@ source('ccm') {
 
 target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
-    user 'cssr'
-    email 'claus.schneider-ext@man-eu.com'
+    user 'Claus Schneider(Praqma)'
+    email 'claus.schneider-ext@man.eu'
     remote "ssh://git@${git_server}/${ccm_project}.git"
     longPaths true
 }
