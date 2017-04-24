@@ -1,4 +1,11 @@
-# Bitbucket target
+---
+layout:            2git
+organization:      Praqma
+repo:              2git
+title:             Bitbucket support
+---
+
+# Bitbucket support
 
 Migrating to and pushing from a local Git repo is already possible in 2git, but certain interactions with Bitbucket still require a lot of custom coding.
 There's no built-in support for creating, listing or deleting repositories, for example.
