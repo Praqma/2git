@@ -6,7 +6,7 @@ title:             Support versioned zip files as a source for 2git
 ---
 
 # Idea - Support versioned zip files as source
-2Git should be able to migrate anything that represents a ordered list of snapshots. Zip files versioned with a number or a date/time stamp are an obvious and easy to understand example.
+2git should be able to migrate anything that represents a ordered list of snapshots. Zip files versioned with a number or a date/time stamp are an obvious and easy to understand example.
 
 We want to support this for a number of reasons:
 
