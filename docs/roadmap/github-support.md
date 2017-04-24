@@ -1,3 +1,9 @@
+---
+  layout:            2git
+  organization:      Praqma
+  repo:              2git
+  title:             GitHub support
+---
 # Github support
 
 ## Problem

@@ -1,8 +1,8 @@
 ---
-layout:            2git
-organization:      Praqma
-repo:              2git
-title:             base ClearCase features
+  layout:            2git
+  organization:      Praqma
+  repo:              2git
+  title:             Base ClearCase Features
 ---
 
 # base ClearCase features

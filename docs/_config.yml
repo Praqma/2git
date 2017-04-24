@@ -5,6 +5,7 @@ description: Migrate to Git like a pro! 2git allows you to script your tranforma
 css-path: /css/praqmacode.css
 
 # Build settings
+permalink: /:categories/:title/
 markdown: kramdown
 highlighter: rouge
 exclude: ["README.md"]

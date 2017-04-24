@@ -29,3 +29,11 @@ If you don't like what you see, you can easily tweak your recipe and run it agai
   * [Target: Git](target-git)
   * [Target: artifactory](target-artifactory)
   * [Other features](other-features)
+
+## Roadmap
+
+ * [Vblog](roadmap/vblog)
+ * [GitHub support](roadmap/github-support)
+ * [Bitbucket support](roadmap/bitbucket-support)
+ * [Base ClearCase features](roadmap/baseClearCaseFeatures)
+ * [Zip files as source](roadmap/zip-file-source)
