@@ -1,3 +1,10 @@
+---
+layout:            2git
+organization:      Praqma
+repo:              2git
+title:             base ClearCase features
+---
+
 # base ClearCase features
 
 ## Problem
