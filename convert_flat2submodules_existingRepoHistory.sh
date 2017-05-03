@@ -22,12 +22,17 @@ if [ ! -e ${repo_name} ] ; then
 #        git reset --hard ${repo_init_tag}
 #        cd -
 #    done
+    export GIT_AUTHOR_DATE="1970-01-01 00:00"
+    export GIT_COMMITTER_DATE="1970-01-01 00:00"
     git add -A .
     git status
-    git commit -m "$repo_init_tag" --allow-empty
+    git commit -m "$repo_init_tag" --allow-empty --amend --reset-author
 
-    git tag -a -m $(git tag -l --format '%(contents)' ${repo_init_tag}) ${repo_name}___${repo_init_tag}
-    git reset --hard ${repo_name}___${repo_init_tag}
+    export GIT_AUTHOR_DATE=""
+    export GIT_COMMITTER_DATE=""
+
+    git tag -a -m $(git tag -l --format '%(contents)' ${repo_init_tag}) ${repo_name}/${repo_init_tag}/${repo_init_tag}
+    git reset --hard ${repo_name}/${repo_init_tag}/${repo_init_tag}
     git clean -xffd
     pwd
     # we are still in the root repo
@@ -44,15 +49,29 @@ for project_revision in ${project_revisions}; do
     repo_convert_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $1}' | awk -F"~" '{print $2}'`
     repo_baseline_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $2}' | awk -F"~" '{print $2}'`
 
-    if [ `git describe ${repo_name}___${repo_convert_rev_tag}` ] ; then
+    ccm_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1" | sed -e 's/ //g'`
+
+    repo_convert_rev_tag_wcomponent="${ccm_component_release}/${repo_convert_rev_tag}"
+
+    if [ `git describe ${repo_convert_rev_tag_wcomponent}` ] ; then
       continue
     fi
 
     git fetch --tags
+
+    # Get the right content
     git reset --hard ${repo_convert_rev_tag}
 
     git clean -xffd
-    git reset --soft ${repo_name}___${repo_baseline_rev_tag}
+    if [ "${repo_baseline_rev_tag}" == "init" ]; then
+        repo_baseline_rev_tag_wcomponent="${repo_name}/${repo_init_tag}/${repo_init_tag}"
+    else
+        ccm_baseline_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g'`
+        repo_baseline_rev_tag_wcomponent="${ccm_baseline_component_release}/${repo_baseline_rev_tag}"
+    fi
+
+    # Move the workarea pointer to the 'baseline' tag
+    git reset --soft ${repo_baseline_rev_tag_wcomponent}
 
     for repo_submodule in ${repo_submodules}; do
         repo_submodule_rev=`ccm query "hierarchy_project_members('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1',none) and name ='${repo_submodule}'" -u -f "%version" | sed -e 's/ /xxx/g'`
@@ -71,7 +90,8 @@ for project_revision in ${project_revisions}; do
         git config remote.origin.url
         git fetch --tags
 
-        if [ `git describe ${repo_name}___${repo_convert_rev_tag}` ] ; then
+        if [ `git describe ${repo_convert_rev_tag_wcomponent}` ] ; then
+            # we already have the correct tag, so just set it and move on..
             git checkout ${repo_submodule_rev}
             git clean -xffd
             repo_submodule_rev=""
@@ -80,27 +100,118 @@ for project_revision in ${project_revisions}; do
         fi
 
         if [ `git describe ${repo_submodule_rev}`  ] ; then
+            # we do have the correct 'content' tag checkout it out
             git checkout ${repo_submodule_rev}
             git clean -xffd
         else
+            # we do not have the 'content' tag available - investgate its root
             cd $(dirname $0)
             ./baseline_history_get_root.sh "${repo_submodule}~$(echo ${repo_submodule_rev} | sed -e 's/xxx/ /g')"
             exit 1
         fi
 
-        git tag -f -a -m `git tag -l --format '%(contents)' ${repo_submodule_rev}` ${repo_name}___${repo_convert_rev_tag}
-        git push origin -f --tag ${repo_name}___${repo_convert_rev_tag}
+        git tag -f -a -m `git tag -l --format '%(contents)' ${repo_submodule_rev}` ${repo_convert_rev_tag_wcomponent}
+        git push origin -f --tag ${repo_convert_rev_tag_wcomponent}
 
         repo_submodule_rev=""
         cd -
 
     done
 
-    git status
+    #git status
     git add -A .
-    git status
-    git commit -C ${repo_convert_rev_tag} || ( echo "Empty commit.." )
-    git tag -a -m `git tag -l --format '%(contents)' ${repo_convert_rev_tag}` ${repo_name}___${repo_convert_rev_tag}
-#    git push origin -f --tag ${repo_name}___${repo_convert_rev_tag}
+    #git status
 
-done
+    export GIT_AUTHOR_DATE=`ccm attr -show create_time "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
+    export GIT_COMMITTER_DATE=${GIT_AUTHOR_DATE}
+    ccm_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
+
+    git commit -C ${repo_convert_rev_tag} --reset-author || ( echo "Empty commit.." )
+
+    ccm_baseline_obj=$(ccm query "has_project_in_baseline('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1') and release='$(ccm query "name='${ccm_project_name}' and version='$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g')' and type='project'" -u -f "%release")'" -u -f "%objectname" | head -1 )
+
+    if [ "${ccm_baseline_obj}X" != "X" ]; then
+        ccm baseline -show info -v "${ccm_baseline_obj}" > ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo "Master Change Requests (MCR):" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        ccm query "has_associatedImpl(has_associated_task(is_dirty_task_in_baseline_of('${ccm_baseline_obj}')))" -u -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Fully integrated Implementation Change Requests(ICR):"     >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Partially integrated Implementation Change Requests(ICR):" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Tasks integrated in baseline:"                             >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm baseline -show tasks "${ccm_baseline_obj}" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Tasks integrated in baseline (verbosed):"                  >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+#        ccm task -sh info @ >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm task -sh info -v @ >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+
+    else
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo "NO BASELINE OBJECT ASSOCIATED WITH THIS PROJECT REVISION" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Master Change Requests (MCR):"                             >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm query "has_associatedImpl(has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo "Related/Integrated Implementation Change Requests(ICR):" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        ccm query "has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1')))" -f "%displayname %release %problem_synopsis"  >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo "Tasks integrated in project:" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        ccm query "is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))" -f "%displayname %status %resolver %release %task_synopsis"  >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+        echo "Tasks integrated in project (verbosed):" >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------">> ./tag_meta_data.txt
+#        ccm task -sh info @ >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm task -sh info -v @ >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+    fi
+
+    git tag -a -F ./tag_meta_data.txt ${repo_convert_rev_tag_wcomponent}
+
+    rm -f ./tag_meta_data.txt
+
+    export GIT_AUTHOR_DATE=""
+    export GIT_COMMITTER_DATE=""
+
+#    git push origin -f --tag ${repo_convert_rev_tag_wcomponent}
+
+    echo "============================================================================
+    echo " NEXT "
+    echo "============================================================================
+
+done  
