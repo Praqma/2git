@@ -22,16 +22,17 @@ if [ ! -e ${repo_name} ] ; then
 #        git reset --hard ${repo_init_tag}
 #        cd -
 #    done
-    export GIT_AUTHOR_DATE="1970-01-01 00:00"
-    export GIT_COMMITTER_DATE="1970-01-01 00:00"
+    export GIT_AUTHOR_DATE="11/11/70 11:11 AM"
+    export GIT_COMMITTER_DATE="11/11/70 11:11 AM"
     git add -A .
     git status
+
     git commit -m "$repo_init_tag" --allow-empty --amend --reset-author
+    git tag -a -m $(git tag -l --format '%(contents)' ${repo_init_tag}) ${repo_name}/${repo_init_tag}/${repo_init_tag}
 
     export GIT_AUTHOR_DATE=""
     export GIT_COMMITTER_DATE=""
 
-    git tag -a -m $(git tag -l --format '%(contents)' ${repo_init_tag}) ${repo_name}/${repo_init_tag}/${repo_init_tag}
     git reset --hard ${repo_name}/${repo_init_tag}/${repo_init_tag}
     git clean -xffd
     pwd
@@ -66,7 +67,14 @@ for project_revision in ${project_revisions}; do
     git fetch --tags
 
     # Get the right content
-    git reset --hard ${repo_convert_rev_tag}
+    if [ `git describe ${repo_convert_rev_tag}`  ] ; then
+        # we do have the correct 'content' tag checkout it out
+        git reset --hard ${repo_convert_rev_tag}
+    else
+        # we do not have the 'content' tag available - investigate its history if it exists ( e.g. missing in repo )
+        ./baseline_history_get_root.sh "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g')"
+        exit 1
+    fi
 
     git clean -xffd
 
@@ -101,7 +109,7 @@ for project_revision in ${project_revisions}; do
         git submodule update --init --recursive
 
         cd ${repo_submodule}
-        git config remote.origin.url
+
         git fetch --tags
 
         if [ `git describe ${repo_convert_rev_tag_wcomponent_wstatus}` ] ; then
@@ -113,9 +121,11 @@ for project_revision in ${project_revisions}; do
             continue
         fi
 
-        if [ `git describe ${repo_submodule_rev}`  ] ; then
+        repo_submodule_rev_wcomponent_wstatus=$(git tag | grep .*/.*/${repo_submodule_rev}_[dprtis][eueenq][lblsta]$ || echo )
+
+        if [ `git describe ${repo_submodule_rev_wcomponent_wstatus}`  ] ; then
             # we do have the correct 'content' tag checkout it out
-            git checkout ${repo_submodule_rev}
+            git checkout ${repo_submodule_rev_wcomponent_wstatus}
             git clean -xffd
         else
             # we do not have the 'content' tag available - investgate its root
@@ -123,8 +133,9 @@ for project_revision in ${project_revisions}; do
             ./baseline_history_get_root.sh "${repo_submodule}~$(echo ${repo_submodule_rev} | sed -e 's/xxx/ /g')"
             exit 1
         fi
-
-        git tag -f -a -m `git tag -l --format '%(contents)' ${repo_submodule_rev}` ${repo_convert_rev_tag_wcomponent_wstatus}
+        git tag -l --format '%(contents)' ${repo_submodule_rev_wcomponent_wstatus} > ./tag_meta_data.txt
+        git tag -f -a -F ./tag_meta_data.txt ${repo_convert_rev_tag_wcomponent_wstatus}
+        rm -f ./tag_meta_data.txt
         git push origin -f --tag ${repo_convert_rev_tag_wcomponent_wstatus}
 
         repo_submodule_rev=""
@@ -135,8 +146,9 @@ for project_revision in ${project_revisions}; do
     #git status
     git add -A .
     #git status
+#date -d "11/1/12 2:13 PM" "+%Y-%m-%d %H:%M"
 
-    export GIT_AUTHOR_DATE=`ccm attr -show create_time "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
+    export GIT_AUTHOR_DATE=`ccm properties -f "%{create_time[dateformat='yyyy-MM-dd HH:MM:SS']}" "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
     export GIT_COMMITTER_DATE=${GIT_AUTHOR_DATE}
     ccm_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
 
