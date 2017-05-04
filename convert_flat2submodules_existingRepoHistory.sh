@@ -46,14 +46,20 @@ fi
 
 for project_revision in ${project_revisions}; do
     ccm_project_name=`echo ${project_revision} | awk -F"@@@" '{print $1}' | awk -F"~" '{print $1}'`
-    repo_convert_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $1}' | awk -F"~" '{print $2}'`
-    repo_baseline_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $2}' | awk -F"~" '{print $2}'`
 
+    repo_convert_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $1}' | awk -F"~" '{print $2}'`
+    ccm_baseline_obj_this=$(ccm query "has_project_in_baseline('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1') and release='$(ccm query "name='${ccm_project_name}' and version='$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g')' and type='project'" -u -f "%release")'" -u -f "%objectname" | head -1 )
     ccm_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1" | sed -e 's/ //g'`
 
-    repo_convert_rev_tag_wcomponent="${ccm_component_release}/${repo_convert_rev_tag}"
+    if [ "${ccm_baseline_obj_this}X" != "X" ]; then
+        ccm_baseline_status_this=`ccm attr -show status "${ccm_baseline_obj_this}" |  cut -c1-3 `
+    else
+        ccm_baseline_status_this=`ccm attr -show status "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g' |  cut -c1-3`
+    fi
 
-    if [ `git describe ${repo_convert_rev_tag_wcomponent}` ] ; then
+    repo_convert_rev_tag_wcomponent_wstatus="${ccm_component_release}/${repo_convert_rev_tag}_${ccm_baseline_status_this}"
+
+    if [ `git describe ${repo_convert_rev_tag_wcomponent_wstatus}` ] ; then
       continue
     fi
 
@@ -63,15 +69,23 @@ for project_revision in ${project_revisions}; do
     git reset --hard ${repo_convert_rev_tag}
 
     git clean -xffd
+
+    repo_baseline_rev_tag=`echo ${project_revision} | awk -F"@@@" '{print $2}' | awk -F"~" '{print $2}'`
+    ccm_baseline_obj_baselineproj=$(ccm query "has_project_in_baseline('${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1') and release='$(ccm query "name='${ccm_project_name}' and version='$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g')' and type='project'" -u -f "%release")'" -u -f "%objectname" | head -1 )
     if [ "${repo_baseline_rev_tag}" == "init" ]; then
-        repo_baseline_rev_tag_wcomponent="${repo_name}/${repo_init_tag}/${repo_init_tag}"
+        repo_baseline_rev_tag_wcomponent_wstatus="${repo_name}/${repo_init_tag}/${repo_init_tag}"
     else
         ccm_baseline_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g'`
-        repo_baseline_rev_tag_wcomponent="${ccm_baseline_component_release}/${repo_baseline_rev_tag}"
+        if [ "${ccm_baseline_obj_baselineproj}X" != "X" ]; then
+            ccm_baseline_status_baseline=`ccm attr -show status "${ccm_baseline_obj_baselineproj}" |  cut -c1-3 `
+        else
+            ccm_baseline_status_baseline=`ccm attr -show status "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g' |  cut -c1-3`
+        fi
+        repo_baseline_rev_tag_wcomponent_wstatus="${ccm_baseline_component_release}/${repo_baseline_rev_tag}_${ccm_baseline_status_baseline}"
     fi
 
     # Move the workarea pointer to the 'baseline' tag
-    git reset --soft ${repo_baseline_rev_tag_wcomponent}
+    git reset --soft ${repo_baseline_rev_tag_wcomponent_wstatus}
 
     for repo_submodule in ${repo_submodules}; do
         repo_submodule_rev=`ccm query "hierarchy_project_members('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1',none) and name ='${repo_submodule}'" -u -f "%version" | sed -e 's/ /xxx/g'`
@@ -90,7 +104,7 @@ for project_revision in ${project_revisions}; do
         git config remote.origin.url
         git fetch --tags
 
-        if [ `git describe ${repo_convert_rev_tag_wcomponent}` ] ; then
+        if [ `git describe ${repo_convert_rev_tag_wcomponent_wstatus}` ] ; then
             # we already have the correct tag, so just set it and move on..
             git checkout ${repo_submodule_rev}
             git clean -xffd
@@ -110,8 +124,8 @@ for project_revision in ${project_revisions}; do
             exit 1
         fi
 
-        git tag -f -a -m `git tag -l --format '%(contents)' ${repo_submodule_rev}` ${repo_convert_rev_tag_wcomponent}
-        git push origin -f --tag ${repo_convert_rev_tag_wcomponent}
+        git tag -f -a -m `git tag -l --format '%(contents)' ${repo_submodule_rev}` ${repo_convert_rev_tag_wcomponent_wstatus}
+        git push origin -f --tag ${repo_convert_rev_tag_wcomponent_wstatus}
 
         repo_submodule_rev=""
         cd -
@@ -128,37 +142,35 @@ for project_revision in ${project_revisions}; do
 
     git commit -C ${repo_convert_rev_tag} --reset-author || ( echo "Empty commit.." )
 
-    ccm_baseline_obj=$(ccm query "has_project_in_baseline('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1') and release='$(ccm query "name='${ccm_project_name}' and version='$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g')' and type='project'" -u -f "%release")'" -u -f "%objectname" | head -1 )
-
-    if [ "${ccm_baseline_obj}X" != "X" ]; then
-        ccm baseline -show info -v "${ccm_baseline_obj}" > ./tag_meta_data.txt
+    if [ "${ccm_baseline_obj_this}X" != "X" ]; then
+        ccm baseline -show info -v "${ccm_baseline_obj_this}" > ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
         echo "Master Change Requests (MCR):" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
-        ccm query "has_associatedImpl(has_associated_task(is_dirty_task_in_baseline_of('${ccm_baseline_obj}')))" -u -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm query "has_associatedImpl(has_associated_task(is_dirty_task_in_baseline_of('${ccm_baseline_obj_this}')))" -u -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Fully integrated Implementation Change Requests(ICR):"     >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Partially integrated Implementation Change Requests(ICR):" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Tasks integrated in baseline:"                             >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show tasks "${ccm_baseline_obj}" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show tasks "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
@@ -201,17 +213,20 @@ for project_revision in ${project_revisions}; do
         ccm task -sh info -v @ >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
     fi
 
-    git tag -a -F ./tag_meta_data.txt ${repo_convert_rev_tag_wcomponent}
+    git tag -a -F ./tag_meta_data.txt ${repo_convert_rev_tag_wcomponent_wstatus}
 
     rm -f ./tag_meta_data.txt
 
     export GIT_AUTHOR_DATE=""
     export GIT_COMMITTER_DATE=""
+    export repo_convert_rev_tag_wcomponent_wstatus=""
 
-#    git push origin -f --tag ${repo_convert_rev_tag_wcomponent}
 
-    echo "============================================================================
+#    git push origin -f --tag ${repo_convert_rev_tag_wcomponent_wstatus}
+
+    echo "============================================================================"
     echo " NEXT "
-    echo "============================================================================
+    echo "============================================================================"
 
-done  
+done
+
