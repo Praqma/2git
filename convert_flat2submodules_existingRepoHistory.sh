@@ -133,9 +133,9 @@ for project_revision in ${project_revisions}; do
             ./baseline_history_get_root.sh "${repo_submodule}~$(echo ${repo_submodule_rev} | sed -e 's/xxx/ /g')"
             exit 1
         fi
-        git tag -l --format '%(contents)' ${repo_submodule_rev_wcomponent_wstatus} > ./tag_meta_data.txt
-        git tag -f -a -F ./tag_meta_data.txt ${repo_convert_rev_tag_wcomponent_wstatus}
-        rm -f ./tag_meta_data.txt
+
+        git tag -f -a -m "Please see tag in master repo for info: ${repo_convert_rev_tag_wcomponent_wstatus}" ${repo_convert_rev_tag_wcomponent_wstatus}
+
         git push origin -f --tag ${repo_convert_rev_tag_wcomponent_wstatus}
 
         repo_submodule_rev=""
@@ -155,34 +155,45 @@ for project_revision in ${project_revisions}; do
     git commit -C ${repo_convert_rev_tag} --reset-author || ( echo "Empty commit.." )
 
     if [ "${ccm_baseline_obj_this}X" != "X" ]; then
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Baseline information:"                             >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         ccm baseline -show info -v "${ccm_baseline_obj_this}" > ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Project baseline:"                             >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "  %displayname"  || echo "  <none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
         echo "Master Change Requests (MCR):" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
-        ccm query "has_associatedImpl(has_associated_task(is_dirty_task_in_baseline_of('${ccm_baseline_obj_this}')))" -u -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm query "has_associatedImpl(has_associated_task(is_dirty_task_in_baseline_of('${ccm_baseline_obj_this}')))" -u -f "%displayname %resolver %release %problem_synopsis" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Fully integrated Implementation Change Requests(ICR):"     >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release"  -f "%displayname %resolver %release %problem_synopsis" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Partially integrated Implementation Change Requests(ICR):" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show fully_included_change_requests -groupby "Release: %release" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show fully_included_change_requests -groupby "Release: %release" -f "%displayname %resolver %release %problem_synopsis" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Tasks integrated in baseline:"                             >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm baseline -show tasks "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm baseline -show tasks -f "%displayname %{create_time[dateformat='yyyy-M-dd HH:MM:SS']} %resolver %status %release %task_synopsis" "${ccm_baseline_obj_this}" >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
@@ -200,21 +211,28 @@ for project_revision in ${project_revisions}; do
 
         echo >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        echo "Project baseline:"                             >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
+        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "  %displayname"  || echo "  <none>" >> ./tag_meta_data.txt
+        echo >> ./tag_meta_data.txt
+
+        echo >> ./tag_meta_data.txt
+        echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Master Change Requests (MCR):"                             >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm query "has_associatedImpl(has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "%displayname %release %problem_synopsis" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm query "has_associatedImpl(has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "%displayname %resolver %release %problem_synopsis" >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
         echo "Related/Integrated Implementation Change Requests(ICR):" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
-        ccm query "has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1')))" -f "%displayname %release %problem_synopsis"  >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
+        ccm query "has_associated_task(is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1')))" -f "%displayname %resolver %release %problem_synopsis"  >> ./tag_meta_data.txt  || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
         echo "Tasks integrated in project:" >> ./tag_meta_data.txt
         echo "---------------------------------------------------------">> ./tag_meta_data.txt
-        ccm query "is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))" -f "%displayname %status %resolver %release %task_synopsis"  >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
+        ccm query "is_task_in_folder_of(is_folder_in_rp_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))" -f "%displayname %{create_time[dateformat='yyyy-M-dd HH:MM:SS']} %resolver %status %release %task_synopsis"  >> ./tag_meta_data.txt || echo "<none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
