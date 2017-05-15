@@ -7,6 +7,7 @@ export project_revisions=`cat ${1}`
 export repo_name=${2}
 export repo_init_tag=${3}
 export repo_submodules=${4}
+export gitignore_file=${5}
 
 export gitrepo_project_original="scars"
 export gitrepo_project_submodule="scars"
@@ -16,22 +17,20 @@ if [ ! -e ${repo_name} ] ; then
     git clone --recursive ssh://git@dtdkcphlx0231.md-man.biz:7998/${gitrepo_project_submodule}/${repo_name}.git
     cd ${repo_name}
     git reset --hard ${repo_init_tag}
-#    for repo_submodule in ${repo_submodules}; do
-#        git submodule add --force ssh://git@dtdkcphlx0231.md-man.biz:7998/${gitrepo_project_submodule}/${repo_submodule}.git
-#        cd ${repo_submodule}
-#        git reset --hard ${repo_init_tag}
-#        cd -
-#    done
+
     export GIT_AUTHOR_DATE="11/11/70 11:11 AM"
     export GIT_COMMITTER_DATE="11/11/70 11:11 AM"
+
+    test "${gitignore_file}x" != "x" && test -e ${gitignore_file} && cp ${gitignore_file} ./.gitignore
+
     git add -A .
     git status
 
     git commit -m "$repo_init_tag" --allow-empty --amend --reset-author
     git tag -a -m $(git tag -l --format '%(contents)' ${repo_init_tag}) ${repo_name}/${repo_init_tag}/${repo_init_tag}
 
-    export GIT_AUTHOR_DATE=""
-    export GIT_COMMITTER_DATE=""
+    unset GIT_AUTHOR_DATE
+    unset GIT_COMMITTER_DATE
 
     git reset --hard ${repo_name}/${repo_init_tag}/${repo_init_tag}
     git clean -xffd
@@ -58,7 +57,7 @@ for project_revision in ${project_revisions}; do
         ccm_baseline_status_this=`ccm attr -show status "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g' |  cut -c1-3`
     fi
 
-    repo_convert_rev_tag_wcomponent_wstatus="${ccm_component_release}/${repo_convert_rev_tag}_${ccm_baseline_status_this}"
+    repo_convert_rev_tag_wcomponent_wstatus="${ccm_project_name}/${repo_convert_rev_tag}_${ccm_baseline_status_this}"
 
     if [ `git describe ${repo_convert_rev_tag_wcomponent_wstatus}` ] ; then
       continue
@@ -83,17 +82,19 @@ for project_revision in ${project_revisions}; do
     if [ "${repo_baseline_rev_tag}" == "init" ]; then
         repo_baseline_rev_tag_wcomponent_wstatus="${repo_name}/${repo_init_tag}/${repo_init_tag}"
     else
-        ccm_baseline_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g'`
+        #ccm_baseline_component_release=`ccm attr -show release "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g'`
         if [ "${ccm_baseline_obj_baselineproj}X" != "X" ]; then
             ccm_baseline_status_baseline=`ccm attr -show status "${ccm_baseline_obj_baselineproj}" |  cut -c1-3 `
         else
             ccm_baseline_status_baseline=`ccm attr -show status "${ccm_project_name}~$(echo ${repo_baseline_rev_tag} | sed -e 's/xxx/ /g'):project:1" |  sed -e 's/ //g' |  cut -c1-3`
         fi
-        repo_baseline_rev_tag_wcomponent_wstatus="${ccm_baseline_component_release}/${repo_baseline_rev_tag}_${ccm_baseline_status_baseline}"
+        repo_baseline_rev_tag_wcomponent_wstatus="${ccm_project_name}/${repo_baseline_rev_tag}_${ccm_baseline_status_baseline}"
     fi
 
     # Move the workarea pointer to the 'baseline' tag
-    git reset --soft ${repo_baseline_rev_tag_wcomponent_wstatus}
+    git reset --mixed ${repo_baseline_rev_tag_wcomponent_wstatus}
+    git checkout HEAD .gitignore
+    git status
 
     for repo_submodule in ${repo_submodules}; do
         repo_submodule_rev=`ccm query "hierarchy_project_members('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1',none) and name ='${repo_submodule}'" -u -f "%version" | sed -e 's/ /xxx/g'`
@@ -101,9 +102,9 @@ for project_revision in ${project_revisions}; do
             echo "The submodule does not exit as a project - skip"
             continue
         fi
-        git checkout HEAD .gitmodules || echo ".gitmodule does not exist in current revision"
+        git checkout HEAD .gitmodules || echo ".gitmodules does not exist in current revision"
         if [ ! `git checkout HEAD ${repo_submodule}` ] ; then
-                git rm -rf ${repo_submodule}
+                git rm -rf ${repo_submodule} || rm -rf ${repo_submodule}
                 git submodule add --force ssh://git@dtdkcphlx0231.md-man.biz:7998/${gitrepo_project_submodule}/${repo_submodule}.git
         fi
         git submodule update --init --recursive
@@ -142,11 +143,9 @@ for project_revision in ${project_revisions}; do
         cd -
 
     done
-
-    #git status
+    git status
     git add -A .
     #git status
-#date -d "11/1/12 2:13 PM" "+%Y-%m-%d %H:%M"
 
     export GIT_AUTHOR_DATE=`ccm properties -f "%{create_time[dateformat='yyyy-MM-dd HH:MM:SS']}" "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1"`
     export GIT_COMMITTER_DATE=${GIT_AUTHOR_DATE}
@@ -165,7 +164,7 @@ for project_revision in ${project_revisions}; do
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Project baseline:"                             >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "  %displayname"  || echo "  <none>" >> ./tag_meta_data.txt
+        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1')" -f "%displayname" >> ./tag_meta_data.txt || echo "  <none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
@@ -213,7 +212,7 @@ for project_revision in ${project_revisions}; do
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
         echo "Project baseline:"                             >> ./tag_meta_data.txt
         echo "---------------------------------------------------------" >> ./tag_meta_data.txt
-        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1'))))" -f "  %displayname"  || echo "  <none>" >> ./tag_meta_data.txt
+        ccm query "is_baseline_project_of('${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g'):project:1')" -f "%displayname"  >> ./tag_meta_data.txt || echo "  <none>" >> ./tag_meta_data.txt
         echo >> ./tag_meta_data.txt
 
         echo >> ./tag_meta_data.txt
@@ -247,9 +246,9 @@ for project_revision in ${project_revisions}; do
 
     rm -f ./tag_meta_data.txt
 
-    export GIT_AUTHOR_DATE=""
-    export GIT_COMMITTER_DATE=""
-    export repo_convert_rev_tag_wcomponent_wstatus=""
+    unset GIT_AUTHOR_DATE
+    unset GIT_COMMITTER_DATE
+    unset repo_convert_rev_tag_wcomponent_wstatus
 
 
 #    git push origin -f --tag ${repo_convert_rev_tag_wcomponent_wstatus}
