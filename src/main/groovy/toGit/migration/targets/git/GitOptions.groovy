@@ -6,6 +6,7 @@ class GitOptions {
     String user = 'migration'
     String email = '2git@praqma.com'
     String remote = ''
+    String initCommitDate = "1970-01-01 00:00"
 
     boolean defaultSetup = true
     boolean longPaths = false
