@@ -49,7 +49,7 @@ def system_path2 = System.getenv("PATH")
 
 def my_workspace
 if ( !my_workspace_root ) {
-    my_workspace_root = "/data/Synergy/ccm2git-main/" 
+    my_workspace_root = "/data/Synergy/ccm2git-main"
     my_workspace = my_workspace_root + "/" + ccm_project + "/"
 } else {
     my_workspace = my_workspace_root + "/" + ccm_project + "/"

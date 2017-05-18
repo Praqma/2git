@@ -59,13 +59,13 @@ class MetaBaseline extends Extraction {
                 log.error "Standard error:"
                 log.error "'" + serr + "'"
                 log.error "Exit code: " + exitValue
-                throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $baselineRevision gave exit code: $exitValue")
+                throw new Exception(cmd_line + " gave exit code: $exitValue")
             }
             if (serr.toString().readLines().size() > 0) {
                 log.error "Standard error:"
                 log.error "'" + serr + "'"
                 log.error "Exit code: " + exitValue
-                throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $baselineRevision: standard error contains text lines: " + serr.toString().readLines().size())
+                throw new Exception(cmd_line + " standard error contains text lines: " + serr.toString().readLines().size())
             }
             result['baselineRevision'] = baselineRevision
             result['baselineRevision_wstatus'] = baselineRevision + '_' + sout.toString().trim()
@@ -74,7 +74,9 @@ class MetaBaseline extends Extraction {
         }
 
         // Get the baseline date from project
-        cmd_line = "ccm properties -f \"%{create_time[dateformat='yyyy-MM-dd HH:MM:SS']}\" $project_revision_with_spaces:project:1"
+//        cmd_line = 'ccm properties -f \"%{create_time[dateformat=\\\"yyyy-MM-dd HH:MM:SS\\\"]}\" ' + project_revision_with_spaces + ':project:1'
+        cmd_line = "ccm properties -f \"%create_time\" $project_revision_with_spaces:project:1"
+        cmd
         log.info "'" + cmd_line + "'"
         cmd = cmd_line.execute(envVars,new File(workspace))
         cmd.waitForProcessOutput(sout, serr)
@@ -110,13 +112,13 @@ class MetaBaseline extends Extraction {
             log.error "Standard error:"
             log.error "'" + serr + "'"
             log.error "Exit code: " + exitValue
-            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision gave exit code: $exitValue" )
+            throw new Exception(cmd_line +": gave exit code: $exitValue" )
         }
         if ( serr.toString().readLines().size() > 0 ){
             log.error "Standard error:"
             log.error "'" + serr + "'"
             log.error "Exit code: " + exitValue
-            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision: standard error contains text lines: " + serr.toString().readLines().size() )
+            throw new Exception(cmd_line + " standard error contains text lines: " + serr.toString().readLines().size() )
         }
         result['snapshot_status'] = sout.toString().trim()
         sout = new StringBuilder()
@@ -132,18 +134,18 @@ class MetaBaseline extends Extraction {
         cmd = cmd_line.execute(envVars,new File(workspace))
         cmd.waitForProcessOutput(sout, serr)
         exitValue = cmd.exitValue()
-        log.info "stdout lines count: " + serr.toString().readLines().size()
+        log.info "stdout lines count: " + sout.toString().readLines().size()
         if ( exitValue ){
             log.error "Standard error:"
             log.error "'" + serr + "'"
             log.error "Exit code: " + exitValue
-            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision gave exit code: $exitValue" )
+            throw new Exception( cmd_line + ": gave exit code: $exitValue" )
         }
         if ( serr.toString().readLines().size() > 0 ){
             log.error "Standard error:"
             log.error "'" + serr + "'"
             log.error "Exit code: " + exitValue
-            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision: standard error contains text lines: " + serr.toString().readLines().size() )
+            throw new Exception( cmd_line + ": standard error contains text lines: " + serr.toString().readLines().size() )
         }
         result['baseline_info'] = sout
 
