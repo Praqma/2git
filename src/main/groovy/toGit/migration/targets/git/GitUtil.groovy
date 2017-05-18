@@ -46,7 +46,7 @@ class GitUtil {
      */
     static void configureRepository(File path, GitOptions options) {
         if (options.user) {
-            callOrDie(path, "config", "user.name", options.user)
+            callOrDie(path, "config", "user.name", "\"$options.user\"")
             log.debug("Set git user.name to $options.user.")
         }
         if (options.email) {
@@ -57,7 +57,7 @@ class GitUtil {
             callOrDie(path, "config", "core.longpaths", "true")
         }
         if (!(("").equals(options.remote))) {
-            call(path, "remote", "add", "origin", options.remote)
+            callOrDie(path, "remote", "add", "origin", options.remote)
         }
         writeGitIgnore(path, options)
         setGitLfs(path, options)
@@ -75,6 +75,11 @@ class GitUtil {
         options.ignore.each { rule ->
             FileUtils.writeStringToFile(gitIgnore, rule + '\n', true)
         }
+        log.info(".gitignore created")
+        if (gitIgnore.exists())
+            log.info(".gitignore add")
+            callOrDie(path, "add", ".gitignore")
+        log.info(".gitignore created")
     }
 
     /**
@@ -105,8 +110,34 @@ class GitUtil {
         if (!path.exists()) {
             log.error("Git dir $path does not exist: FAIL")
         } else {
-            callOrDie(path, "commit", "--allow-empty", "-m init")
-            callOrDie(path, "tag", "-m init", "init")
+
+            log.info("Creating the init commit")
+            def sout = new StringBuilder(), serr = new StringBuilder()
+            def cmd
+            def cmd_line
+            log.info("Setting environment: GIT_COMMITTER_DATE, GIT_AUTHOR_DATE")
+            def envVars = System.getenv().collect { k, v -> "$k=$v"  }
+            envVars.add('GIT_COMMITTER_DATE=1970-01-01 11:11:11')
+            envVars.add('GIT_AUTHOR_DATE=1970-01-01 11:11:11')
+
+            // Create the init commit
+            cmd_line = "git commit --allow-empty -m init"
+            log.debug("Executing '$cmd_line' in $path")
+            cmd = cmd_line.execute(envVars,path)
+            cmd.waitForProcessOutput(sout, serr)
+            println sout
+            println serr
+
+            // Create the tag
+            cmd_line = "git tag -m init init"
+            log.debug("Executing '$cmd_line' in $path")
+            cmd = cmd_line.execute(envVars,path)
+            cmd.waitForProcessOutput(sout, serr)
+
+            println sout
+            println serr
+
+
         }
     }
 }

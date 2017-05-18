@@ -2,8 +2,6 @@ package examples
 
 /* vim: set syntax=groovy:set et:set tabstop=4: */
 
-//def ccm_project = "make2"
-//def start_project = ccm_project + "~makedev2_migr"
 def ccm_delimiter='~'
 
 def ccm_project
@@ -39,7 +37,6 @@ if ( !System.getenv("CCM_ADDR") ){
 } else {
     ccm_addr_cli = System.getenv("CCM_ADDR")
 }
-// "DTDKCPHPW111426:61516:10.100.104.126"
 
 def ccm_home_cli
 if ( !System.getenv("CCM_HOME") ){
@@ -50,17 +47,21 @@ if ( !System.getenv("CCM_HOME") ){
 }
 def system_path2 = System.getenv("PATH")
 
-//def my_workspace = "c:/Users/cssr/git_conversion/ccm2git-main/" + ccm_project
 def my_workspace
-
 if ( !my_workspace_root ) {
     my_workspace_root = "/data/Synergy/ccm2git-main/" 
-    my_workspace = my_workspace_root + ccm_project + "/"
+    my_workspace = my_workspace_root + "/" + ccm_project + "/"
 } else {
-    my_workspace = my_workspace_root + ccm_project + "/"
+    my_workspace = my_workspace_root + "/" + ccm_project + "/"
 }
 
-def git_server = "dtdkcphlx0231.md-man.biz:7991/scarp"
+def git_server_path_this
+if ( !git_server_path ){
+    git_server_path_this = "dtdkcphlx0231.md-man.biz:7991/scarp"
+} else {
+    git_server_path_this = git_server_path
+}
+
 
 
 def my_workspace_file = new File(my_workspace)
@@ -81,8 +82,9 @@ target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user 'Claus Schneider(Praqma)'
     email 'claus.schneider-ext@man.eu'
-    remote "ssh://git@${git_server}/${ccm_project}.git"
+    remote "ssh://git@${git_server_path_this}/${ccm_project}.git"
     longPaths true
+    ignore ""
 }
 
 migrate {
@@ -92,18 +94,12 @@ migrate {
                 AlreadyConverted(target.workspace)
             }
             extractions {
-                baselineProperties()
+                baselineProperties(source.workspace)
             }
             actions {
-                custom { project ->
-                    println project.snapshot
-                    println project.snapshotName
-                    println project.snapshotRevision
-                    println project.baselineRevision
-                }
 
                 // Scrub Git repository, so file deletions will also be committed
-                cmd 'git reset --hard $baselineRevision', target.workspace
+                cmd 'git reset --hard $baselineRevision_wstatus', target.workspace
 
                 custom {
                     println "Removing files except .git folder in: $target.workspace"
@@ -137,14 +133,71 @@ migrate {
                 // Commit everything
                 cmd 'git add -A .', target.workspace
 
-                cmd 'git commit -m "$snapshotRevision" || (echo "Empty commit.." && exit 0)', target.workspace
+                custom { project ->
+                    def sout = new StringBuilder(), serr = new StringBuilder()
+                    def cmd_line = 'git commit -m "' + project.snapshotRevision + '"'
+                    println cmd_line
 
-//                cmd 'git commit --allow-empty -m "$snapshotRevision"', target.workspace
+                    def envVars = System.getenv().collect { k, v -> "$k=$v" }
+                    envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
+                    envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
+                    def cmd = cmd_line.execute(envVars, new File(target.workspace))
+                    cmd.waitForProcessOutput(sout, serr)
+                    def exitValue = cmd.exitValue()
+                    println "Standard out:"
+                    println "'" + sout + "'"
+                    println "Standard error:"
+                    println "'" + serr + "'"
+                    println "Exit code: " + exitValue
 
-                cmd 'git tag -f -m "$snapshotRevision" "$snapshotRevision"', target.workspace
+                    if ( sout.contains('nothing to commit, working directory clean') )
+                        println "Empty workspace - skip, but still tag"
+
+                    if (exitValue) {
+                        if ( sout.contains('nothing to commit, working directory clean') )
+                            println "Empty workspace - skip, but still tag"
+                        else
+                            throw new Exception(cmd_line + ": gave exit code: $exitValue")
+                    }
+                    if (serr.toString().readLines().size() > 0) {
+                        throw new Exception(cmd_line + ": standard error contains text lines: " + serr.toString().readLines().size())
+                    }
+                }
+
+                // The file for tag info is generated during MetaDataExtraction
+                custom { project ->
+                    new File(target.workspace + File.separator + "tag_meta_data.txt").withWriter { out ->
+                        project.baseline_info.each {
+                            out.println it
+                        }
+                    }
+                }
+                custom { project ->
+                    def sout = new StringBuilder(), serr = new StringBuilder()
+                    def cmd_line = "git tag -F tag_meta_data.txt " + project.snapshotRevision + "_" + project.snapshot_status
+                    println cmd_line
+
+                    def envVars = System.getenv().collect { k, v -> "$k=$v" }
+                    envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
+                    envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
+                    def cmd = cmd_line.execute(envVars,new File(target.workspace))
+                    cmd.waitForProcessOutput(sout, serr)
+                    def exitValue = cmd.exitValue()
+                    println "Standard out:"
+                    println "'" + sout + "'"
+                    println "Standard error:"
+                    println "'" + serr + "'"
+                    println "Exit code: " + exitValue
+                    if ( exitValue ){
+                        throw new Exception(cmd_line + ": gave exit code: $exitValue" )
+                    }
+                    if ( serr.toString().readLines().size() > 0 ){
+                        throw new Exception(cmd_line + ": standard error contains text lines: " + serr.toString().readLines().size() )
+                    }
+                }
 
                 cmd 'du -sh .git >> ../git_sizes.txt', target.workspace
-                cmd 'du -sh .git', target.workspace
+                cmd 'tail -1 ../git_sizes.txt', target.workspace
             }
         }
     }

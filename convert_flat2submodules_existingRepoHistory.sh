@@ -68,7 +68,8 @@ for project_revision in ${project_revisions}; do
     # Get the right content
     if [ `git describe ${repo_convert_rev_tag}`  ] ; then
         # we do have the correct 'content' tag checkout it out
-        git reset --hard ${repo_convert_rev_tag}
+        repo_submodule_rev_wcomponent_wstatus=$(git tag | grep .*/.*/${repo_convert_rev_tag}_[dprtis][eueenq][lblsta]$ || echo )
+        git reasdfset --hard ${repo_convert_rev_tag}  || git reset --hard ${repo_submodule_rev_wcomponent_wstatus}
     else
         # we do not have the 'content' tag available - investigate its history if it exists ( e.g. missing in repo )
         ./baseline_history_get_root.sh "${ccm_project_name}~$(echo ${repo_convert_rev_tag} | sed -e 's/xxx/ /g')"
@@ -105,7 +106,7 @@ for project_revision in ${project_revisions}; do
         git checkout HEAD .gitmodules || echo ".gitmodules does not exist in current revision"
         if [ ! `git checkout HEAD ${repo_submodule}` ] ; then
                 git rm -rf ${repo_submodule} || rm -rf ${repo_submodule}
-                git submodule add --force ssh://git@dtdkcphlx0231.md-man.biz:7998/${gitrepo_project_submodule}/${repo_submodule}.git
+                git submodule add --force afds/${gitrepo_project_submodule}/${repo_submodule}.git
         fi
         git submodule update --init --recursive
 

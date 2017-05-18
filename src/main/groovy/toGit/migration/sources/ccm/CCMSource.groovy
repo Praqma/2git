@@ -28,19 +28,13 @@ class CCMSource implements MigrationSource {
         println cmd_line
 
         def envVars = System.getenv().collect { k, v -> "$k=$v" }
-//        def envVars = ["CCM_ADDR=" + ccm_addr, "CCM_HOME=" + ccm_home, "PATH=" + system_path]
         def cmd = cmd_line.execute(envVars,new File(workspace))
-        //cmd.consumeProcessOutput(sout, serr)
         cmd.waitForProcessOutput(sout, serr)
 
         println sout
         println serr
 
         projects = sout.readLines().collect{new Snapshot(it){}}
-
-//        projects.each {
-//            println it
-//        }
 
         println projects.size()
 
@@ -61,7 +55,7 @@ class CCMSource implements MigrationSource {
         codeFile.mkdir()
 
         if ( new File(workspace + "/code/" + project).exists()){
-            println "Skipping project revision: ${project} - already exists"
+            println "CM/Synergy checkout: Skipping project revision: ${project} - already exists"
         } else {
             def sout = new StringBuilder(), serr = new StringBuilder()
 
@@ -74,7 +68,6 @@ class CCMSource implements MigrationSource {
             }
 
             def envVars = System.getenv().collect { k, v -> "$k=$v" }
-            //def envVars = ["CCM_ADDR=" + ccm_addr, "CCM_HOME=" + ccm_home, "PATH=" + system_path]
             def cmd_line = ["ccm", "copy_to_file_system", "-p", "${project}_tmp", "-r", "${project_revision_with_spaces}:project:1"]
             println "'" + cmd_line + "'"
             def cmd = cmd_line.execute(envVars,codeFile)
@@ -94,7 +87,6 @@ class CCMSource implements MigrationSource {
 
             FileUtils.moveDirectory(new File(workspace + "/code/" + project + "_tmp"), new File(workspace + "/code/" + project))
 
-            //println ("ccm copy_to_file_system -p $project -r \"$project:project:1\" > /dev/null".execute([],codeFile.parentFile).text)
         }
 
 

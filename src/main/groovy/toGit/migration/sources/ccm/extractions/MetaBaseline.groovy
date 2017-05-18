@@ -9,47 +9,143 @@ class MetaBaseline extends Extraction {
 
     final static log = LoggerFactory.getLogger(this.class)
 
-    Map<String, String> map
+    String workspace
 
-    MetaBaseline(Map<String, String> map) {
-        this.map = map
+    MetaBaseline(String ccm_workspace) {
+        this.workspace = ccm_workspace
     }
 
     @Override
     HashMap<String, Object> extract(Snapshot snapshot ) {
         def result = [:]
 
+        def snapshotName = snapshot.identifier.split("@@@")[0].split("~")[0]
+        def snapshotRevision = snapshot.identifier.split("@@@")[0].split("~")[1]
+        def baselineRevision = snapshot.identifier.split("@@@")[1].split("~")[1]
+
         result['snapshot'] = snapshot.identifier.split("@@@")[0]
-        result['snapshotName'] = snapshot.identifier.split("@@@")[0].split("~")[0]
-        result['snapshotRevision'] = snapshot.identifier.split("@@@")[0].split("~")[1]
+        result['snapshotName'] = snapshotName
+        result['snapshotRevision'] = snapshotRevision
 
-        result['baselineRevision'] = snapshot.identifier.split("@@@")[1].split("~")[1]
+        def project_revision_with_spaces = snapshot.identifier.split("@@@")[0].replaceAll("xxx"," ")
 
-/**
-        def submodules = [:]
+        result['snapshot_revision_wspaces'] = project_revision_with_spaces
 
-        submodule_paths.each { path ->
-            log.info("Submodule path: ${path}")
-            def sout = new StringBuilder(), serr = new StringBuilder()
-            def cmd_line = 'ccm query "is_member_of(\'' + snapshot.identifier.split("@@@")[0] + 'project:1\') and type='project' and name=\'' + path + "'" + ' -u -f "%displayname" '
-            println cmd_line
+        def envVars = System.getenv().collect { k, v -> "$k=$v" }
+        def cmd_line
+        def cmd
+        def exitValue
+        def sout
+        def serr
+        sout = new StringBuilder()
+        serr = new StringBuilder()
 
-            def envVars = ["CCM_ADDR=" + ccm_addr ];
-            def cmd = cmd_line.execute(envVars,new File(workspace))
-            //cmd.consumeProcessOutput(sout, serr)
+        // get baseline or project baseline status of the baseline revision
+        if ( baselineRevision ==~ /init/ ) {
+            result['baselineRevision'] = baselineRevision
+            result['baselineRevision_wstatus'] = baselineRevision
+        } else {
+
+            cmd_line = "bash --login " +
+                    System.getProperty("user.dir") + File.separator + "ccm-get-status-from-baseline-or-project.sh " +
+                    "$snapshotName " +
+                    "$baselineRevision"
+            log.info(cmd_line)
+            cmd = cmd_line.execute(envVars, new File(workspace))
             cmd.waitForProcessOutput(sout, serr)
-
-            println sout
-            println serr
-
-            submodule_line = sout.readLines().first().trim()
-            submodules[submodule_line.split('~')[0]] =  submodule_line.split('~')[1]
-            log.info("Submodule revision: ${submodule_line}")
+            exitValue = cmd.exitValue()
+            log.info "stdout: " + sout.toString().trim()
+            if (exitValue) {
+                log.error "Standard error:"
+                log.error "'" + serr + "'"
+                log.error "Exit code: " + exitValue
+                throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $baselineRevision gave exit code: $exitValue")
+            }
+            if (serr.toString().readLines().size() > 0) {
+                log.error "Standard error:"
+                log.error "'" + serr + "'"
+                log.error "Exit code: " + exitValue
+                throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $baselineRevision: standard error contains text lines: " + serr.toString().readLines().size())
+            }
+            result['baselineRevision'] = baselineRevision
+            result['baselineRevision_wstatus'] = baselineRevision + '_' + sout.toString().trim()
+            sout = new StringBuilder()
+            serr = new StringBuilder()
         }
 
-        result['submodules'] = submodules
-*/
-        // extract ccm data (baseline, tasks bla bla)
+        // Get the baseline date from project
+        cmd_line = "ccm properties -f \"%{create_time[dateformat='yyyy-MM-dd HH:MM:SS']}\" $project_revision_with_spaces:project:1"
+        log.info "'" + cmd_line + "'"
+        cmd = cmd_line.execute(envVars,new File(workspace))
+        cmd.waitForProcessOutput(sout, serr)
+        exitValue = cmd.exitValue()
+        log.info "stdout: " + sout.toString().trim()
+        if ( exitValue ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception(cmd_line + ": gave an non-0 exit code" )
+        }
+        if ( serr.toString().readLines().size() > 0 ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception(cmd_line + ": standard error contains text lines: " + serr.toString().readLines().size() )
+        }
+        result['snapshot_commiter_date'] = sout.toString().trim()
+        sout = new StringBuilder()
+        serr = new StringBuilder()
+
+        // get baseline or project baseline status from
+        cmd_line = "bash --login " +
+                System.getProperty("user.dir") + File.separator + "ccm-get-status-from-baseline-or-project.sh " +
+                "$snapshotName " +
+                "$snapshotRevision"
+        log.info(cmd_line)
+        cmd = cmd_line.execute(envVars,new File(workspace))
+        cmd.waitForProcessOutput(sout, serr)
+        exitValue = cmd.exitValue()
+        log.info "stdout: " + sout.toString().trim()
+        if ( exitValue ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision gave exit code: $exitValue" )
+        }
+        if ( serr.toString().readLines().size() > 0 ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision: standard error contains text lines: " + serr.toString().readLines().size() )
+        }
+        result['snapshot_status'] = sout.toString().trim()
+        sout = new StringBuilder()
+        serr = new StringBuilder()
+
+
+        // Build the CCM project meta data for later commit
+        cmd_line = "bash --login " +
+                System.getProperty("user.dir") + File.separator + "ccm-extract-baseline-project-metadata.sh " +
+                "$snapshotName " +
+                "$snapshotRevision"
+        log.info(cmd_line)
+        cmd = cmd_line.execute(envVars,new File(workspace))
+        cmd.waitForProcessOutput(sout, serr)
+        exitValue = cmd.exitValue()
+        log.info "stdout lines count: " + serr.toString().readLines().size()
+        if ( exitValue ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision gave exit code: $exitValue" )
+        }
+        if ( serr.toString().readLines().size() > 0 ){
+            log.error "Standard error:"
+            log.error "'" + serr + "'"
+            log.error "Exit code: " + exitValue
+            throw new Exception("ccm-extract-baseline-project-metadata.sh $snapshotName $snapshotRevision: standard error contains text lines: " + serr.toString().readLines().size() )
+        }
+        result['baseline_info'] = sout
 
         return result
     }
