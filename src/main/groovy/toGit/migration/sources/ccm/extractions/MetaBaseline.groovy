@@ -75,8 +75,10 @@ class MetaBaseline extends Extraction {
 
         // Get the baseline date from project
 //        cmd_line = 'ccm properties -f \"%{create_time[dateformat=\\\"yyyy-MM-dd HH:MM:SS\\\"]}\" ' + project_revision_with_spaces + ':project:1'
-        cmd_line = "ccm properties -f \"%create_time\" $project_revision_with_spaces:project:1"
-        cmd
+        cmd_line = "bash --login " +
+                System.getProperty("user.dir") + File.separator + "ccm-get-create-time-of-project.sh " +
+                "$snapshotName " +
+                "$snapshotRevision"
         log.info "'" + cmd_line + "'"
         cmd = cmd_line.execute(envVars,new File(workspace))
         cmd.waitForProcessOutput(sout, serr)
