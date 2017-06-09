@@ -101,6 +101,9 @@ The resulting migration plan that will be executed is the following:
 | D        | N/A         | commit      |
 | E        | readFile    | commit, tag |
 
+## CodeScene Analysis results
+[![](https://codescene.io/projects/1347/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1347/jobs/latest-successful/results)
+
 ## Contributing
 
 Feel like chipping in? Check our [contribution guidelines](CONTRIBUTING.md) for more information!
