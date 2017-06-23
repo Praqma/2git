@@ -4,7 +4,7 @@ maintainer: praqma-thi
 
 # 2git
 
-The 2git project is an SCM migration engine that enables you to migrate to git using a Groovy DSL.
+The 2git project is an SCM migration engine enabling you to migrate to git using a Groovy DSL.
 It allows you to document your migration in a Groovy DSL and execute it by passing it to the 2git engine.
 If you don't like what you see, you can easily tweak your recipe and run it again, until you get the perfect migration.
 
