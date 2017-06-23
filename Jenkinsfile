@@ -1,7 +1,7 @@
 /** CONFIG **/
 REPO = "github.com/Praqma/2git.git"
 INTEGRATION_BRANCH = 'master'
-BRANCH_PREFIX = 'test/'
+BRANCH_PREFIX = 'ready/'
 CREDENTIALS_ID = "releasepraqma-https"
 
 /** STATE **/
