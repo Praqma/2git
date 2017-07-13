@@ -117,26 +117,12 @@ def guardedStage(name, closure) {
 
 def pipelineSuccess() {
     node("master") {
-        emailext(
-                subject: "Success: ${BRANCH_NAME}",
-                to: authorEmail,
-                body: """\
-                        Status: Succeeded
-                        Branch: ${BRANCH_NAME}
-                        Jenkins URL: ${BUILD_URL}""".stripIndent()
-        )
+        currentBuild.result = 'SUCCESS'
     }
 }
 
 def pipelineFailure(stage, exception) {
     node("master") {
-        emailext(
-                subject: "Failure: ${BRANCH_NAME}: ${stage}",
-                to: authorEmail,
-                body: """\
-                        Status: Failed at stage "${stage}" with "${exception.toString()}"
-                        Branch: ${BRANCH_NAME}
-                        Jenkins URL: ${BUILD_URL}""".stripIndent()
-        )
+        currentBuild.result = 'FAILURE'
     }
 }
