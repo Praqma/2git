@@ -1,9 +1,20 @@
+// --------------------
+// plugins
+// --------------------
+
+plugins {
+    id 'com.palantir.git-version' version '0.8.0'
+}
+
 apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
 
+// --------------------
+// dependencies
+// --------------------
+
 repositories {
-    mavenCentral()
     jcenter()
     maven {
         url 'http://code.praqma.net/repo/maven/'
@@ -11,31 +22,45 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'net.praqma:cool:0.6.48'
-    compile 'org.apache.ivy:ivy:2.4.0'
-    compile('org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'){
-        exclude group: 'org.codehaus.groovy'
-    }
+    compile 'net.praqma:cool:0.6.50'
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile('org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2')
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
+
+// --------------------
+// project configuration
+// --------------------
+
+project.group           = 'com.praqma'
+project.version         = gitVersion()
+project.description     = 'Migration engine used to migrate from an arbitrary VCS to git'
+
+
+// --------------------
+// application plugin
+// --------------------
+
+project.mainClassName   = 'toGit.Run'
+
+startScripts {
+    doLast {
+        // The start scripts can't handle a project name starting with a number.
+        // They'd contain use of a parameter called '$2GIT_OPTS', in which the '$2' was problematic.
+        unixScript.text     = unixScript.text.replaceAll('2GIT_OPTS', 'TOGIT_OPTS')
+        windowsScript.text  = windowsScript.text.replaceAll('2GIT_OPTS', 'TOGIT_OPTS')
+    }
+}
+
+// --------------------
+// testing
+// --------------------
 
 task functionalTest(type: Test) {
     dependsOn('testClasses')
     include 'toGit/functional/**'
 }
-
-task uberjar(type: Jar) {
-    dependsOn('compileGroovy')
-    from files(sourceSets.main.output.classesDir)
-    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
-    manifest {
-        attributes 'Main-Class': 'toGit.Run'
-    }
-}
-
-mainClassName='toGit.Run'
 
 test {
     exclude 'toGit/functional/**'
