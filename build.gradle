@@ -3,7 +3,8 @@
 // --------------------
 
 plugins {
-    id 'com.palantir.git-version' version '0.8.0'
+    id 'com.palantir.git-version'   version '0.8.0'
+    id 'co.riiid.gradle'            version '0.4.2'
 }
 
 apply plugin: 'groovy'
@@ -52,6 +53,23 @@ startScripts {
         windowsScript.text  = windowsScript.text.replaceAll('2GIT_OPTS', 'TOGIT_OPTS')
     }
 }
+
+// --------------------
+// github plugin
+// --------------------
+
+github {
+    owner   = 'ReleasePraqma'
+    repo    = 'gradle-github-plugin'
+    token   = project.hasProperty("GITHUB_TOKEN") ? "$GITHUB_TOKEN" : "No token provided"
+    tagName = gitVersion()
+    name    = gitVersion()
+    assets  = ["build/distributions2git-${gitVersion()}.zip"]
+    targetCommitish = 'master'
+}
+
+githubRelease.group = "Publishing"
+githubRelease.description = "Creates a release on GitHub"
 
 // --------------------
 // testing
