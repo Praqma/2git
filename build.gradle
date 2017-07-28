@@ -59,12 +59,15 @@ startScripts {
 // --------------------
 
 github {
-    owner   = 'ReleasePraqma'
-    repo    = 'gradle-github-plugin'
+    owner   = 'Praqma'
+    repo    = '2git'
     token   = project.hasProperty("GITHUB_TOKEN") ? "$GITHUB_TOKEN" : "No token provided"
     tagName = gitVersion()
     name    = gitVersion()
-    assets  = ["build/distributions2git-${gitVersion()}.zip"]
+    assets  = [
+        "build/distributions/2git-${gitVersion()}.zip",
+        "build/distributions/2git-${gitVersion()}.tar"
+    ]
     targetCommitish = 'master'
 }
 

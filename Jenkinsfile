@@ -87,6 +87,25 @@ lockIf(shouldMerge(), "integration-lock") {
     }
 }
 
+// Flyweight executor
+guardedStage("promotion"){
+    timeout(time: 1, unit: 'HOURS') {
+        input "Promote? (Don't forget to tag!)"
+    }
+}
+
+node {
+    guardedStage("release"){
+        deleteDir()
+        docker.image('gradle:3.5-jre-alpine').inside {
+            unstash "merge-result"
+            withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
+                sh "gradle githubRelease -PGITHUB_TOKEN=\$GITHUB_TOKEN"
+            }
+        }
+    }
+}
+
 pipelineSuccess()
 
 /** UTILITY METHODS **/
