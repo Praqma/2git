@@ -5,7 +5,7 @@ multibranchPipelineJob('2gitPipeline') {
   branchSources {
     git {
       remote('git@github.com:Praqma/2git.git')
-      credentialsID('jenkins')
+      credentialsId('jenkins')
       includes('*')
     }
   }
