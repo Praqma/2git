@@ -17,7 +17,7 @@ println("[PARAMETERS]" +
         "\n\tmerge: ${shouldMerge()}")
 
 lockIf(shouldMerge(), "integration-lock") {
-    node {
+    node('docker') {
         guardedStage("checkout") {
             deleteDir()
             checkout scm
@@ -55,7 +55,7 @@ lockIf(shouldMerge(), "integration-lock") {
         }
     }
 
-    node {
+    node('docker') {
         guardedStage("build") {
             deleteDir()
             docker.image('gradle:3.5-jre-alpine').inside {
@@ -65,7 +65,7 @@ lockIf(shouldMerge(), "integration-lock") {
         }
     }
 
-    node {
+    node('docker') {
         guardedStage("push") {
             deleteDir()
             if (shouldMerge()) {
@@ -94,7 +94,7 @@ guardedStage("promotion"){
     }
 }
 
-node {
+node('docker') {
     guardedStage("release"){
         deleteDir()
         docker.image('gradle:3.5-jre-alpine').inside {
