@@ -58,7 +58,7 @@ lockIf(shouldMerge(), "integration-lock") {
     node('docker') {
         guardedStage("build") {
             deleteDir()
-            docker.image('gradle:3.5-jre-alpine').inside {
+            docker.image('drbosse/gradle-git:3.5-jre-alpine').inside {
                 unstash "merge-result"
                 sh "gradle build"
             }
