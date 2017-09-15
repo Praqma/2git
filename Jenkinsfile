@@ -97,7 +97,7 @@ guardedStage("promotion"){
 node('utility-slave') {
     guardedStage("release"){
         deleteDir()
-        docker.image('gradle:3.5-jre-alpine').inside {
+        docker.image('drbosse/gradle-git:3.5-jre-alpine').inside {
             unstash "merge-result"
             withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
                 sh "gradle githubRelease -PGITHUB_TOKEN=\$GITHUB_TOKEN"
