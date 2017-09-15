@@ -2,7 +2,7 @@
 REPO = "github.com/Praqma/2git.git"
 INTEGRATION_BRANCH = 'master'
 BRANCH_PREFIX = 'ready/'
-CREDENTIALS_ID = "releasepraqma-https"
+CREDENTIALS_ID = "github"
 
 /** STATE **/
 inputSHA = ""
@@ -60,7 +60,7 @@ lockIf(shouldMerge(), "integration-lock") {
             deleteDir()
             docker.image('drbosse/gradle-git:3.5-jre-alpine').inside {
                 unstash "merge-result"
-                sh "gradle build"
+                sh "gradle build --stacktrace"
             }
         }
     }
@@ -100,7 +100,7 @@ node('utility-slave') {
         docker.image('drbosse/gradle-git:3.5-jre-alpine').inside {
             unstash "merge-result"
             withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
-                sh "gradle githubRelease -PGITHUB_TOKEN=\$GITHUB_TOKEN"
+                sh "gradle githubRelease --stacktrace -PGITHUB_TOKEN=\$GITHUB_TOKEN"
             }
         }
     }
