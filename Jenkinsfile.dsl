@@ -15,3 +15,15 @@ multibranchPipelineJob('2gitPipeline') {
     }
   }
 }
+
+listView('2git') {
+  jobs {
+    regex('2git.+')
+  }
+  columns {
+    status()
+    weather()
+    name()
+    buildButton()
+  }
+}
