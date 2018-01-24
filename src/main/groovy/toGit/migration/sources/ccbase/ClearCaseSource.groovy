@@ -12,16 +12,35 @@ class ClearCaseSource implements MigrationSource {
 
     final static log = LoggerFactory.getLogger(this.class)
 
-    String configSpec;
-    String labelVob;
-    String viewTag;
-    List<String> vobPaths = [];
+    String configSpec
+    String labelVob
+    String labelFile
+    String viewTag
+    List<String> vobPaths = []
 
     @Override
     List<Snapshot> getSnapshots(List<Criteria> initialFilter) {
-        log.info("Retrieving labels from vob ${labelVob}")
-        def labels = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false).split("\n")
-        return labels.collect { new ClearCaseSnapshot(it) }
+        if (!labelFile && !labelVob) {
+            log.error("Missing label source")
+            log.error("Neither labelFile or labelVob were specified")
+            System.exit(1)
+        }
+
+        if(labelFile) {
+            def asFile = new File(labelFile)
+            if(!asFile.exists() || asFile.isDirectory()) {
+                log.error("Couldn't find labelFile: ${asFile.absolutePath}")
+                System.exit(1)
+            }
+            def labels = asFile.text.readLines().collect { it.trim() }.grep { it != null && it != "" }
+            return labels.collect { new ClearCaseSnapshot(it) }
+        }
+
+        if(labelVob) {
+            log.info("Retrieving labels from vob ${labelVob}")
+            def labels = runCommand(["cleartool", "lstype", "-kind", "lbtype", "-short", "-invob", labelVob], true, false).split("\n")
+            return labels.collect { new ClearCaseSnapshot(it) }
+        }
     }
 
     @Override
@@ -34,7 +53,7 @@ class ClearCaseSource implements MigrationSource {
     @Override
     void prepare() {
         log.info("Creating snapshot view '${viewTag}'")
-        runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", "${workspace}"], false, true)
+        runCommand(["cleartool", "mkview", "-snapshot", "-tag", viewTag, "-stgloc", "-auto", workspace], false, true)
     }
 
     @Override
@@ -57,16 +76,18 @@ class ClearCaseSource implements MigrationSource {
      * @param label The label to update the spec with
      */
     private void updateConfigSpec(String label) {
-        def spec = configSpecAsFile()
-        if (label == null || label.isEmpty())
-            spec.text = "element * CHECKEDOUT\nelement * /main/LATEST\n"
-        else
-            spec.text = "element * $label\n"
+        def specText = "element * CHECKEDOUT\n"
+        if (label) {
+            specText += "element * $label\n"
+        }
+        specText += "element * /main/LATEST\n"
 
         vobPaths.each {
-            spec.text += ("load /$it\n")
+            specText += ("load /$it\n")
         }
-        println(spec.text)
+
+        configSpecAsFile().text = specText
+        println(specText)
     }
 
     /**
@@ -82,12 +103,19 @@ class ClearCaseSource implements MigrationSource {
      * @return The process output as a String
      */
     private String runCommand(List<String> command, boolean runInWorkspace, boolean printOutput) {
+        log.info("Executing: ${command.join(" ")}")
         def builder = new ProcessBuilder(command).redirectErrorStream(true)
         builder = runInWorkspace ? builder.directory(new File(workspace)) : builder
         def process = builder.start()
-        if (printOutput) { process.in.eachLine { log.info(it) } }
-        log.info("runCommand return: ${process.waitFor()}")
-        return process.text
+        def output = ""
+        process.in.eachLine {
+            if (printOutput) {
+                log.info(it)
+            }
+            output += "${it}\n"
+        }
+        log.info("Executed: ${process.waitFor()}")
+        return output
     }
 
     /**

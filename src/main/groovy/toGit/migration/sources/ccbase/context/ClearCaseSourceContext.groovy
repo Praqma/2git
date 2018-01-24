@@ -29,6 +29,14 @@ class ClearCaseSourceContext implements Context, SourceContext {
     }
 
     /**
+     * Sets the name of the file to fetch the labels from
+     * @param fileName Label file name
+     */
+    void labelFile(String fileName) {
+        (source as ClearCaseSource).labelFile = fileName
+    }
+
+    /**
      * Sets the workspace, i.e. the view path, of the migration
      * @param path The path of the workspace
      */
