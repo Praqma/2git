@@ -89,16 +89,16 @@ lockIf(isIntegration(), 'integration-lock') {
 }
 
 // Flyweight executor
-guardedStage('promotion'){
+stage('promotion'){
     timeout(time: 1, unit: 'HOURS') {
         input 'Promote? (Remember to tag!)'
     }
 }
 
 node('utility-slave') {
-    guardedStage('release'){
+    stage('release'){
         deleteDir()
-        docker.image('alpine/git:1.0.4').inside {
+        docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside {
             unstash 'merge-result'
             withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
                 sh "./gradlew githubRelease --stacktrace -PGITHUB_TOKEN=\$GITHUB_TOKEN"
