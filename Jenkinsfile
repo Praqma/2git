@@ -17,7 +17,7 @@ println('[PARAMETERS]' +
         "\n\tmerge: ${isIntegration()}")
 
 lockIf(isIntegration(), 'integration-lock') {
-    node('utility-slave') {
+    node('dockerhost1') {
         stage('checkout') {
             deleteDir()
             checkout scm
@@ -95,7 +95,7 @@ stage('promotion'){
     }
 }
 
-node('utility-slave') {
+node('dockerhost1') {
     stage('release'){
         deleteDir()
         docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside {

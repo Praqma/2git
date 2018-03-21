@@ -1,10 +1,10 @@
 multibranchPipelineJob('2gitPipeline') {
   displayName('2git pipeline')
   branchSources {
-    git {
-      remote('git@github.com:Praqma/2git.git')
-      credentialsId('jenkins')
-      includes('*')
+    gitHub {
+      repoOwner('Praqma')
+      repository('2git.git')
+      scanCredentialsId('jenkins')
     }
   }
   orphanedItemStrategy {
