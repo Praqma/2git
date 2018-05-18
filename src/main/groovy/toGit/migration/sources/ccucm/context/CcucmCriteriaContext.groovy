@@ -7,10 +7,19 @@ import toGit.context.base.Context
 import toGit.migration.sources.ccucm.criteria.AfterDate
 import toGit.migration.sources.ccucm.criteria.BaselineName
 import toGit.migration.sources.ccucm.criteria.BaselineNames
+import toGit.migration.sources.ccucm.criteria.NewestOnly
 import toGit.migration.sources.ccucm.criteria.PromotionLevels
 
 trait CcucmCriteriaContext implements Context {
     final static Logger log = LoggerFactory.getLogger(this.class)
+
+    /**
+     * Only include the newest baseline in stream
+     */
+    void newestOnly() {
+        criteria.add(new NewestOnly())
+        log.debug("Added 'newestOnly' criteria")
+    }
 
     /**
      * Filters out baselines that were created before a baseline

@@ -10,4 +10,9 @@ class Baseline extends Snapshot {
         super(source.fullyQualifiedName)
         this.source = source
     }
+
+    @Override
+    String toString() {
+        return "${source.shortname}@${source.PVob.name}".toString()
+    }
 }

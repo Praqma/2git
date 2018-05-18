@@ -12,7 +12,7 @@ class AfterLabel extends Criteria{
     }
 
     @Override
-    boolean appliesTo(Snapshot snapshot) {
+    boolean appliesTo(Snapshot snapshot, List<Snapshot> allSnapshots) {
         return label.compareTo(snapshot.identifier) < 0
     }
 }

@@ -20,7 +20,7 @@ class AfterDate extends Criteria {
     }
 
     @Override
-    boolean appliesTo(Snapshot snapshot) {
+    boolean appliesTo(Snapshot snapshot, List<Snapshot> allSnapshots) {
         def baseline = ((Baseline) snapshot).source
         log.debug("Testing '${baseline.shortname} (${baseline.date})' against date '${date}'")
         def result = baseline.date > date

@@ -18,11 +18,11 @@ class CriteriaContext implements Context, HasCriteria {
         log.debug("Registering criteria - custom")
         criteria.add(new Criteria() {
             @Override
-            boolean appliesTo(Snapshot snapshot) {
+            boolean appliesTo(Snapshot snapshot, List<Snapshot> allSnapshots) {
                 log.debug("Testing $snapshot.identifier using custom criteria.")
                 closure.delegate = this
                 closure.resolveStrategy = Closure.DELEGATE_FIRST
-                def result = closure.call(snapshot)
+                def result = closure.call(snapshot, allSnapshots)
                 log.info("Result: " + (result ? "SUCCESS" : "FAILURE"))
                 return result
             }

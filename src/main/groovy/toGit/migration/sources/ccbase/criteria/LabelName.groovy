@@ -3,7 +3,7 @@ package toGit.migration.sources.ccbase.criteria
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 
-class LabelName extends Criteria{
+class LabelName extends Criteria {
 
     String regex
 
@@ -12,7 +12,7 @@ class LabelName extends Criteria{
     }
 
     @Override
-    boolean appliesTo(Snapshot snapshot) {
+    boolean appliesTo(Snapshot snapshot, List<Snapshot> allSnapshots) {
         return snapshot.identifier =~ regex
     }
 }

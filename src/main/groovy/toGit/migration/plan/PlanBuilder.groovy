@@ -40,17 +40,15 @@ class PlanBuilder {
      * @param snapshotPlans The set of snapshots the filter will be applied to.
      * @param filter The filter that will be applied.
      */
-    private
-    static void applyFilter(Map<String, SnapshotPlan> migrationPlan, Collection<Snapshot> snapshots, Filter filter) {
+    private static void applyFilter(Map<String, SnapshotPlan> migrationPlan, Collection<Snapshot> snapshots, Filter filter) {
         log.debug("Applying filter to ${snapshots.size()}")
         def matchingSnapshots = snapshots.findAll { snapshot ->
-            snapshot.matches(filter.criteria)
+            snapshot.matches(filter.criteria, snapshots)
         }
         log.debug("Found ${matchingSnapshots.size()} matching snapshots")
         if (!matchingSnapshots) return
 
-        log.debug("Applying ${filter.extractions.size()} extractions " +
-                "and ${filter.actions.size()} actions to ${matchingSnapshots.size()} snapshots")
+        log.debug("Applying ${filter.extractions.size()} extractions and ${filter.actions.size()} actions to ${matchingSnapshots.size()} snapshots")
         for (def snapshot : matchingSnapshots) {
             if (!migrationPlan.containsKey(snapshot.identifier))
                 migrationPlan.put(snapshot.identifier, new SnapshotPlan(snapshot))

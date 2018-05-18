@@ -48,6 +48,6 @@ public class CriteriaContextTest {
 
     @Test
     public void testCustom() throws Exception {
-        testCriteria("custom { s -> return s.identifier.contains('a') } ")
+        testCriteria("custom { snapshot, allSnapshots -> return snapshot.identifier.contains('a') } ")
     }
 }

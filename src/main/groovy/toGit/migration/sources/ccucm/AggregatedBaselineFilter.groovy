@@ -28,7 +28,7 @@ class AggregatedBaselineFilter extends BaselineFilter {
         def baselineIterator = baselines.iterator()
         while (baselineIterator.hasNext()) {
             def snapshot = new Baseline(baselineIterator.next())
-            if (!snapshot.matches(criteria)) {
+            if (!snapshot.matches(criteria, baselineList.collect { new Baseline(it) })) {
                 baselineIterator.remove()
                 removed++
             }
