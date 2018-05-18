@@ -3,6 +3,7 @@ REPO = 'github.com/Praqma/2git.git'
 INTEGRATION_BRANCH = 'master'
 BRANCH_PREFIX = 'ready/'
 CREDENTIALS_ID = 'github'
+DOCKER_NODE = 'dockerhost1'
 
 /** STATE **/
 inputSHA = ''
@@ -17,11 +18,11 @@ println('[PARAMETERS]' +
         "\n\tmerge: ${isIntegration()}")
 
 lockIf(isIntegration(), 'integration-lock') {
-    node('dockerhost1') {
+    node(DOCKER_NODE) {
         stage('checkout') {
             deleteDir()
             checkout scm
-            docker.image('alpine/git:1.0.4').inside {
+            docker.image('alpine/git:1.0.4').inside("--entrypoint=''") {
                 // Collecting some intel
                 inputSHA = sh(script: "git rev-parse origin/${BRANCH_NAME}", returnStdout: true).trim()
                 authorName = sh(script: "git log -1 --format='%an' ${inputSHA}", returnStdout: true).trim()
@@ -60,7 +61,7 @@ lockIf(isIntegration(), 'integration-lock') {
         // Run a build
         stage('build') {
             deleteDir()
-            docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside {
+            docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside("--entrypoint=''") {
                 unstash 'merge-result'
                 sh 'gradle build --stacktrace'
             }
@@ -70,7 +71,7 @@ lockIf(isIntegration(), 'integration-lock') {
         stage('publish') {
             deleteDir()
             if (isIntegration()) {
-                docker.image('alpine/git:1.0.4').inside {
+                docker.image('alpine/git:1.0.4').inside("--entrypoint=''") {
                     unstash 'merge-result'
                     withCredentials([[$class: 'UsernamePasswordMultiBinding',
                             credentialsId: "$CREDENTIALS_ID",
@@ -89,19 +90,28 @@ lockIf(isIntegration(), 'integration-lock') {
 }
 
 // Flyweight executor
+PROMOTE = false
 stage('promotion'){
-    timeout(time: 1, unit: 'HOURS') {
-        input 'Promote? (Remember to tag!)'
+    try {
+        timeout(time: 1, unit: 'HOURS') {
+            input 'Promote? (Remember to tag!)'
+        }
+        PROMOTE = true
+    } catch (Throwable t) {
+        currentBuild.result = 'SUCCESS'
+        return
     }
 }
 
-node('dockerhost1') {
-    stage('release'){
-        deleteDir()
-        docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside {
-            unstash 'merge-result'
-            withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
-                sh "./gradlew githubRelease --stacktrace -PGITHUB_TOKEN=\$GITHUB_TOKEN"
+if (PROMOTE) {
+    node(DOCKER_NODE) {
+        stage('release'){
+            deleteDir()
+            docker.image('drbosse/gradle-git:4.5.0-jre8-alpine').inside("--entrypoint=''") {
+                unstash 'merge-result'
+                withCredentials([string(credentialsId: '2git-token', variable: 'GITHUB_TOKEN')]) {
+                    sh "./gradlew githubRelease --stacktrace -PGITHUB_TOKEN=\$GITHUB_TOKEN"
+                }
             }
         }
     }
