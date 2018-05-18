@@ -38,6 +38,7 @@ lockIf(isIntegration(), 'integration-lock') {
                         sh """\
                             git config user.email "${authorEmail}"
                             git config user.name "${authorName}"
+                            git fetch origin "${INTEGRATION_BRANCH}":"${INTEGRATION_BRANCH}"
                             git checkout "${INTEGRATION_BRANCH}"
 
                             if [ "\$(git branch --contains ${inputSHA} | wc -l)" -gt "0" ]
