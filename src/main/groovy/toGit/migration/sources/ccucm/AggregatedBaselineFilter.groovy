@@ -26,6 +26,9 @@ class AggregatedBaselineFilter extends BaselineFilter {
     int filter(BaselineList baselines) {
         int removed = 0
         def baselineIterator = baselines.iterator()
+        //Make a copy of the set of baselines we've discovered. Purpose: Pass it in so we can select only the last
+        //element in a filter
+        def baselineList = new ArrayList(baselines)
         while (baselineIterator.hasNext()) {
             def snapshot = new Baseline(baselineIterator.next())
             if (!snapshot.matches(criteria, baselineList.collect { new Baseline(it) })) {
