@@ -76,25 +76,18 @@ class ClearCaseSource implements MigrationSource {
      * @param label The label to update the spec with
      */
     private void updateConfigSpec(String label) {
-        def specText = "element * CHECKEDOUT\n"
-        if (label) {
-            specText += "element * $label\n"
-        }
-        specText += "element * /main/LATEST\n"
-
+        def csText = csTemplateAsFile().text.replace('$label', label)
         vobPaths.each {
-            specText += ("load /$it\n")
+            csText += ("load /$it\n")
         }
-
-        configSpecAsFile().text = specText
-        println(specText)
+        csAsFile().text = csText
     }
 
     /**
      * Sets the view's config spec to
      */
     private void updateViewConfigSpec() {
-        runCommand(["cleartool", "setcs", "-force", configSpecAsFile().absolutePath], true, true)
+        runCommand(["cleartool", "setcs", "-force", csAsFile().absolutePath], true, true)
     }
 
     /**
@@ -118,16 +111,16 @@ class ClearCaseSource implements MigrationSource {
         return output
     }
 
-    /**
-     * Checks if the given config spec exists
-     * @return The given config spec as a Java.io.File
-     */
-    private File configSpecAsFile() {
-        def configSpecFile = new File(configSpec);
-        if (!configSpecFile.exists() || configSpecFile.isDirectory()) {
-            log.error("Could not find config spec at ${configSpecFile.absolutePath}")
-            System.exit(1)
+    private File csTemplateAsFile() {
+        def configSpecText = new File(configSpec);
+        if (!configSpecText.exists() || configSpecText.isDirectory()) {
+            throw new Exception("Could not find config spec template at ${configSpecText.absolutePath}")
         }
-        return configSpecFile;
+        return configSpecText
+    }
+
+    private File csAsFile() {
+        def configSpecText = csTemplateAsFile()
+        return new File(configSpecText.parentFile, 'configspec.tmp')
     }
 }

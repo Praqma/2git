@@ -19,7 +19,7 @@ class Setup extends Action {
 
     @Override
     void act(HashMap<String, Object> extractionMap) {
-        log.info("Initializing Git repository")
+        log.info("Initializing Git repository: $path")
         GitUtil.initRepository(path)
         GitUtil.configureRepository(path, options)
         log.info("Initialized Git repository")
