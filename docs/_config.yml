@@ -1,7 +1,7 @@
 # Site settings
 title: 2git
 tag_text: The 2git conversion engine
-description: Migrate to Git like a pro! 2git allows you to script your tranformation from anything to Git using a custom DSL language and a generic transformation engine.
+description: Migrate to Git like a pro! 2git allows you to script your migration from anything to Git using a custom DSL and generic transformation engine.
 css-path: /css/praqmacode.css
 
 # Build settings
