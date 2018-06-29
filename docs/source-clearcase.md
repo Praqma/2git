@@ -6,12 +6,11 @@ github-issues:     true
 javadoc:           false
 ---
 
-**_Note:_** The ClearCase plugin is a WIP
-
 ## How it works
 
 A view is created for the purpose of the migration.
-For each given label, its config spec is updated with the given VOBs.
+For each matching label, a provided config spec template is updated, and the view is updated.
+Actions can then run to migrate the view contents however you see fit.
 
 ## Defining the source
 
@@ -27,7 +26,8 @@ source('clearcase') {
 
 ##### configSpec
 
-The path to the config spec file used in the migration as a String
+The path to the config spec template as a String.
+Any occurences of `$label` in the template will be replaced with the label currently being handled.
 
 ```groovy
 source('clearcase') {
@@ -35,9 +35,12 @@ source('clearcase') {
 }
 ```
 
-##### labelVob
+##### labelVob/labelFile
 
-The VOB from which labels to migrate will be fetched as a String
+One of these must be configured:
+
+* `labelVob`: the VOB from which labels be fetched as a String.
+* `labelFile`: path to a file from which labels will be read as a String.
 
 ```groovy
 source('clearcase') {
@@ -47,7 +50,8 @@ source('clearcase') {
 
 ##### vobPaths
 
-The VOBs to load in the migration view as a List of Strings
+The paths to load into the view as a List of String.
+These will be added to the config spec template automatically.
 
 ```groovy
 source('clearcase') {
@@ -75,6 +79,7 @@ source('clearcase') {
     viewTag 'cc2git-migration'
 }
 ```
+
 [//]: # ()
 [//]: # (#### Optional)
 [//]: # ()
@@ -104,7 +109,7 @@ criteria {
 
 #### afterLabel
 
-Checks if the label comes _alphabetically_ after the given label name.
+Checks if the label _alphabetically_ comes after the given label name.
 
 ```groovy
 criteria {

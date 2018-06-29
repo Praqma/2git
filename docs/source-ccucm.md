@@ -10,12 +10,12 @@ javadoc:           false
 
 To migrate a defined component from a defined stream, a temporary child stream and view are made.
 The child stream is rebased to the selected Baselines and the view is updated.
-For every baseline, actions can then be done to migrate the view contents to Git in whatever way you see fit.
+For every baseline, actions are run to migrate the view contents to Git in whatever way you see fit.
 The view and stream are cleaned up afterwards.
 
 ## Defining the source
 
-```
+```groovy
 source('ccucm') {
     /* Configure the source here */
 }
@@ -29,7 +29,7 @@ source('ccucm') {
 
 Defines the component to migrate.
 
-```
+```groovy
 source('ccucm') {
     component 'component:foo@\\myVob'
 }
@@ -39,7 +39,7 @@ source('ccucm') {
 
 Defines the stream to migrate from.
 
-```
+```groovy
 source('ccucm') {
     stream 'stream:foo_Int@\\myVob'
 }
@@ -52,14 +52,14 @@ source('ccucm') {
 Defines the migration workspace. This will be a temporary view used solely for the migration.
 Defaults to a new temp dir in the current working directory.
 
-```
+```groovy
 source('ccucm') {
     workspace 'path/to/migration/workspace'
 }
 ```
 
 #### Optional
-                     
+
 ##### loadComponents
 
 Which files should be checked out when updating the migration view.
@@ -70,7 +70,7 @@ Either `all` or `modifiable`. Defaults to `modifiable`.
 Defines the project on which the temporary migration child stream should be made.
 Defaults to the target stream.
 
-```
+```groovy
 source('ccucm') {
     loadComponents 'all'
 }
@@ -81,7 +81,7 @@ source('ccucm') {
 Defines the project on which the temporary migration child stream should be made.
 Defaults to the target stream.
 
-```
+```groovy
 source('ccucm') {
     migrationProject 'Migration'
 }
@@ -93,7 +93,7 @@ Controls if the temporary migration stream should be read-only or not.
 May have a positive effect on performance.
 Defaults to `false`.
 
-```
+```groovy
 source('ccucm') {
     readOnlyMigrationStream true
 }

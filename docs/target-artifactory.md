@@ -8,9 +8,9 @@ javadoc:           false
 
 ## Defining the target
 
-Define a target with the `'artifactory'` type, followed by your target identifier (in this case, `'art'`).
+Define a target with the `'artifactory'` type, optionally followed by your target identifier (in this case, `'art'`).
 
-```
+```groovy
 target('artifactory', 'art') {
     /* Configure the target here */
 }
@@ -24,7 +24,7 @@ target('artifactory', 'art') {
 
 Defines the Artifactory url
 
-```
+```groovy
 target('artifactory') {
     host 'artifactory.blumanufacturing.com:8081/artifactory'
 }
@@ -34,7 +34,7 @@ target('artifactory') {
 
 Defines the Artifactory repository
 
-```
+```groovy
 target('artifactory') {
     repository 'libs-snapshot-local'
 }
@@ -46,7 +46,7 @@ target('artifactory') {
 
 Defines the Artifactory credentials
 
-```
+```groovy
 target('artifactory') {
     user 'art-user'
     password 'mYSecrEt2000'
@@ -59,7 +59,7 @@ target('artifactory') {
 
 Publishes a file to Artifactory
 
-```
+```groovy
 actions {
     def artifact = new File('build/client.zip')
     art.publish("com/blu/foober/${version}/client-${version}.zip", artifact)
