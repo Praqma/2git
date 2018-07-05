@@ -80,19 +80,6 @@ source('clearcase') {
 }
 ```
 
-[//]: # ()
-[//]: # (#### Optional)
-[//]: # ()
-[//]: # (##### n/a)
-[//]: # ()
-[//]: # (n/a)
-[//]: # ()
-[//]: # (```)
-[//]: # (source('clearcase'\) {)
-[//]: # (n/a 'foo')
-[//]: # (})
-[//]: # (```)
-
 ## Specific criteria
 
 ### Label name
