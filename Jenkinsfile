@@ -28,6 +28,12 @@ lockIf(isIntegration(), 'integration-lock') {
                 authorName = sh(script: "git log -1 --format='%an' ${inputSHA}", returnStdout: true).trim()
                 authorEmail = sh(script: "git log -1 --format='%ae' ${inputSHA}", returnStdout: true).trim()
 
+                // Somehow these branches don't exist post-clone
+                sh """\
+                    git fetch origin ${INTEGRATION_BRANCH}:${INTEGRATION_BRANCH}
+                    git fetch origin ${BRANCH_NAME}:${BRANCH_NAME}
+                    """.stripIndent()
+
                 // 5 minutes of patience
                 timeout(5) {
                     if (!isIntegration()) {
@@ -38,21 +44,18 @@ lockIf(isIntegration(), 'integration-lock') {
                         sh """\
                             git config user.email "${authorEmail}"
                             git config user.name "${authorName}"
-                            git fetch origin "${INTEGRATION_BRANCH}":"${INTEGRATION_BRANCH}"
-                            git checkout "${INTEGRATION_BRANCH}"
 
-                            if [ "\$(git branch --contains ${inputSHA} | wc -l)" -gt "0" ]
+                            git checkout "${INTEGRATION_BRANCH}"
+                            if [ "\$(git branch --contains ${inputSHA} | wc -l)" -gt "1" ]
                             then
                                 echo "MERGE ERROR: ${BRANCH_NAME} already exists in ${INTEGRATION_BRANCH}"
                                 exit 1
                             fi
-                            COMMITS="\$(git log --oneline ${INTEGRATION_BRANCH}..${inputSHA} | wc -l)"
-                            if [ "\${COMMITS}" -gt "1" ] || ! git merge --ff-only ${inputSHA}
-                            then
-                                git reset --hard origin/${INTEGRATION_BRANCH}
-                                git merge --no-ff --no-commit ${inputSHA}
-                                git commit --author "${authorName} <${authorEmail}>" --message "Merge branch '${BRANCH_NAME}' into '${INTEGRATION_BRANCH}'"
-                            fi""".stripIndent()
+
+                            git rebase ${INTEGRATION_BRANCH} ${BRANCH_NAME}
+                            git checkout "${INTEGRATION_BRANCH}"
+                            git merge --ff-only ${BRANCH_NAME}
+                            """.stripIndent()
                     }
                 }
                 stash name: 'merge-result', includes: '**', useDefaultExcludes: false
