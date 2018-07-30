@@ -1,26 +1,25 @@
-package toGit.context.dummy
+package togit.context.dummy
 
 import org.junit.Test
-import toGit.Executor
-import toGit.TestHelper
-import toGit.migration.MigrationManager
-import toGit.migration.sources.dummy.DummySource
-import toGit.migration.targets.dummy.DummyTarget
+import togit.Executor
+import togit.TestHelper
+import togit.migration.MigrationManager
+import togit.migration.sources.dummy.DummySource
+import togit.migration.targets.dummy.DummyTarget
 
-public class ActionsContextTest {
+class ActionsContextTest {
 
     //
     // A whole bunch of basic tests
     //
 
     private static void testAction(String action) {
-        def commandFile = TestHelper.createCommandFile(actionScriptFor(action))
-        new Executor().execute(commandFile.absolutePath)
+        new Executor().execute(TestHelper.tempCommandFile(actionScriptFor(action)).absolutePath)
         assertPlan()
     }
 
     static String actionScriptFor(String action) {
-        def script = $/
+        $/
             source('dummy')
             target('dummy')
             migrate(true) {
@@ -31,12 +30,12 @@ public class ActionsContextTest {
                         }
                     }
                 }
-            }/$
-        return script.stripIndent()
+            }
+        /$.stripIndent()
     }
 
     private static void assertPlan() {
-        def manager = MigrationManager.instance
+        MigrationManager manager = MigrationManager.instance
         assert manager.source instanceof DummySource
         assert manager.targets.values()[0] instanceof DummyTarget
 
@@ -52,37 +51,37 @@ public class ActionsContextTest {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         testAction("copy()")
     }
 
     @Test
-    public void testMove() {
+    void testMove() {
         testAction("move()")
     }
 
     @Test
-    public void testCmd() {
+    void testCmd() {
         testAction("cmd 'echo hi'")
     }
 
     @Test
-    public void testCmdWithPath() {
+    void testCmdWithPath() {
         testAction("cmd 'echo hi', '/usr/anon'")
     }
 
     @Test
-    public void testCustom() {
+    void testCustom() {
         testAction("custom { println 'hi' }")
     }
 
     @Test
-    public void testMethodMissing() {
+    void testMethodMissing() {
         testAction("foogleburg 'winstonfungler', 5")
     }
 
     @Test
-    public void testFlattenDir() {
+    void testFlattenDir() {
         testAction("flattenDir '.', 3")
     }
 
@@ -92,9 +91,8 @@ public class ActionsContextTest {
 
     @Test
     @org.junit.Ignore
-    public void closuresPassedDown() {
-
-        def command = $/
+    void closuresPassedDown() {
+        String command = $/
             source ('dummy')
             target ('dummy')
 
@@ -115,8 +113,7 @@ public class ActionsContextTest {
             }
         /$
 
-        def commandFile = TestHelper.createCommandFile(command)
-        new Executor().execute(commandFile.absolutePath)
+        new Executor().execute(TestHelper.tempCommandFile(command))
         assertPlan()        
     }
 }

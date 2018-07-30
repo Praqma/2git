@@ -1,22 +1,21 @@
-package toGit.context.dummy
+package togit.context.dummy
 
 import org.junit.Test
-import toGit.Executor
-import toGit.TestHelper
-import toGit.migration.MigrationManager
-import toGit.migration.sources.dummy.DummySource
-import toGit.migration.targets.dummy.DummyTarget
+import togit.Executor
+import togit.TestHelper
+import togit.migration.MigrationManager
+import togit.migration.sources.dummy.DummySource
+import togit.migration.targets.dummy.DummyTarget
 
-public class ExtractionsContextTest {
+class ExtractionsContextTest {
 
     private static void testExtraction(String extraction) {
-        def commandFile = TestHelper.createCommandFile(actionScriptFor(extraction))
-        new Executor().execute(commandFile.absolutePath)
+        new Executor().execute(TestHelper.tempCommandFile(actionScriptFor(extraction)).absolutePath)
         assertPlan()
     }
 
     static String actionScriptFor(String extraction) {
-        def script = $/
+        $/
         source('dummy')
         target('dummy')
         migrate(true) {
@@ -27,12 +26,11 @@ public class ExtractionsContextTest {
                     }
                 }
             }
-        }/$
-        return script.stripIndent()
+        }/$.stripIndent()
     }
 
     private static void assertPlan() {
-        def manager = MigrationManager.instance
+        MigrationManager manager = MigrationManager.instance
         assert manager.source instanceof DummySource
         assert manager.targets.values()[0] instanceof DummyTarget
 
@@ -47,9 +45,8 @@ public class ExtractionsContextTest {
         assert manager.plan.filters[0].filters.size() == 0
     }
 
-
     @Test
-    public void testCustom() throws Exception {
+    void testCustom() {
         testExtraction("custom { println 'hi' }")
     }
 }

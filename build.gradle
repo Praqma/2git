@@ -5,6 +5,7 @@
 plugins {
     id 'com.palantir.git-version'   version '0.8.0'
     id 'co.riiid.gradle'            version '0.4.2'
+    id 'codenarc'
 }
 
 apply plugin: 'groovy'
@@ -42,12 +43,11 @@ project.group           = 'com.praqma'
 project.version         = gitVersion()
 project.description     = 'Migration engine used to migrate from an arbitrary VCS to git'
 
-
 // --------------------
 // application plugin
 // --------------------
 
-project.mainClassName   = 'toGit.Run'
+project.mainClassName   = 'togit.Run'
 
 startScripts {
     doLast {
@@ -77,3 +77,13 @@ github {
 
 githubRelease.group = "Publishing"
 githubRelease.description = "Creates a release on GitHub"
+
+// --------------------
+// codenarc
+// --------------------
+
+boolean runCodenarc = project.findProperty('CODENARC') == "true"
+
+codenarcMain.onlyIf { runCodenarc }
+
+codenarcTest.onlyIf { runCodenarc }

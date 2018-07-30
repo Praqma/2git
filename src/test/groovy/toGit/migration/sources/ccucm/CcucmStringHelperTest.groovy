@@ -1,4 +1,4 @@
-package toGit.migration.sources.ccucm
+package togit.migration.sources.ccucm
 
 import org.junit.Test
 import spock.lang.Specification
@@ -22,7 +22,7 @@ class CcucmStringHelperTest extends Specification {
         when: 'I have a stream name'
         def selector = 'Server_int'
 
-        then: "the name should end up under the 'tag'"
+        then: 'the name should end up under the tag'
         def parseResult = CcucmStringHelper.parseName(selector)
         !parseResult.identifier
         parseResult.tag == 'Server_int'
@@ -34,7 +34,7 @@ class CcucmStringHelperTest extends Specification {
         when: 'I have a stream selector'
         def selector = 'myStream@\\2Cool'
 
-        then: "It should be recognized as a FQName"
+        then: 'It should be recognized as a FQName'
         CcucmStringHelper.isSelector(selector)
     }
 
@@ -43,7 +43,7 @@ class CcucmStringHelperTest extends Specification {
         when: 'I have a stream selector'
         def selector = 'stream:myStream@\\2Cool'
 
-        then: "It should be recognized as a FQName"
+        then: 'It should be recognized as a FQName'
         CcucmStringHelper.isSelector(selector)
     }
 
@@ -52,7 +52,7 @@ class CcucmStringHelperTest extends Specification {
         when: 'I have a component selector'
         def selector = 'myComponent@\\2Cool'
 
-        then: "It should be recognized as a FQName"
+        then: 'It should be recognized as a FQName'
         CcucmStringHelper.isSelector(selector)
     }
 
@@ -61,7 +61,7 @@ class CcucmStringHelperTest extends Specification {
         when: 'I have a component selector'
         def selector = 'component:myComponent@\\2Cool'
 
-        then: "It should be recognized as a FQName"
+        then: 'It should be recognized as a FQName'
         CcucmStringHelper.isSelector(selector)
     }
 }

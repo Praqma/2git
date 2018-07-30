@@ -1,21 +1,20 @@
-package toGit.context.dummy
+package togit.context.dummy
 
 import org.junit.Test
-import toGit.Executor
-import toGit.TestHelper
-import toGit.migration.MigrationManager
-import toGit.migration.sources.dummy.DummySource
-import toGit.migration.targets.dummy.DummyTarget
+import togit.Executor
+import togit.TestHelper
+import togit.migration.MigrationManager
+import togit.migration.sources.dummy.DummySource
+import togit.migration.targets.dummy.DummyTarget
 
-public class CriteriaContextTest {
+class CriteriaContextTest {
     private static void testCriteria(String criteria) {
-        def commandFile = TestHelper.createCommandFile(actionScriptFor(criteria))
-        new Executor().execute(commandFile.absolutePath)
+        new Executor().execute(TestHelper.tempCommandFile(actionScriptFor(criteria)).absolutePath)
         assertPlan()
     }
 
     static String actionScriptFor(String criteria) {
-        def script = $/
+        $/
         source('dummy')
         target('dummy')
         migrate(true) {
@@ -26,12 +25,11 @@ public class CriteriaContextTest {
                     }
                 }
             }
-        }/$
-        return script.stripIndent()
+        }/$.stripIndent()
     }
 
     private static void assertPlan() {
-        def manager = MigrationManager.instance
+        MigrationManager manager = MigrationManager.instance
         assert manager.source instanceof DummySource
         assert manager.targets.values()[0] instanceof DummyTarget
 
@@ -47,7 +45,12 @@ public class CriteriaContextTest {
     }
 
     @Test
-    public void testCustom() throws Exception {
+    void testCustom() {
         testCriteria("custom { snapshot, allSnapshots -> return snapshot.identifier.contains('a') } ")
+    }
+
+    @Test
+    void testSourceSpecific() {
+        testCriteria('dummyCriteria()')
     }
 }

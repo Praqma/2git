@@ -1,10 +1,10 @@
-package toGit
+package togit
 
 class TestHelper {
-    static File createCommandFile(String script) {
-        def commandFile = File.createTempFile("command-", ".groovy")
+    static File tempCommandFile(String script) {
+        File commandFile = File.createTempFile('command-', '.groovy')
         commandFile.write script
         commandFile.deleteOnExit()
-        return commandFile
+        commandFile
     }
 }
