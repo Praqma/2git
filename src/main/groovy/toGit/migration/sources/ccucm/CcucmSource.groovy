@@ -7,7 +7,7 @@ import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineFilter
 import net.praqma.clearcase.ucm.view.SnapshotView as CoolSnapshotView
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 import toGit.migration.sources.MigrationSource

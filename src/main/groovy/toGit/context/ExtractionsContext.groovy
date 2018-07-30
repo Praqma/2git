@@ -1,14 +1,14 @@
 package toGit.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.HasExtractions
 import toGit.migration.plan.Extraction
 import toGit.migration.plan.Snapshot
 
-class ExtractionsContext implements Context, HasExtractions {
+class ExtractionsContext implements Context {
 
     final static log = LoggerFactory.getLogger(this.class)
+
+    final List<Extraction> extractions = []
 
     /**
      * Runs a custom closure to map values

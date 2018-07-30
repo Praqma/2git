@@ -1,11 +1,10 @@
 package toGit.migration.sources.ccbase.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.SourceContext
+import toGit.context.SourceContext
 import toGit.migration.sources.ccbase.ClearCaseSource
 
-class ClearCaseSourceContext implements Context, SourceContext {
+class ClearCaseSourceContext extends SourceContext {
     final static log = LoggerFactory.getLogger(this.class)
 
     public ClearCaseSourceContext() {

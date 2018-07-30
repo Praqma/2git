@@ -2,7 +2,7 @@ package toGit.migration.sources.ccucm.context
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.sources.ccucm.extractions.BaselineProperty
 
 trait CcucmExtractionsContext implements Context {

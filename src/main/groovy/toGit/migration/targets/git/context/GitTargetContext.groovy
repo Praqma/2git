@@ -1,12 +1,11 @@
 package toGit.migration.targets.git.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.TargetContext
+import toGit.context.TargetContext
 import toGit.migration.targets.git.GitOptions
 import toGit.migration.targets.git.GitTarget
 
-class GitTargetContext implements Context, TargetContext {
+class GitTargetContext extends TargetContext {
 
     final static log = LoggerFactory.getLogger(this.class)
 

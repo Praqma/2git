@@ -1,10 +1,5 @@
 package toGit.context
 
-import toGit.context.base.Context
-import toGit.context.traits.HasActions
-import toGit.context.traits.HasCriteria
-import toGit.context.traits.HasExtractions
-
 class ContextHelper {
     private ContextHelper() {
     }
@@ -19,9 +14,9 @@ class ContextHelper {
         if (closure) {
             //FIXME Workaround for the CEA arrays not being cleared
             //FIXME This is due to contexts being global and no new instances being made
-            if (context instanceof HasCriteria) context.criteria.clear()
-            if (context instanceof HasExtractions) context.extractions.clear()
-            if (context instanceof HasActions) context.actions.clear()
+            if (context instanceof CriteriaContext) context.criteria.clear()
+            if (context instanceof ExtractionsContext) context.extractions.clear()
+            if (context instanceof ActionsContext) context.actions.clear()
 
             closure.delegate = context
             closure.resolveStrategy = Closure.DELEGATE_FIRST

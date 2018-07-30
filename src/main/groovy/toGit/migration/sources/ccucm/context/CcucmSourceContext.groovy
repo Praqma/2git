@@ -2,12 +2,11 @@ package toGit.migration.sources.ccucm.context
 
 import net.praqma.clearcase.ucm.view.SnapshotView
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.SourceContext
+import toGit.context.SourceContext
 import toGit.migration.sources.ccucm.CcucmOptions
 import toGit.migration.sources.ccucm.CcucmSource
 
-class CcucmSourceContext implements Context, SourceContext {
+class CcucmSourceContext extends SourceContext {
 
     final static log = LoggerFactory.getLogger(this.class)
 

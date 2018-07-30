@@ -1,8 +1,6 @@
 package toGit.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.base.DslContext
 import toGit.migration.MigrationManager
 import toGit.migration.plan.Filter
 

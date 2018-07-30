@@ -9,6 +9,10 @@ import toGit.migration.targets.dummy.DummyTarget
 
 public class ActionsContextTest {
 
+    //
+    // A whole bunch of basic tests
+    //
+
     private static void testAction(String action) {
         def commandFile = TestHelper.createCommandFile(actionScriptFor(action))
         new Executor().execute(commandFile.absolutePath)
@@ -48,37 +52,71 @@ public class ActionsContextTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         testAction("copy()")
     }
 
     @Test
-    public void testMove() throws Exception {
+    public void testMove() {
         testAction("move()")
     }
 
     @Test
-    public void testCmd() throws Exception {
+    public void testCmd() {
         testAction("cmd 'echo hi'")
     }
 
     @Test
-    public void testCmdWithPath() throws Exception {
+    public void testCmdWithPath() {
         testAction("cmd 'echo hi', '/usr/anon'")
     }
 
     @Test
-    public void testCustom() throws Exception {
+    public void testCustom() {
         testAction("custom { println 'hi' }")
     }
 
     @Test
-    public void testMethodMissing() throws Exception {
+    public void testMethodMissing() {
         testAction("foogleburg 'winstonfungler', 5")
     }
 
     @Test
-    public void testFlattenDir() throws Exception {
+    public void testFlattenDir() {
         testAction("flattenDir '.', 3")
+    }
+
+    //
+    // Testing if contexts pass things down sanely
+    //
+
+    @Test
+    @org.junit.Ignore
+    public void closuresPassedDown() {
+
+        def command = $/
+            source ('dummy')
+            target ('dummy')
+
+            def foo = {
+                custom {
+                    println "foo"
+                }
+            }
+
+            migrate {
+                filters {
+                    filter {
+                        actions {
+                            foo()
+                        }
+                    }
+                }
+            }
+        /$
+
+        def commandFile = TestHelper.createCommandFile(command)
+        new Executor().execute(commandFile.absolutePath)
+        assertPlan()        
     }
 }

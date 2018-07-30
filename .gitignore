@@ -1,18 +1,21 @@
-# Gradle
+# dev
 .gradle
 build/
 gradle-app.setting
 !gradle-wrapper.jar
 /.nb-gradle/
 
-# IDEA
+bin/
+.project
+.settings
+.classpath
+
+.vscode
+
 .idea/
 *.iml
-
-# Output
 out/
 
-# Jekyll
 _site
 .sass-cache
 
@@ -22,8 +25,3 @@ _site
 # Specific command files
 customers/*
 *.swp
-
-# 2git log files
-2git-[-_0-9]*.log
-logs
-cc2git

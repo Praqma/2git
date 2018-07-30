@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import toGit.context.ActionsContext
 import toGit.context.CriteriaContext
 import toGit.context.ExtractionsContext
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.plan.MigrationPlan
 import toGit.migration.sources.MigrationSource
 import toGit.migration.targets.MigrationTarget

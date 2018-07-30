@@ -4,15 +4,15 @@ import groovy.text.SimpleTemplateEngine
 import net.praqma.util.execute.CommandLine
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.HasActions
 import toGit.migration.MigrationManager
 import toGit.migration.plan.Action
 import toGit.utils.FileHelper
 
-class ActionsContext implements Context, HasActions {
+class ActionsContext implements Context {
 
     final static log = LoggerFactory.getLogger(this.class)
+
+    final List<Action> actions = []
 
     /**
      * Copies the contents of the source directory to the default target directory.

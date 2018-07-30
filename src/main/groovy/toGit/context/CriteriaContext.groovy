@@ -1,14 +1,14 @@
 package toGit.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.HasCriteria
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 
-class CriteriaContext implements Context, HasCriteria {
+class CriteriaContext implements Context {
 
     final static log = LoggerFactory.getLogger(this.class)
+
+    final List<Criteria> criteria = []
 
     /**
      * Filters {@link Snapshot}s using a custom Groovy closure

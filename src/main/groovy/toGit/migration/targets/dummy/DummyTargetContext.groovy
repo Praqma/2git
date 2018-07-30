@@ -1,9 +1,8 @@
 package toGit.migration.targets.dummy
 
-import toGit.context.base.Context
-import toGit.context.traits.TargetContext
+import toGit.context.TargetContext
 
-class DummyTargetContext implements Context, TargetContext {
+class DummyTargetContext extends TargetContext {
     public DummyTargetContext() {
         target = new DummyTarget()
     }

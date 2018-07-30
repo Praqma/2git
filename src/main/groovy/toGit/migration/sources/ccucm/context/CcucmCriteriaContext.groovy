@@ -3,7 +3,7 @@ package toGit.migration.sources.ccucm.context
 import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.sources.ccucm.criteria.AfterDate
 import toGit.migration.sources.ccucm.criteria.BaselineName
 import toGit.migration.sources.ccucm.criteria.BaselineNames

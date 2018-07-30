@@ -1,6 +1,6 @@
 package toGit.migration.sources
 
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.plan.Criteria
 import toGit.migration.plan.Snapshot
 

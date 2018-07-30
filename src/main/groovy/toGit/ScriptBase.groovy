@@ -1,11 +1,8 @@
 package toGit
 
 import org.slf4j.LoggerFactory
-import toGit.context.MigrationContext
-import toGit.context.base.Context
-import toGit.context.base.DslContext
-import toGit.context.traits.SourceContext
-import toGit.context.traits.TargetContext
+import toGit.context.*
+import toGit.context.*
 import toGit.migration.MigrationManager
 import toGit.migration.sources.MigrationSource
 import toGit.migration.sources.ccbase.context.ClearCaseSourceContext
@@ -71,9 +68,9 @@ abstract class ScriptBase extends Script implements Context {
         if (!sourceTypes.containsKey(type)) throw new Exception("Source '$type' not supported.")
 
         // Initialize and configure the source
-        def sourceContext = sourceTypes[type].newInstance() as SourceContext
-        executeInContext(closure, sourceContext)
-        MigrationSource newSource = sourceContext.source
+        def SourceContext = sourceTypes[type].newInstance()
+        executeInContext(closure, SourceContext)
+        MigrationSource newSource = SourceContext.source
 
         // Set MigrationManager's source
         MigrationManager.instance.source = newSource

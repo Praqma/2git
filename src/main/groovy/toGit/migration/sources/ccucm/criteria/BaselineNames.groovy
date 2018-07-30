@@ -11,11 +11,11 @@ class BaselineNames extends Criteria {
     List<String> baselines
 
     BaselineNames(String... baselines) {
-        this.baselines = baselines
+        thislines = baselines
     }
 
     BaselineNames(List<String> baselines) {
-        this.baselines = baselines
+        thislines = baselines
     }
 
     @Override

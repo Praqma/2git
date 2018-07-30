@@ -2,7 +2,7 @@ package toGit.migration.sources.ccbase.context
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
+import toGit.context.Context
 import toGit.migration.sources.ccbase.extractions.LabelExtraction
 
 trait ClearCaseExtractionsContext implements Context {

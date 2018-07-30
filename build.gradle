@@ -77,16 +77,3 @@ github {
 
 githubRelease.group = "Publishing"
 githubRelease.description = "Creates a release on GitHub"
-
-// --------------------
-// testing
-// --------------------
-
-task functionalTest(type: Test) {
-    dependsOn('testClasses')
-    include 'toGit/functional/**'
-}
-
-test {
-    exclude 'toGit/functional/**'
-}

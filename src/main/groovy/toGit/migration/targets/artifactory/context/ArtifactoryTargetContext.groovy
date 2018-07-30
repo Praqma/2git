@@ -1,12 +1,11 @@
 package toGit.migration.targets.artifactory.context
 
 import org.slf4j.LoggerFactory
-import toGit.context.base.Context
-import toGit.context.traits.TargetContext
+import toGit.context.TargetContext
 import toGit.migration.targets.artifactory.ArtifactoryOptions
 import toGit.migration.targets.artifactory.ArtifactoryTarget
 
-class ArtifactoryTargetContext implements TargetContext {
+class ArtifactoryTargetContext extends TargetContext {
 
     final static log = LoggerFactory.getLogger(this.class)
 
