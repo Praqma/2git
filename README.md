@@ -86,6 +86,7 @@ The second filter, being a child of the first, _further_ filters on the selected
 It selects those with 'x' at 5 or above and assigns the custom extraction and 'tag' action to them.
 
 The resulting migration plan that will be executed is the following:
+
 | Snapshot | Extractions | Actions     |
 |----------|-------------|-------------|
 | A        | N/A         | N/A         |

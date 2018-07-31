@@ -33,6 +33,6 @@ A brief summary:
 ### Finding a task to work on
 
  * Check our GitHub issues for an up-to-date list of workable tasks.
- * Some issues can be labelled with `Difficulty - easy`. This indicates the issue should be easy  to pick up for people unfamiliar with the project. We might not be there quite yet, but we will try to go that extra mile in providing better descriptions and clear scopes for these issues.
+ * Some issues can be labeled with `Difficulty - easy`. This indicates the issue should be easy  to pick up for people unfamiliar with the project. We might not be there quite yet, but we will try to go that extra mile in providing better descriptions and clear scopes for these issues.
  * When you're familiar with the project, consider picking a more challenging task, leaving the easy issues for the newlings. It's tempting to burn through all the easy issues, but this quickly leaves little for newcomers to tackle.
  * Another great way of contributing is to help groom tasks, making them easier for newcomers to pick up. Suggesting solutions, relevant code locations and other helpful comments are a great help. Helping split larger issues into smaller tasks is also greatly appreciated.
