@@ -8,7 +8,6 @@ import togit.context.Context
 import togit.migration.plan.MigrationPlan
 import togit.migration.sources.MigrationSource
 import togit.migration.targets.MigrationTarget
-import togit.utils.ExceptionHelper
 
 @Singleton
 class MigrationManager {
@@ -59,7 +58,6 @@ class MigrationManager {
             LOG.info('Executed migration plan')
         } catch (Exception e) {
             LOG.error('An error occurred during the migration')
-            ExceptionHelper.simpleLog(e)
             LOG.error('The migration has been stopped')
             throw e
         } finally {
