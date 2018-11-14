@@ -63,12 +63,12 @@ class ClearCaseSource implements MigrationSource {
     }
 
     @Override
-    void addCriteria() {
+    void mixinCriteria() {
         CriteriaContext.mixin(ClearCaseCriteriaContext)
     }
 
     @Override
-    void addExtractions() {
+    void mixinExtractions() {
         ExtractionsContext.mixin(ClearCaseExtractionsContext)
     }
 

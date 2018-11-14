@@ -35,10 +35,10 @@ trait MigrationSource {
     /**
      * Adds source-specific contexts to the global CriteriaContext
      */
-    abstract void addCriteria()
+    abstract void mixinCriteria()
 
     /**
      * Adds source-specific contexts to the global ExtractionsContext
      */
-    abstract void addExtractions()
+    abstract void mixinExtractions()
 }

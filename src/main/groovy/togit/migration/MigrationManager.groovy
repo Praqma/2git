@@ -27,6 +27,10 @@ class MigrationManager {
         source = null
         targets.clear()
         plan = new MigrationPlan()
+        refreshContexts()
+    }
+
+    void refreshContexts() {
         criteriaContext = new CriteriaContext()
         extractionsContext = new ExtractionsContext()
         actionsContext = new ActionsContext()

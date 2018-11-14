@@ -65,12 +65,12 @@ class CcucmSource implements MigrationSource {
     }
 
     @Override
-    void addCriteria() {
+    void mixinCriteria() {
         CriteriaContext.mixin(CcucmCriteriaContext)
     }
 
     @Override
-    void addExtractions() {
+    void mixinExtractions() {
         ExtractionsContext.mixin(CcucmExtractionsContext)
     }
 

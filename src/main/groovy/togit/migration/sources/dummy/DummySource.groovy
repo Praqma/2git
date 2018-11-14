@@ -42,12 +42,12 @@ class DummySource implements MigrationSource {
     }
 
     @Override
-    void addCriteria() {
+    void mixinCriteria() {
         CriteriaContext.mixin(DummyCriteriaContext)
     }
 
     @Override
-    void addExtractions() {
+    void mixinExtractions() {
         ExtractionsContext.mixin(DummyExtractionsContext)
     }
 }

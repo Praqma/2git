@@ -84,8 +84,9 @@ abstract class ScriptBase extends Script implements Context {
         MigrationManager.instance.source = newSource
 
         // Mix in specific criteria/extraction contexts
-        newSource.addCriteria()
-        newSource.addExtractions()
+        newSource.mixinCriteria()
+        newSource.mixinExtractions()
+        MigrationManager.instance.refreshContexts()
     }
 
     /**
