@@ -14,11 +14,11 @@ class ExtractionsContext implements Context {
      * Runs a custom closure to map values
      * @param closure Closure to run
      */
-    void custom(Closure<Map<String, Object>> closure) {
+    void custom(Closure<HashMap<String, Object>> closure) {
         LOG.debug('Registering extraction - custom')
         extractions.add(new Extraction() {
             @Override
-            Map<String, Object> extract(Snapshot snapshot) {
+            HashMap<String, Object> extract(Snapshot snapshot) {
                 closure.delegate = this
                 closure.resolveStrategy = Closure.DELEGATE_FIRST
                 closure.call(snapshot)

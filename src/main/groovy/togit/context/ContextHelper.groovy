@@ -1,9 +1,6 @@
 package togit.context
 
 class ContextHelper {
-    private ContextHelper() {
-    }
-
     /**
      * Executes a {@link Closure} in the given {@link Context}
      * @param closure the Closure to execute

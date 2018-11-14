@@ -13,7 +13,7 @@ class MigrationPlan {
     List<Filter> filters = []
 
     List<Action> befores = []
-    Map<String, SnapshotPlan> steps = [:]
+    HashMap<String, SnapshotPlan> steps = [:]
     List<Action> afters = []
 
     /**
@@ -30,7 +30,7 @@ class MigrationPlan {
      * Executes the migration plan.
      */
     void execute() {
-        Map extractionMap = [:]
+        HashMap extractionMap = [:]
 
         LOG.info('Executing pre-migration actions')
         befores.each { action ->
@@ -51,8 +51,8 @@ class MigrationPlan {
             LOG.info("Executing extractions for $step")
             step.extractions.each { extraction ->
                 LOG.info("Executing ${extraction.class.simpleName}")
-                extraction.extract(step.snapshot).entrySet().each { kv ->
-                    extractionMap.put(kv.key, kv.value)
+                extraction.extract(step.snapshot).entrySet().each { k, v ->
+                    extractionMap.put(k, v)
                 }
                 LOG.info("Executed ${extraction.class.simpleName}")
             }

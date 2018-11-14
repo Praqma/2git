@@ -14,7 +14,7 @@ class FillEmptyDirs extends Action {
     }
 
     @Override
-    void act(Map<String, Object> extractionMap) {
+    void act(HashMap<String, Object> extractionMap) {
         LOG.info('Sprinkling dummy files in empty directories')
         sprinkleDummies(new File(path))
         LOG.info('Finished sprinkling dummy files')

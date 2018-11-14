@@ -17,11 +17,11 @@ class CcucmStringHelper {
      * @param name the ClearCase name (e.g. component:Model@\myVob, stream@\myVob, \myVob, stream)
      * @return a map containing the fqName's identifier, tag and vobName
      */
-    static Map<String, String> parseName(String name) {
+    static HashMap<String, String> parseName(String name) {
         String regex = ~/^([^:]*?):?([^:\\]+?)?@?(\\\w+)?$/
         Matcher matcher = name =~ regex
         if (matcher.matches()) {
-            Map result = ['identifier':matcher.group(1), 'tag':matcher.group(2), 'vob':matcher.group(3)]
+            HashMap result = ['identifier':matcher.group(1), 'tag':matcher.group(2), 'vob':matcher.group(3)]
             LOG.debug("Parse result: $result")
             return result
         }

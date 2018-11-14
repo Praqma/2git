@@ -11,10 +11,10 @@ class PlanBuilder {
      * Builds the migration plan for the given source and filters.
      * @param source the Migration
      * @param filters the Filters to build the migration plan for
-     * @return the migration plan as a Map<Snapshot.Id, SnapshotPlan>
+     * @return the migration plan as a HashMap<Snapshot.Id, SnapshotPlan>
      */
-    static Map build(List<Filter> filters) {
-        Map<String, SnapshotPlan> migrationPlan = [:]
+    static HashMap build(List<Filter> filters) {
+        HashMap<String, SnapshotPlan> migrationPlan = [:]
         filters.each { filter ->
             fill(migrationPlan, filter)
         }
@@ -26,7 +26,7 @@ class PlanBuilder {
      * @param migrationPlan The migration plan, a map of SnapshotPlans, with the Snapshot identifiers as keys
      * @param filter A top-level filter
      */
-    private static void fill(Map<String, SnapshotPlan> migrationPlan, Filter filter) {
+    private static void fill(HashMap<String, SnapshotPlan> migrationPlan, Filter filter) {
         LOG.debug('Retrieving snapshots')
         List snapshots = MigrationManager.instance.source.getSnapshots(filter.criteria)
         LOG.debug("Retrieved ${snapshots.size()} snapshots")
@@ -40,7 +40,7 @@ class PlanBuilder {
      * @param snapshotPlans The set of snapshots the filter will be applied to.
      * @param filter The filter that will be applied.
      */
-    private static void apply(Map<String, SnapshotPlan> migrationPlan, List<Snapshot> snapshots, Filter filter) {
+    private static void apply(HashMap<String, SnapshotPlan> migrationPlan, List<Snapshot> snapshots, Filter filter) {
         LOG.debug("Applying filter to ${snapshots.size()}")
         List matchingSnapshots = snapshots.findAll { snapshot ->
             snapshot.matches(filter.criteria, snapshots)

@@ -21,7 +21,7 @@ class Publish extends Action {
     }
 
     @Override
-    void act(Map<String, Object> extractionMap) {
+    void act(HashMap<String, Object> extractionMap) {
         LOG.info("Publishing ${file.name} to Artifactory")
         client.repository(repository).upload(path, file).doUpload()
         LOG.info("Published ${file.name} to Artifactory")

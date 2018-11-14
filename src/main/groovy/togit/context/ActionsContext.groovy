@@ -28,7 +28,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - copy')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 File sourceDir = new File(source)
                 File targetDir = new File(target)
                 sourceDir.listFiles().each { file ->
@@ -57,7 +57,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - move')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 File sourceDir = new File(source)
                 File targetDir = new File(target)
                 sourceDir.listFiles().each { file ->
@@ -89,7 +89,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - cmd')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 String expandedCmd = new SimpleTemplateEngine().createTemplate(command).make(extractionMap)
                 CommandLine.newInstance().run(expandedCmd, path ? new File(path) : null).stdoutBuffer.eachLine { line ->
                     LOG.info(line)
@@ -107,7 +107,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - custom')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 closure.delegate = this
                 closure.resolveStrategy = Closure.DELEGATE_FIRST
                 closure.call(extractionMap)
@@ -120,7 +120,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - emptyDir')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 FileHelper.emptyDirectory(new File(dir))
             }
         })
@@ -137,7 +137,7 @@ class ActionsContext implements Context {
         LOG.debug('Registering action - flattenDir')
         actions.add(new Action() {
             @Override
-            void act(Map<String, Object> extractionMap) {
+            void act(HashMap<String, Object> extractionMap) {
                 amount.times {
                     FileHelper.singleFlattenDirectory(new File(dir))
                 }

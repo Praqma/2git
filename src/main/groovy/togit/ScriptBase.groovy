@@ -28,14 +28,14 @@ abstract class ScriptBase extends Script implements Context {
     final static LOG = LoggerFactory.getLogger(this.class)
 
     // Supported sources
-    final Map<String, Class> sourceTypes = [
+    final HashMap<String, Class> sourceTypes = [
             'dummy':DummySourceContext,
             'ccucm':CcucmSourceContext,
             'clearcase':ClearCaseSourceContext,
     ]
 
     // Supported targets
-    final Map<String, Class> targetTypes = [
+    final HashMap<String, Class> targetTypes = [
             'dummy':DummyTargetContext,
             'git':GitTargetContext,
             'artifactory':ArtifactoryTargetContext,
@@ -166,7 +166,7 @@ abstract class ScriptBase extends Script implements Context {
      * Allows referencing the targets as 'targets' in the DSL front-end
      * @return the Migrator's MigrationTargets
      */
-    static Map<String, MigrationTarget> getTargets() {
+    static HashMap<String, MigrationTarget> getTargets() {
         MigrationManager.instance.targets
     }
 }

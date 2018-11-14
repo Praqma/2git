@@ -11,7 +11,7 @@ class LabelExtraction extends Extraction {
         this.key = key
     }
 
-    @Override Map<String, Object> extract(Snapshot snapshot) {
+    @Override HashMap<String, Object> extract(Snapshot snapshot) {
         [:].put(key, snapshot.identifier)
     }
 }

@@ -14,7 +14,7 @@ class Clear extends Action {
     }
 
     @Override
-    void act(Map<String, Object> extractionMap) {
+    void act(HashMap<String, Object> extractionMap) {
         LOG.debug('Clearing git repository')
         new File(path).listFiles().findAll { !it.name.startsWith('.git') }.each {
             if (it.directory) {

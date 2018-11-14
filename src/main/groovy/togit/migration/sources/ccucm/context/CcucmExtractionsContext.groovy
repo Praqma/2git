@@ -12,7 +12,7 @@ class CcucmExtractionsContext implements Context {
      * Extracts a CoolBaseline property
      * @param map A map of values to extract and keys to map them to.
      */
-    void baselineProperty(Map<String, String> map) {
+    void baselineProperty(HashMap<String, String> map) {
         extractions.add(new BaselineProperty(map))
         LOG.debug("Added 'baselineProperty' extraction.")
     }

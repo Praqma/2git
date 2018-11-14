@@ -16,7 +16,7 @@ class MigrationManager {
     final static LOG = LoggerFactory.getLogger(this.class)
 
     MigrationSource source
-    Map<String, MigrationTarget> targets = [:]
+    HashMap<String, MigrationTarget> targets = [:]
     MigrationPlan plan
 
     Context criteriaContext

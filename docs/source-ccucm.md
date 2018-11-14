@@ -181,7 +181,7 @@ criteria {
 
 #### baselineProperty
 
-`baselineProperty (Map<String, String> mappingValues)`
+`baselineProperty (HashMap<String, String> mappingValues)`
 
 ```groovy
 extractions {

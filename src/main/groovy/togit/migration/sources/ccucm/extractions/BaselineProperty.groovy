@@ -9,15 +9,15 @@ class BaselineProperty extends Extraction {
 
     final static LOG = LoggerFactory.getLogger(this.class)
 
-    Map<String, String> map
+    HashMap<String, String> map
 
-    BaselineProperty(Map<String, String> map) {
+    BaselineProperty(HashMap<String, String> map) {
         this.map = map
     }
 
     @Override
-    Map<String, Object> extract(Snapshot snapshot) {
-        Map result = [:]
+    HashMap<String, Object> extract(Snapshot snapshot) {
+        HashMap result = [:]
         map.each { propertyName ->
             LOG.debug("Extracting baseline property '${propertyName.value}'")
             Object value = ((Baseline) snapshot).source."$propertyName.value"
