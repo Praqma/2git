@@ -2,6 +2,7 @@ package togit.migration.sources.ccucm
 
 import net.praqma.clearcase.PVob as CoolVob
 import net.praqma.clearcase.ucm.entities.Component as CoolComponent
+import net.praqma.clearcase.ucm.entities.Baseline as CoolBaseline
 import net.praqma.clearcase.ucm.entities.Project as CoolProject
 import net.praqma.clearcase.ucm.entities.Stream as CoolStream
 import net.praqma.clearcase.ucm.utils.BaselineList
@@ -83,7 +84,7 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void checkout(Snapshot snapshot) {
-        Baseline baseline = ((Baseline) snapshot).source
+        CoolBaseline baseline = ((Baseline) snapshot).source
 
         migrationStream = migrationStream ?: Cool.spawnChildStream(parentStream, baseline, "$component.shortname-2git-$id", options.readOnlyMigrationStream)
         migrationView = migrationView ?: Cool.spawnView(migrationStream, new File(workspace), "$component.shortname-2git-$id")
