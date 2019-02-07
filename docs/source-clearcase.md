@@ -31,7 +31,7 @@ Any occurences of `$label` in the template will be replaced with the label curre
 
 ```groovy
 source('clearcase') {
-    configSpec '/home/rob/tmp/migration.cs'
+    configSpec 'cc2git/data/product_x.cs'
 }
 ```
 
@@ -45,6 +45,12 @@ One of these must be configured:
 ```groovy
 source('clearcase') {
     labelVob 'product_x'
+}
+```
+
+```groovy
+source('clearcase') {
+    labelFile 'cc2git/data/product_x_labels.txt'
 }
 ```
 
