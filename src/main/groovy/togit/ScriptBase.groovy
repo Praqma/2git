@@ -123,13 +123,12 @@ abstract class ScriptBase extends Script implements Context {
      * Closure containing DSL methods used for the migration
      * @param closure The DSL code
      */
-    static void migrate(boolean dryRun = false, @DslContext(MigrationContext) Closure closure) {
+    static void migrate(boolean skipExecution = false, boolean skipReset = false, @DslContext(MigrationContext) Closure closure) {
         executeInContext(closure, new MigrationContext())
-        MigrationManager.instance.migrate(dryRun)
+        MigrationManager.instance.migrate(skipExecution)
         LOG.info(migrationComplete())
-        if (!dryRun) {
-            MigrationManager.instance.resetMigrationPlan()
-        }
+        if (skipReset) { return }
+        MigrationManager.instance.resetMigrationPlan()
     }
 
     /**

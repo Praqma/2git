@@ -39,8 +39,9 @@ class MigrationManager {
         plan = new MigrationPlan()
     }
 
-    void migrate(boolean dryRun = false) {
-        if (dryRun) {
+    void migrate(boolean skipExecution = false) {
+        if (skipExecution) {
+            LOG.info('Skipping execution')
             plan.plan()
             return
         }

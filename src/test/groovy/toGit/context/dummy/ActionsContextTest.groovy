@@ -22,7 +22,7 @@ class ActionsContextTest {
         $/
             source('dummy')
             target('dummy')
-            migrate(true) {
+            migrate(true, true) {
                 filters {
                     filter {
                         actions {

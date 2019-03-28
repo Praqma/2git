@@ -4,6 +4,7 @@ build/
 gradle-app.setting
 !gradle-wrapper.jar
 /.nb-gradle/
+output/
 
 bin/
 .project

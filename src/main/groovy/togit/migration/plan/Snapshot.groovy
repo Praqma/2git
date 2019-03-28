@@ -34,11 +34,11 @@ abstract class Snapshot {
      * @return true if the Snapshot matches all Criteria, otherwise false
      */
     boolean matches(List<Criteria> criteria, List<Snapshot> allSnapshots) {
-        for (def crit : criteria) {
+        for (Criteria crit : criteria) {
             if (!crit.appliesTo(this, allSnapshots)) {
-                false
+                return false
             }
         }
-        true
+        return true
     }
 }
