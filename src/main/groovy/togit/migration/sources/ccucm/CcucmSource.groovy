@@ -24,7 +24,8 @@ class CcucmSource implements MigrationSource {
     CoolSnapshotView migrationView
     CoolStream migrationStream
 
-    CoolVob vob
+    CoolVob streamVob
+    CoolVob componentVob
     CoolComponent component
     CoolStream stream
     CoolStream parentStream
@@ -33,16 +34,18 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void prepare() {
-        String vobName = CcucmStringHelper.parseName(options.stream).vob
         String componentName = CcucmStringHelper.parseName(options.component).tag
-        String streamName = CcucmStringHelper.parseName(options.stream).tag
+        String componentVobName = CcucmStringHelper.parseName(options.component).vob
+        componentVob = Cool.findPVob(componentVobName)
+        component = Cool.findComponent(componentName, componentVob)
 
-        vob = Cool.findPVob(vobName)
-        component = Cool.findComponent(componentName, vob)
-        stream = Cool.findStream(streamName, vob)
+        String streamName = CcucmStringHelper.parseName(options.stream).tag
+        String streamVobName = CcucmStringHelper.parseName(options.stream).vob
+        streamVob = Cool.findPVob(streamVobName)
+        stream = Cool.findStream(streamName, streamVob)
 
         if (options.migrationProject) {
-            CoolProject targetProject = CoolProject.get(options.migrationProject, vob).load()
+            CoolProject targetProject = CoolProject.get(options.migrationProject, streamVob).load()
             parentStream = targetProject.integrationStream
         } else {
             parentStream = stream
