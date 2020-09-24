@@ -15,6 +15,30 @@ class CcucmSourceContext extends SourceContext {
     }
 
     /**
+    * Cleans up migration streams and views
+    */
+    void cleanup(boolean cleanup) {
+        source.options.cleanup = cleanup
+        LOG.debug("Set cleanup to $cleanup.")
+    }
+
+    /**
+    * Use unique migration views for each baseline
+    */
+    void uniqueViews(boolean useUnique) {
+        source.options.uniqueViews = useUnique
+        LOG.debug("Set uniqueViews to $useUnique.")
+    }
+
+    /**
+    * Use unique migration streams for each baseline
+    */
+    void uniqueStreams(boolean useUnique) {
+        source.options.uniqueStreams = useUnique
+        LOG.debug("Set uniqueStreams to $useUnique.")
+    }
+
+    /**
      * Sets the target stream to migrate from
      * @param streamName Fully qualified stream name
      */

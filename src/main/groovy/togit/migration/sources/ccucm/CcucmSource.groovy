@@ -21,8 +21,9 @@ class CcucmSource implements MigrationSource {
     final static LOG = LoggerFactory.getLogger(this.class)
 
     UUID id = UUID.randomUUID()
-    CoolSnapshotView migrationView
-    CoolStream migrationStream
+
+    List<CoolStream> migrationStreams
+    List<CoolSnapshotView> migrationViews
 
     CoolVob streamVob
     CoolVob componentVob
@@ -50,22 +51,30 @@ class CcucmSource implements MigrationSource {
         } else {
             parentStream = stream
         }
+
+        migrationStreams = []
+        migrationViews = []
     }
 
     @Override
     void cleanup() {
-        if (migrationView) {
-            LOG.info('Cleaning up migration view')
-            migrationView.remove()
-            new File(migrationView.path).deleteDir()
-            LOG.info('Cleaned up migration view')
+        if (!options.cleanup) {
+            LOG.info("Source cleanup set to false, skipping cleanup")
+            return
         }
 
-        if (migrationStream) {
-            LOG.info('Cleaning up migration stream')
-            migrationStream.remove()
-            LOG.info('Cleaned up migration stream')
+        LOG.info('Cleaning up migration views')
+        migrationViews.each { view ->
+            view.remove()
+            new File(view.path).deleteDir()
         }
+        LOG.info('Cleaned up migration views')
+
+        LOG.info('Cleaning up migration streams')
+        migrationStreams.each { stream ->
+            stream.remove()
+        }
+        LOG.info('Cleaned up migration streams')
     }
 
     @Override
@@ -87,10 +96,28 @@ class CcucmSource implements MigrationSource {
 
     @Override
     void checkout(Snapshot snapshot) {
-        CoolBaseline baseline = ((Baseline) snapshot).source
+        UUID baselineId = UUID.randomUUID()
 
-        migrationStream = migrationStream ?: Cool.spawnChildStream(parentStream, baseline, "$component.shortname-2git-$id", options.readOnlyMigrationStream)
-        migrationView = migrationView ?: Cool.spawnView(migrationStream, new File(workspace), "$component.shortname-2git-$id")
+        CoolBaseline baseline = ((Baseline) snapshot).source
+        CoolStream migrationStream
+        CoolSnapshotView migrationView
+
+        // Determine the migration stream
+        if (options.uniqueStreams || migrationStreams.isEmpty()) {
+            migrationStream = Cool.spawnChildStream(parentStream, baseline, "2git-$baseline.shortname-$baselineId", options.readOnlyMigrationStream)
+            migrationStreams.add(migrationStream)
+        } else {
+            migrationStream = migrationStreams.last()
+        }
+
+        // Determine the migration view
+        if (options.uniqueViews || migrationViews.isEmpty()) {
+            File targetLocation = options.uniqueViews ? new File(workspace, baseline.shortname) : new File(workspace)
+            migrationView = Cool.spawnView(migrationStream, targetLocation, "2git-$baseline.shortname-$baselineId")
+            migrationViews.add(migrationView)
+        } else {
+            migrationView = migrationViews.last()
+        }
 
         Cool.rebase(baseline, migrationView)
         Cool.updateView(migrationView, options.loadComponents)

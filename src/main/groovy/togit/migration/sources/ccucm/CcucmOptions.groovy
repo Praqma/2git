@@ -12,6 +12,9 @@ class CcucmOptions {
     String migrationProject
     boolean readOnlyMigrationStream
     SnapshotView.Components loadComponents = SnapshotView.Components.MODIFIABLE
+    boolean cleanup = true
+    boolean uniqueViews = false
+    boolean uniqueStreams = false
 
     void setReadOnlyMigrationStream(boolean readOnlyMigrationStream) {
         this.readOnlyMigrationStream = readOnlyMigrationStream

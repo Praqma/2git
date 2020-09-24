@@ -101,6 +101,43 @@ source('ccucm') {
 
 **Note:** May break when combined with `loadComponents 'modifiable'`
 
+##### cleanup
+
+Whether or not to remove temporary migration views and streams after the migration.
+Primarily disabled for debugging in combination with `uniqueStreams` and/or `uniqueViews`.
+Defaults to `true`.
+
+```groovy
+source('ccucm') {
+    cleanup true
+}
+```
+
+##### uniqueStreams
+
+Whether or not to use a unique temporary migration stream for each baseline.
+Primarily disabled for debugging in combination with `cleanup`.
+Defaults to `false`.
+
+```groovy
+source('ccucm') {
+    uniqueStreams false
+}
+```
+
+##### uniqueViews
+
+Whether or not to use a unique temporary migration view for each baseline.
+The views are located under the `workspace`, in a directory sharing the baseline's short name.
+Primarily disabled for debugging in combination with `cleanup`.
+Defaults to `false`.
+
+```groovy
+source('ccucm') {
+    uniqueViews false
+}
+```
+
 ## CCUCM-specific criteria
 
 ### Baseline creation date
