@@ -14,6 +14,10 @@ class ActionsContext implements Context {
 
     final List<Action> actions = []
 
+    private String expand(String target, HashMap<String, Object> extractionMap) {
+        return new SimpleTemplateEngine().createTemplate(newTarget).make(extractionMap)
+    }
+
     /**
      * Copies the contents of the source directory to the default target directory.
      */
@@ -29,8 +33,9 @@ class ActionsContext implements Context {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                File sourceDir = new File(source)
-                File targetDir = new File(target)
+                File sourceDir = new File(expand(source, extractionMap))
+                File targetDir = new File(expand(target, extractionMap))
+                LOG.info("Copying contents -\n\tfrom: ${sourceDir}\n\tto: ${targetDir}")
                 sourceDir.listFiles().each { file ->
                     if (file.isDirectory()) {
                         FileUtils.copyDirectoryToDirectory(file, targetDir)
@@ -58,8 +63,9 @@ class ActionsContext implements Context {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                File sourceDir = new File(source)
-                File targetDir = new File(target)
+                File sourceDir = new File(expand(source, extractionMap))
+                File targetDir = new File(expand(target, extractionMap))
+                LOG.info("Moving contents -\n\tfrom: ${sourceDir}\n\tto: ${targetDir}")
                 sourceDir.listFiles().each { file ->
                     if (file.isDirectory()) {
                         FileUtils.moveDirectoryToDirectory(file, targetDir, true)
@@ -90,7 +96,7 @@ class ActionsContext implements Context {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                String expandedCmd = new SimpleTemplateEngine().createTemplate(command).make(extractionMap)
+                String expandedCmd = expand(command, extractionMap)
                 CommandLine.newInstance().run(expandedCmd, path ? new File(path) : null).stdoutBuffer.eachLine { line ->
                     LOG.info(line)
                 }
@@ -121,7 +127,8 @@ class ActionsContext implements Context {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                FileHelper.emptyDirectory(new File(dir))
+                String expandedDir = expand(dir, extractionMap)
+                FileHelper.emptyDirectory(new File(expandedDir))
             }
         })
         LOG.debug('Registered action - emptyDir')
@@ -138,8 +145,9 @@ class ActionsContext implements Context {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
+                String expandedDir = expand(dir, extractionMap)
                 amount.times {
-                    FileHelper.singleFlattenDirectory(new File(dir))
+                    FileHelper.singleFlattenDirectory(new File(expandedDir))
                 }
             }
         })
