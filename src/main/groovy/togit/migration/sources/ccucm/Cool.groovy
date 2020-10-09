@@ -41,6 +41,7 @@ class Cool {
      */
     static CoolSnapshotView spawnView(CoolStream parent, File path, String tag) {
         LOG.debug("Creating view for $parent.fullyQualifiedName.")
+        if (!path.exists()) { path.mkdirs() }
         CoolSnapshotView view = CoolSnapshotView.create(parent, path, tag)
         LOG.debug("Created view for $parent.fullyQualifiedName.")
         view
