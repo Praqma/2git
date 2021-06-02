@@ -17,22 +17,22 @@ If you don't like what you see, tweak your recipe and run it again, until you ge
 
 ## General documentation
 
-* [Workflow and concepts](workflow-and-concepts)
-* [Contact and contributing](contact-and-contributing)
+* [Workflow and concepts](workflow-and-concepts.md)
+* [Contact and contributing](contact-and-contributing.md)
 
 ## Technical documentation
 
-* [Getting started](getting-started)
-* [Source: ClearCase UCM](source-ccucm)
-* [Source: ClearCase](source-clearcase)
-* [Target: Git](target-git)
-* [Target: Artifactory](target-artifactory)
-* [Other features](other-features)
+* [Getting started](getting-started.md)
+* [Source: ClearCase UCM](source-ccucm.md)
+* [Source: ClearCase](source-clearcase.md)
+* [Target: Git](target-git.md)
+* [Target: Artifactory](target-artifactory.md)
+* [Other features](other-features.md)
 
 ## Roadmap
 
-* [Vblog](roadmap/vblog)
-* [GitHub support](roadmap/github-support)
-* [Bitbucket support](roadmap/bitbucket-support)
-* [Base ClearCase features](roadmap/baseClearCaseFeatures)
-* [Zip files as source](roadmap/zip-file-source)
+* [Vblog](roadmap/vblog.md)
+* [GitHub support](roadmap/github-support.md)
+* [Bitbucket support](roadmap/bitbucket-support.md)
+* [Base ClearCase features](roadmap/baseClearCaseFeatures.md)
+* [Zip files as source](roadmap/zip-file-source.md)
