@@ -1,0 +1,25 @@
+{
+    "name": "Groovy & Gradle Dev Container (1-8-jdk-bullseye)",
+    "image": "mcr.microsoft.com/devcontainers/java:1-8-jdk-bullseye",
+
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "8",
+            "installGradle": "true",
+            "gradleVersion": "5.0",
+            "installGroovy": "true",
+            "installMaven": "true"
+        }
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-gradle",
+                "groovy-language.groovy",
+                "vscjava.vscode-java-pack"
+            ]
+        }
+    },
+    "postCreateCommand": "gradle --version && groovy --version"
+}

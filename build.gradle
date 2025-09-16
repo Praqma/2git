@@ -17,9 +17,13 @@ apply plugin: 'maven-publish'
 // --------------------
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven {
         url 'https://repo.jenkins-ci.org/public/'
+    }
+    maven {
+        // org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2 is published here
+        url 'https://releases.jfrog.io/artifactory/oss-releases/'
     }
 }
 
