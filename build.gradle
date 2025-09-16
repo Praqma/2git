@@ -38,7 +38,9 @@ task uberjar(type: Jar) {
     }
 }
 
-mainClassName='toGit.Run'
+application {
+    mainClass = 'toGit.Run'
+}
 
 test {
     exclude 'toGit/functional/**'
