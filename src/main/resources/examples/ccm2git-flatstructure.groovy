@@ -286,7 +286,7 @@ migrate {
                     def cmd_line = "git tag -F ../tag_meta_data.txt " + project.gitSnapshotRevision + "_" + project.snapshot_status
                     log.info cmd_line
 
-                    def email_domain = '@safrangroup.com'
+                    def email_domain = '@eficode.com'
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
                     envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)

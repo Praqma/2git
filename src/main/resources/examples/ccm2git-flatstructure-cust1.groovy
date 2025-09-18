@@ -103,7 +103,7 @@ source('ccm') {
 target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user 'Claus Schneider(Eficode)'
-    email 'claus.schneider-ext@man-es.com'
+    email 'claus.schneider-ext@eficode.com'
     remote "ssh://git@${git_server_path_this}/${ccm_project}.git"
     longPaths true
     ignore ""
@@ -178,7 +178,7 @@ migrate {
                         }
                     }
 
-                    def email_domain = '@man-es.com'
+                    def email_domain = '@eficode.com'
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
                     envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
@@ -251,7 +251,7 @@ migrate {
                     def cmd_line = "git tag -F ../tag_meta_data.txt " + project.gitSnapshotRevision + "_" + project.snapshot_status
                     log.info cmd_line
 
-                    def email_domain = '@man-es.com'
+                    def email_domain = '@eficode.com'
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
                     envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
