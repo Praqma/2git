@@ -6,6 +6,10 @@ class GitOptions {
     String user = 'migration'
     String email = '2git@praqma.com'
     String remote = ''
+    String initCommitDate = "1970-01-01 00:00"
+
+    // FIXME: how to handle this in a abstract way for smart commit handling?
+    String jiraProjectKey = ""
 
     boolean defaultSetup = true
     boolean longPaths = false

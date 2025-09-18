@@ -76,4 +76,17 @@ class GitTargetContext implements Context, TargetContext {
         target.options.remote = remoteUrl
         log.debug("Set remote url to $remoteUrl.")
     }
+
+    // FIXME: how to handle this in a abstract way for smart commit handling?
+    // For now, just set it in the GitOptions directly with either # or gh-<issue>
+    // or <jira-project-key> 
+    // Consider to fix in metadata to expect "-" must also com from parameter/config
+    // to handle # for ADO etc.
+    /**
+     * Sets the Jira project key for git commit references
+     */
+    void jiraProjectKey(String jiraProjectKey) {
+        log.debug("Set jiraProjectKey to $jiraProjectKey.")
+        target.options.jiraProjectKey = jiraProjectKey
+    }
 }
