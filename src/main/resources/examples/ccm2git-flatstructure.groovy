@@ -5,7 +5,7 @@ package examples
 import org.slf4j.LoggerFactory
 
 final log = LoggerFactory.getLogger(this.class)
-
+ 
 if ( !System.getenv("git_user_name") ){
     println "ERROR: git_user_name env variable must be set. It is used for the committer and init commit author."
     System.exit(1)
@@ -41,6 +41,7 @@ def ccm_instance
 if ( !start_project?.trim() || !start_project.contains(':') || !start_project.contains(ccm_delimiter) ) {
     println "start_project not set correctly \n" +
             "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+            "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
     System.exit(1)
 } else {
     ccm_name4part = start_project.trim()
@@ -55,14 +56,17 @@ if ( !start_project?.trim() || !start_project.contains(':') || !start_project.co
     if ( !ccm_revision || ccm_revision.contains(':') || ccm_revision.contains('~') ) {
         println "ccm_revision contains ':' \n" +
                 "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+                "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
         System.exit(1)
     }
     if ( !ccm_instance || ccm_instance.contains(':') || ccm_instance.contains('~') ) {
         println "ccm_instance contains ':' or '~' \n" +
                 "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+                "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
         System.exit(1)
     }
     if ( !ccm_name4part.contains(':') || !ccm_name4part.contains(ccm_delimiter) ) {
+        println "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
         println "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
         System.exit(1)
     }
@@ -85,9 +89,6 @@ if ( !System.getenv("CCM_HOME") ){
     ccm_home_cli = System.getenv("CCM_HOME")
 }
 def system_path2 = System.getenv("PATH")
-
-
-
 def my_workspace
 if ( !my_workspace_root ) {
     my_workspace_root = "/data/Synergy/ccm2git-main"
@@ -102,6 +103,7 @@ if ( !git_server_path ){
 } else {
     git_server_path_this = git_server_path
 }
+
 
 
 def jira_project_key_this
@@ -133,6 +135,8 @@ target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user System.getenv("git_user_name")
     email System.getenv("git_user_email")
+    user System.getenv("git_user_name")
+    email System.getenv("git_user_email")
     remote "ssh://git@${git_server_path_this}/${ccm_project}.git"
     longPaths true
     ignore ""
@@ -145,14 +149,15 @@ migrate {
                 AlreadyConverted(target.workspace)
             }
 
+
             extractions {
                 baselineProperties(source.workspace, source.jiraProjectKey)
             }
             actions {
 
                 // Scrub Git repository, so file deletions will also be committed
+                // THIS SHOULD BE GENERIC AND BE IN BASE GIT SOURCE
                 cmd 'git reset --hard -q $gitBaselineRevision_wstatus', target.workspace
-
                 custom {
                     log.info "Removing files except .git folder in: $target.workspace"
                     new File(target.workspace).eachFile { file ->
@@ -171,17 +176,20 @@ migrate {
                         if(!file.name.startsWith(".git")) println file.getName()
                     }
                 }
+                // End scrub
 
                 // Copy checked out into Git repository
                 copy("$source.workspace/code/\${gitSnapshotName}-\${gitSnapshotRevision}/\$gitSnapshotName", target.workspace)
+                copy("$source.workspace/code/\${gitSnapshotName}-\${gitSnapshotRevision}/\$gitSnapshotName", target.workspace)
 
+                // DEBUG INFO
                 custom {
                     log.info "First level files in: $target.workspace"
                     new File(target.workspace).eachFile { file ->
                         if(!file.name.startsWith(".git")) println file.getName()
                     }
                 }
-
+            
                 // Remove all .gitignore, .gitmodules, .gitattributes except in root folder
                 cmd "bash git-remove-all-git-related-files-2plus-levels.sh " + target.workspace, System.getProperty("user.dir")
                 // Add everything and renormalize attributes
@@ -214,12 +222,20 @@ migrate {
                     def email_domain = '@'+System.getenv("git_email_domain")
                     log.info("email_domain: " + email_domain )
 
+                    if ( !System.getenv("git_email_domain") ){
+                        println "ERROR: git_email_domain env variable must be set. It is used for the author domain ala 'eficode.com'. The username part of email is retrieved from CM/Synergy"
+                        System.exit(1)
+                    }
+                    def email_domain = '@'+System.getenv("git_email_domain")
+                    log.info("email_domain: " + email_domain )
+
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
                     envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
                     log.info("project.snapshotOwner: " + project.snapshotOwner)
-                    if ( project.snapshotOwner != null ){
+                    if (project.snapshotOwner){
                         envVars.add('GIT_AUTHOR_NAME=' + project.snapshotOwner )
+                        envVars.add('GIT_AUTHOR_EMAIL=' + project.snapshotOwner + email_domain)                    
                         envVars.add('GIT_AUTHOR_EMAIL=' + project.snapshotOwner + email_domain)                    
                     }
                     def cmd_line = 'git commit --file ../commit_meta_data.txt'
@@ -272,6 +288,7 @@ migrate {
                 }
                 cmd 'git reset --hard -q HEAD', target.workspace
                 cmd 'diff -r -q -x ".gitignore" -x ".gitattributes" -x ".gitmodules" -x ".git" . ' + source.workspace + '/code/${gitSnapshotName}-${gitSnapshotRevision}/${gitSnapshotName}', target.workspace
+                cmd 'diff -r -q -x ".gitignore" -x ".gitattributes" -x ".gitmodules" -x ".git" . ' + source.workspace + '/code/${gitSnapshotName}-${gitSnapshotRevision}/${gitSnapshotName}', target.workspace
 
                 // The file for tag info is generated during MetaDataExtraction
                 custom { project ->
@@ -286,6 +303,7 @@ migrate {
                     def cmd_line = "git tag -F ../tag_meta_data.txt " + project.gitSnapshotRevision + "_" + project.snapshot_status
                     log.info cmd_line
 
+                    def email_domain = '@safrangroup.com'
                     def email_domain = '@safrangroup.com'
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
@@ -313,7 +331,8 @@ migrate {
                         throw new Exception(cmd_line + ": standard error contains text lines: " + serr.toString().readLines().size() )
                     }
                 }
-
+                // Show the size of the .git directory for information purposes
+                // Useful to see if something is wrong and the .git directory is growing too large
                 cmd 'du -sBM .git > ../${gitSnapshotName}-${gitSnapshotRevision}@git_size.txt', target.workspace
                 cmd 'cat ../${gitSnapshotName}-${gitSnapshotRevision}@git_size.txt', target.workspace
 

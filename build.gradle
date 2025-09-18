@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 repositories {
     mavenCentral()
     maven {
-        url 'https://repo.jenkins-ci.org/public/'
+        url = 'https://repo.jenkins-ci.org/public/'
     }
 }
 
