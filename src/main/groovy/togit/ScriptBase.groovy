@@ -3,21 +3,23 @@ package togit
 import static togit.context.ContextHelper.executeInContext
 
 import org.slf4j.LoggerFactory
-import org.apache.commons.lang.NotImplementedException
-import togit.context.Context
-import togit.context.SourceContext
-import togit.context.TargetContext
-import togit.context.DslContext
-import togit.context.MigrationContext
-import togit.migration.MigrationManager
-import togit.migration.sources.MigrationSource
-import togit.migration.sources.ccbase.context.ClearCaseSourceContext
-import togit.migration.sources.ccucm.context.CcucmSourceContext
-import togit.migration.sources.dummy.DummySourceContext
-import togit.migration.targets.MigrationTarget
-import togit.migration.targets.artifactory.context.ArtifactoryTargetContext
-import togit.migration.targets.dummy.DummyTargetContext
-import togit.migration.targets.git.context.GitTargetContext
+import toGit.context.MigrationContext
+import toGit.context.base.Context
+import toGit.context.base.DslContext
+import toGit.context.traits.SourceContext
+import toGit.context.traits.TargetContext
+import toGit.migration.MigrationManager
+import toGit.migration.sources.MigrationSource
+import toGit.migration.sources.ccbase.context.ClearCaseSourceContext
+import toGit.migration.sources.ccucm.context.CcucmSourceContext
+import toGit.migration.sources.ccm.CCMSourceContext
+import toGit.migration.sources.dummy.DummySourceContext
+import toGit.migration.targets.MigrationTarget
+import toGit.migration.targets.artifactory.context.ArtifactoryTargetContext
+import toGit.migration.targets.dummy.DummyTargetContext
+import toGit.migration.targets.git.context.GitTargetContext
+
+import static toGit.context.ContextHelper.executeInContext
 
 /**
  * Script base for the DSL.
@@ -28,10 +30,11 @@ abstract class ScriptBase extends Script implements Context {
     final static LOG = LoggerFactory.getLogger(this.class)
 
     // Supported sources
-    final HashMap<String, Class> sourceTypes = [
-            'dummy':DummySourceContext,
-            'ccucm':CcucmSourceContext,
-            'clearcase':ClearCaseSourceContext,
+    final Map<String, Class> sourceTypes = [
+            'dummy': DummySourceContext,
+            'ccucm': CcucmSourceContext,
+            'ccm': CCMSourceContext,
+            'clearcase': ClearCaseSourceContext,
     ]
 
     // Supported targets

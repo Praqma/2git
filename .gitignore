@@ -16,6 +16,8 @@ bin/
 .idea/
 *.iml
 out/
+build/
+output/
 
 _site
 .sass-cache
@@ -26,3 +28,13 @@ _site
 # Specific command files
 customers/*
 *.swp
+
+# 2git log files
+2git-[-_0-9]*.log
+logs
+cc2git
+
+# ccmm2git files
+projects.txt
+*.env
+project_baselines.txt
