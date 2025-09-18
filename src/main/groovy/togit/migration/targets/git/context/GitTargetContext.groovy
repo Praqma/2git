@@ -75,4 +75,20 @@ class GitTargetContext extends TargetContext {
         target.options.remote = remoteUrl
         LOG.debug("Set remote url to $remoteUrl.")
     }
+
+    /**
+     * Sets the Jira project key for git commit references
+     */
+    void jiraProjectKey(String jiraProjectKey) {
+        log.debug("Set jiraProjectKey to $jiraProjectKey.")
+        target.options.jiraProjectKey = jiraProjectKey
+    }
+
+    /**
+     * Sets the Jira project key for git commit references
+     */
+    void jiraProjectKey(String jiraProjectKey) {
+        log.debug("Set jiraProjectKey to $jiraProjectKey.")
+        target.options.jiraProjectKey = jiraProjectKey
+    }
 }

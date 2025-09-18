@@ -1,6 +1,6 @@
 package togit.migration.targets.artifactory
 
-import static org.jfrog.artifactory.client.ArtifactoryClient.create
+import static org.jfrog.artifactory.client.ArtifactoryClientBuilder.create
 
 import org.jfrog.artifactory.client.Artifactory
 import org.slf4j.LoggerFactory
@@ -33,7 +33,7 @@ class ArtifactoryTarget implements MigrationTarget {
     }
 
     Artifactory getClient() {
-        client = client ?: create(options.url, options.user, options.password)
-        client
+        if (!client) client = create().setUrl(options.url).setUser(options.user).setPassword(options.password).build()
+        return client
     }
 }
