@@ -146,4 +146,39 @@ class GitUtil {
 
         }
     }
+
+    static void initCommit(File path) {
+        if (!path.exists()) {
+            log.error("Git dir $path does not exist: FAIL")
+        } else {
+
+            log.info("Creating the init commit")
+            def sout = new StringBuilder(), serr = new StringBuilder()
+            def cmd
+            def cmd_line
+            log.info("Setting environment: GIT_COMMITTER_DATE, GIT_AUTHOR_DATE")
+            def envVars = System.getenv().collect { k, v -> "$k=$v"  }
+            envVars.add('GIT_COMMITTER_DATE=1970-01-01 11:11:11')
+            envVars.add('GIT_AUTHOR_DATE=1970-01-01 11:11:11')
+
+            // Create the init commit
+            cmd_line = "git commit --allow-empty -m init"
+            log.debug("Executing '$cmd_line' in $path")
+            cmd = cmd_line.execute(envVars,path)
+            cmd.waitForProcessOutput(sout, serr)
+            println sout
+            println serr
+
+            // Create the tag
+            cmd_line = "git tag -m init init"
+            log.debug("Executing '$cmd_line' in $path")
+            cmd = cmd_line.execute(envVars,path)
+            cmd.waitForProcessOutput(sout, serr)
+
+            println sout
+            println serr
+
+
+        }
+    }
 }

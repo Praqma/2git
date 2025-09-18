@@ -55,6 +55,10 @@ application {
     mainClass = 'toGit.Run'
 }
 
+test {
+    exclude 'toGit/functional/**'
+}
+
 github {
     owner   = 'Praqma'
     repo    = '2git'

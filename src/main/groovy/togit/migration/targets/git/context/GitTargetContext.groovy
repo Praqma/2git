@@ -83,4 +83,12 @@ class GitTargetContext extends TargetContext {
         log.debug("Set jiraProjectKey to $jiraProjectKey.")
         target.options.jiraProjectKey = jiraProjectKey
     }
+
+    /**
+     * Sets the Jira project key for git commit references
+     */
+    void jiraProjectKey(String jiraProjectKey) {
+        log.debug("Set jiraProjectKey to $jiraProjectKey.")
+        target.options.jiraProjectKey = jiraProjectKey
+    }
 }
