@@ -109,7 +109,7 @@ class CCMSource implements MigrationSource {
             def envVars = System.getenv().collect { k, v -> "$k=$v" }
             def cmd_line = ["ccm", "copy_to_file_system", "-p", "${gitSnapshot_revision_for_ws}_tmp", "-r", "${ccmSnapshotThis}"]
             log.info "'" + cmd_line + "'"
-            def cmd = cmd_line.execute(envVars,codeFile)
+            def cmd = cmd_line.execute(envVars, codeFile)
             cmd.waitForProcessOutput(sout, serr)
             def exitValue = cmd.exitValue()
             log.info "Standard out:"
@@ -144,7 +144,7 @@ class CCMSource implements MigrationSource {
 
     @Override
     void prepare() {
-
+        //Copy utility scripts to temporary folder during migration from resources
     }
 
     @Override

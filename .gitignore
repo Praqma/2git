@@ -1,19 +1,24 @@
-# Gradle
+# dev
 .gradle
 build/
 gradle-app.setting
 !gradle-wrapper.jar
-*.jar
 /.nb-gradle/
+output/
 
-# IDEA
+bin/
+.project
+.settings
+.classpath
+
+.vscode
+
 .idea/
 *.iml
-
-# Output
 out/
+build/
+output/
 
-# Jekyll
 _site
 .sass-cache
 

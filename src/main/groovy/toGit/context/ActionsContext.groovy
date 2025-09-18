@@ -29,7 +29,6 @@ class ActionsContext implements Context, HasActions {
         actions.add(new Action() {
             @Override
             void act(HashMap<String, Object> extractionMap) {
-                
                 def expandedSource = new SimpleTemplateEngine().createTemplate(source).make(extractionMap).toString()
                 def expandedTarget = new SimpleTemplateEngine().createTemplate(target).make(extractionMap).toString()
                 def sourceDir = new File(expandedSource)

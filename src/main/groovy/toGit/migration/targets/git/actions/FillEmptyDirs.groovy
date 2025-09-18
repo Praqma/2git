@@ -28,7 +28,6 @@ class FillEmptyDirs extends Action {
             if(contents.any()) {
                 sprinkleDummies(subDir)
             } else {
-                // FIXME: This assumes that the emptydir.gitignore file is in the current working directory - other solutions?
                 FileUtils.copyFileToDirectory(new File(System.getProperty("user.dir") + File.separator + "emptydir.gitignore"), targetDir)
                 log.info("Dropped .gitignore file in $subDir")
             }

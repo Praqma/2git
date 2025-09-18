@@ -118,9 +118,8 @@ class GitUtil {
             def cmd_line
             log.info("Setting environment: GIT_COMMITTER_DATE, GIT_AUTHOR_DATE")
             def envVars = System.getenv().collect { k, v -> "$k=$v"  }
-            // FIXME: read from config
-            envVars.add('GIT_COMMITTER_DATE=1970-01-01 00:00:00')
-            envVars.add('GIT_AUTHOR_DATE=1970-01-01 00:00:00')
+            envVars.add('GIT_COMMITTER_DATE=1970-01-01 11:11:11')
+            envVars.add('GIT_AUTHOR_DATE=1970-01-01 11:11:11')
 
             // Create the init commit
             cmd_line = "git commit --allow-empty -m init"
