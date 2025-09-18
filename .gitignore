@@ -33,4 +33,8 @@ customers/*
 2git-[-_0-9]*.log
 logs
 cc2git
+
+# ccmm2git files
 projects.txt
+*.env
+project_baselines.txt

@@ -25,6 +25,25 @@ if ( !System.getenv("git_email_domain") ){
     println "git_email_domain: " + System.getenv("git_email_domain")
 }
 
+if ( !System.getenv("git_user_name") ){
+    println "ERROR: git_user_name env variable must be set. It is used for the committer and init commit author."
+    System.exit(1)
+} else {
+    println "git_user_name: " + System.getenv("git_user_name")
+}
+if ( !System.getenv("git_user_email") ){
+    println "ERROR: git_user_email env variable must be set. It is used for the committer and init commit author"
+    System.exit(1)
+} else {
+    println "git_user_email: " + System.getenv("git_user_email")
+}
+if ( !System.getenv("git_email_domain") ){
+    println "ERROR: git_email_domain env variable must be set. It is used for the author domain ala 'eficode.com'. The username part of email is retrieved from CM/Synergy"
+    System.exit(1)
+} else {
+    println "git_email_domain: " + System.getenv("git_email_domain")
+}
+
 if ( !System.getenv("ccm_delim") ){
     println "ccm_delim variable not set"
     System.exit(1)
@@ -89,6 +108,12 @@ if ( !System.getenv("CCM_HOME") ){
     ccm_home_cli = System.getenv("CCM_HOME")
 }
 def system_path2 = System.getenv("PATH")
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> origin/ccm2git-4part-dynamic-db-delimiter
 def my_workspace
 if ( !my_workspace_root ) {
     my_workspace_root = "/data/Synergy/ccm2git-main"
@@ -135,8 +160,6 @@ target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user System.getenv("git_user_name")
     email System.getenv("git_user_email")
-    user System.getenv("git_user_name")
-    email System.getenv("git_user_email")
     remote "ssh://git@${git_server_path_this}/${ccm_project}.git"
     longPaths true
     ignore ""
@@ -148,7 +171,6 @@ migrate {
             criteria {
                 AlreadyConverted(target.workspace)
             }
-
 
             extractions {
                 baselineProperties(source.workspace, source.jiraProjectKey)
@@ -179,7 +201,6 @@ migrate {
                 // End scrub
 
                 // Copy checked out into Git repository
-                copy("$source.workspace/code/\${gitSnapshotName}-\${gitSnapshotRevision}/\$gitSnapshotName", target.workspace)
                 copy("$source.workspace/code/\${gitSnapshotName}-\${gitSnapshotRevision}/\$gitSnapshotName", target.workspace)
 
                 // DEBUG INFO
@@ -222,20 +243,12 @@ migrate {
                     def email_domain = '@'+System.getenv("git_email_domain")
                     log.info("email_domain: " + email_domain )
 
-                    if ( !System.getenv("git_email_domain") ){
-                        println "ERROR: git_email_domain env variable must be set. It is used for the author domain ala 'eficode.com'. The username part of email is retrieved from CM/Synergy"
-                        System.exit(1)
-                    }
-                    def email_domain = '@'+System.getenv("git_email_domain")
-                    log.info("email_domain: " + email_domain )
-
                     def envVars = System.getenv().collect { k, v -> "$k=$v" }
                     envVars.add('GIT_COMMITTER_DATE=' + project.snapshot_commiter_date)
                     envVars.add('GIT_AUTHOR_DATE=' + project.snapshot_commiter_date)
                     log.info("project.snapshotOwner: " + project.snapshotOwner)
                     if (project.snapshotOwner){
                         envVars.add('GIT_AUTHOR_NAME=' + project.snapshotOwner )
-                        envVars.add('GIT_AUTHOR_EMAIL=' + project.snapshotOwner + email_domain)                    
                         envVars.add('GIT_AUTHOR_EMAIL=' + project.snapshotOwner + email_domain)                    
                     }
                     def cmd_line = 'git commit --file ../commit_meta_data.txt'

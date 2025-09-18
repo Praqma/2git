@@ -44,10 +44,11 @@ else
     echo "Parameter 5 is not set to 'commit' or 'tag' - exit 1" >&2
     exit 1
 fi
-# FIXME: Customer specific - should be generic
+
+# FIXME: This is a bit of a hack to determine the database type - should be done as a parameter/config as the database config
 ccm_current_db=$(ccm status -f "%database %current_session" | grep TRUE | awk -F " " '{print $1}')
 case ${ccm_current_db} in
-    /data/ccmdb/db_functionDevelopment|/data/ccmdb/db_automation|/data/ccmdb/db_module|/data/ccmdb/db_application|/data/ccmdb/db_hardware_ng|/data/ccmdb/db_prototype)
+    /data/ccmdb/db_x|/data/ccmdb/db_y)
         epic_level_header="Change Requests: (CR)"
         epic_level_release_attr="TargetRelease"
         epic_level_epic2story_relation="associatedWP"
@@ -56,7 +57,7 @@ case ${ccm_current_db} in
         story_level_release_attr="TargetRelease"
         require_baseline_object="false"
         ;;
-    /data/ccmdb/ME_ECS|/data/ccmdb/halon|/data/ccmdb/ParamCreat|/data/ccmdb/cocos) 
+    /data/ccmdb/z)
         epic_level_header="Master Change Requests: (MCR)"
         epic_level_release_attr="release"
         epic_level_epic2story_relation="associatedImpl"
@@ -66,12 +67,13 @@ case ${ccm_current_db} in
         require_baseline_object="false"
         ;;
     *)
+        epic_level_header="Master Change Requests: (MCR)"
+        epic_level_release_attr="release"
+        epic_level_epic2story_relation="associatedImpl"
         story_level_header="Implementation Change Requests"
         story_level_release_attr="release"
         require_baseline_object="false"
         ;;
-  #      echo "Undetermined/supported: ccm_current_db: ${ccm_current_db}" >&2
- #       exit 1
 esac
 
 test "${ccm_project_name}x" == "x"      && ( echo "'ccm_project_name' not set - exit"    >&2   && exit 1 )

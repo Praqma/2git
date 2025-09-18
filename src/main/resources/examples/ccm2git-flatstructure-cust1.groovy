@@ -14,7 +14,7 @@ def ccm_name4part
 def ccm_instance
 if ( !start_project?.trim() || !start_project.contains(':') || !start_project.contains(ccm_delimiter) ) {
     println "start_project not set correctly \n" +
-            "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+            "Provide the start_project=<projectname>~<revision>:project:<instance>"
     System.exit(1)
 } else {
     ccm_name4part = start_project.trim()
@@ -28,16 +28,16 @@ if ( !start_project?.trim() || !start_project.contains(':') || !start_project.co
     }
     if ( !ccm_revision || ccm_revision.contains(':') || ccm_revision.contains('~') ) {
         println "ccm_revision contains ':' \n" +
-                "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+                "Provide the start_project=<projectname>~<revision>:project:<instance>"
         System.exit(1)
     }
     if ( !ccm_instance || ccm_instance.contains(':') || ccm_instance.contains('~') ) {
         println "ccm_instance contains ':' or '~' \n" +
-                "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+                "Provide the start_project=<projectname>~<revision>:project:<instance>"
         System.exit(1)
     }
     if ( !ccm_name4part.contains(':') || !ccm_name4part.contains(ccm_delimiter) ) {
-        println "Provide the start_project=<projectname>" + ccm_delimiter + "<revision>:project:<instance>"
+        println "Provide the start_project=<projectname>~<revision>:project:<instance>"
         System.exit(1)
     }
 }
@@ -103,11 +103,10 @@ source('ccm') {
 target('git', repository_name) {
     workspace "${my_workspace}/repo/" + ccm_project
     user 'Claus Schneider(Eficode)'
-    email 'claus.schneider.ext@eficode.com'
+    email 'claus.schneider-ext@eficode.com'
     remote "ssh://git@${git_server_path_this}/${ccm_project}.git"
     longPaths true
     ignore ""
-    lfs '*.bundle', '*.pima', '*.bz2', '*.exe', '*.jar', '*.deb', '*.zip', '*.tgz', '*.xz', '*.gz'
 }
 
 migrate {
@@ -122,7 +121,7 @@ migrate {
             actions {
 
                 // Scrub Git repository, so file deletions will also be committed
-                cmd 'git reset --hard -q $baselineRevision_wstatus', target.workspace
+                cmd 'git reset --hard -q $gitBaselineRevision_wstatus', target.workspace
 
                 custom {
                     log.info "Removing files except .git folder in: $target.workspace"
@@ -144,7 +143,7 @@ migrate {
                 }
 
                 // Copy checked out into Git repository
-                copy("$source.workspace/code/\${snapshotName}-\${snapshotRevision}/\$snapshotName", target.workspace)
+                copy("$source.workspace/code/\${gitSnapshotName}~\${gitSnapshotRevision}/\$gitSnapshotName", target.workspace)
 
                 custom {
                     log.info "First level files in: $target.workspace"
@@ -153,9 +152,14 @@ migrate {
                     }
                 }
 
+                // Remove all .gitignore, .gitmodules, .gitattributes except in root folder
+                cmd "bash git-remove-all-git-related-files-2plus-levels.sh " + target.workspace, System.getProperty("user.dir")
+                // Add everything and renormalize attributes
+                cmd 'git add -A --force .', target.workspace
+                cmd 'git add --renormalize -A --force .', target.workspace
+
                 // Fill empty dirs with .gitignore for empty directories
                 cmd "bash git-fill-empty-dirs-with-gitignore.sh " + target.workspace, System.getProperty("user.dir")
-
                 // Add everything
                 cmd 'git add -A --force .', target.workspace
 
@@ -216,6 +220,24 @@ migrate {
 
                 }
 
+                // Reset to test that git return to workspace is identical except the .git* files that are manipulated (removed Synergy snapshot .git files and added .gitignore to empty dirs
+                custom {
+                    log.info "Removing files except .git folder in: $target.workspace"
+                    new File(target.workspace).eachFile { file ->
+                        if(!file.name.startsWith(".git")) {
+                            if (!file.isDirectory()) {
+                                println file.getName()
+                                file.delete()
+                            } else {
+                                println file.getName()
+                                file.deleteDir()
+                            }
+                        }
+                    }
+                }
+                cmd 'git reset --hard -q HEAD', target.workspace
+                cmd 'diff -r -q -x ".gitignore" -x ".gitattributes" -x ".gitmodules" -x ".git" . ' + source.workspace + '/code/${gitSnapshotName}~${gitSnapshotRevision}/${gitSnapshotName}', target.workspace
+
                 // The file for tag info is generated during MetaDataExtraction
                 custom { project ->
                     new File(target.workspace + File.separator + ".." + File.separator + "tag_meta_data.txt").withWriter { out ->
@@ -226,7 +248,7 @@ migrate {
                 }
                 custom { project ->
                     def sout = new StringBuilder(), serr = new StringBuilder()
-                    def cmd_line = "git tag -F ../tag_meta_data.txt " + project.snapshotRevision + "_" + project.snapshot_status
+                    def cmd_line = "git tag -F ../tag_meta_data.txt " + project.gitSnapshotRevision + "_" + project.snapshot_status
                     log.info cmd_line
 
                     def email_domain = '@eficode.com'
@@ -257,8 +279,9 @@ migrate {
                     }
                 }
 
-                cmd 'du -sBM .git > ../${snapshotName}-${snapshotRevision}@git_size.txt', target.workspace
-                cmd 'cat ../${snapshotName}-${snapshotRevision}@git_size.txt', target.workspace
+                cmd 'du -sBM .git > ../${gitSnapshotName}~${gitSnapshotRevision}@git_size.txt', target.workspace
+                cmd 'cat ../${gitSnapshotName}~${gitSnapshotRevision}@git_size.txt', target.workspace
+
             }
         }
     }
