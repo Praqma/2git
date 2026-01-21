@@ -70,6 +70,7 @@ class GitUtil {
     static void setGitLfs(File path, GitOptions options) {
         options.lfs.each { file ->
             callOrDie(path, 'lfs', 'track', "'$file'")
+            callOrDie(path, "add", ".gitattributes" )
         }
     }
 
